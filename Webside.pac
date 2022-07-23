@@ -78,6 +78,7 @@ package setPrerequisites: #(
 	'..\Core\Object Arts\Dolphin\Base\Dolphin'
 	'..\DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
 	'..\Core\Object Arts\Dolphin\MVP\Base\Dolphin MVP Base'
+	'..\Core\Object Arts\Dolphin\ActiveX\COM\OLE COM'
 	'..\Core\Contributions\Refactory\Refactoring Browser\Change Objects\RBChangeObjects'
 	'..\Core\Object Arts\Dolphin\System\Compiler\Smalltalk Parser'
 	'..\Core\Contributions\svenc\STON\STON-Core'
@@ -284,7 +285,7 @@ groupBy: aspect
 asWebsideJson
 	| source category |
 	source := self getSource copyWithout: 10 asCharacter.
-	category := self categories detect: [:c | c isPrivacy not] ifNone: [].
+	category := self categories detect: [:c | c isPrivacy not and: [c isVirtual not]] ifNone: [].
 	^Dictionary new
 		at: 'selector' put: selector;
 		at: 'class' put: self methodClass name;
@@ -1792,6 +1793,10 @@ addChange
 badRequest: aString
 	^HttpServerResponse badRequest content: aString!
 
+bodyAt: aString	^ self bodyAt: aString ifAbsent: nil!
+
+bodyAt: aString ifAbsent: aBlock	| json |	json := STONJSON fromString: request body.	^ json at: aString ifAbsent: aBlock!
+
 categories
 	| class |
 	class := self requestedClass.
@@ -1895,11 +1900,15 @@ compilationError: aCompilationError
 		contentType: 'application/json; charset=utf-8';
 		content: error asUtf8String!
 
+debugExpression	| expression method receiver process context debugger id |	expression := self bodyAt: 'expression' ifAbsent: [''].	method := self compiler compile: expression.	receiver := self compilerReceiver.	process := [ method valueWithReceiver: receiver arguments: #() ]		newProcess.	context := process suspendedContext.	debugger := process		newDebugSessionNamed: 'debug it'		startedAt: context.	debugger stepIntoUntil: [ :c | c method == method ].	id := self newID.	self evaluations at: id put: process.	self debuggers at: id put: debugger.	^ id asString!
+
 defaultRootClass
 	^Object!
 
 dialect
 	^'Dolphin'!
+
+evaluateExpression	| debug expression sync pin id semaphore object process block json |	debug := self bodyAt: 'debug'.	debug == true		ifTrue: [ ^ self debugExpression ].	expression := self bodyAt: 'expression'.	sync := (self bodyAt: 'sync') ifNil: true.	pin := (self bodyAt: 'pin') ifNil: false.	id := self newID.	semaphore := Semaphore new.	block := [ [ object := self compiler evaluate: expression ]		on: Exception		do: [ :exception | 			semaphore signal.			process				suspendedContext: exception signalerContext;				suspend ].	self evaluations removeKey: id ifAbsent: nil.	(sync not or: [ pin ])		ifTrue: [ self objects at: id put: object ].	semaphore signal.	object ].	process := self evaluations at: id put: block fork.	sync		ifTrue: [ semaphore wait.			object ifNil: [ ^ self evaluationError: id ].			json := object asWebsideJson.			pin				ifTrue: [ json at: 'id' put: id asString ].			^ json ].	^ Dictionary new		at: 'id' put: id asString;		at: 'expression' put: expression;		yourself!
 
 filterByCategory: aCollection
 	| category |
@@ -2009,6 +2018,8 @@ methods
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
 	^(methods collect: [:m | m asWebsideJson]) asArray!
+
+newID	^IID newUnique!
 
 notFound
 	^HttpServerResponse notFound!
@@ -2154,6 +2165,8 @@ variables
 	^self instanceVariables , self classVariables! !
 !WebsideAPI categoriesFor: #addChange!changes endpoints!public! !
 !WebsideAPI categoriesFor: #badRequest:!private! !
+!WebsideAPI categoriesFor: #bodyAt:!public! !
+!WebsideAPI categoriesFor: #bodyAt:ifAbsent:!private! !
 !WebsideAPI categoriesFor: #categories!code endpoints!public! !
 !WebsideAPI categoriesFor: #classDefinition!code endpoints!public! !
 !WebsideAPI categoriesFor: #classes!code endpoints!public! !
@@ -2162,14 +2175,17 @@ variables
 !WebsideAPI categoriesFor: #classTreeFromClasses:!private! !
 !WebsideAPI categoriesFor: #classVariables!code endpoints!public! !
 !WebsideAPI categoriesFor: #compilationError:!private! !
+!WebsideAPI categoriesFor: #debugExpression!private! !
 !WebsideAPI categoriesFor: #defaultRootClass!private! !
 !WebsideAPI categoriesFor: #dialect!code endpoints!public! !
+!WebsideAPI categoriesFor: #evaluateExpression!evaluation endpoints!public! !
 !WebsideAPI categoriesFor: #filterByCategory:!private! !
 !WebsideAPI categoriesFor: #filterByVariable:!private! !
 !WebsideAPI categoriesFor: #implementorsOf:!private! !
 !WebsideAPI categoriesFor: #instanceVariables!code endpoints!public! !
 !WebsideAPI categoriesFor: #method!code endpoints!public! !
 !WebsideAPI categoriesFor: #methods!code endpoints!public! !
+!WebsideAPI categoriesFor: #newID!private! !
 !WebsideAPI categoriesFor: #notFound!private! !
 !WebsideAPI categoriesFor: #package!code endpoints!public! !
 !WebsideAPI categoriesFor: #packageClasses!code endpoints!public! !
@@ -2326,10 +2342,7 @@ initializeDebuggingRoutes
 		routePOST: '/debuggers/{id}/terminate' to: #terminateDebugger;
 		routeDELETE: '/debuggers/{id}' to: #deleteDebugger!
 
-initializeEvaluationRoutes
-	router
-		routePOST: '/evaluations' to: #evaluateExpression;
-		routeGET: '/evaluation/{id}' to: #evaluation!
+initializeEvaluationRoutes	self		routePOST: '/evaluations' to: #evaluateExpression;		routeGET: '/evaluations' to: #activeEvaluations;		routeGET: '/evaluations/{id}' to: #activeEvaluation;		routeDELETE: '/evaluations/{id}' to: #cancelEvaluation!
 
 initializeObjectsRoutes
 	router
