@@ -46,8 +46,18 @@ package methodNames
 	add: #RenameClassChange -> #fromWebsideJson:;
 	add: #RenameVariableChange -> #asWebsideJson;
 	add: #RenameVariableChange -> #fromWebsideJson:;
+	add: #StAssignmentNode -> #asWebsideJson;
+	add: #StCascadeNode -> #asWebsideJson;
+	add: #StLiteralValueNode -> #asWebsideJson;
+	add: #StMessageNode -> #asWebsideJson;
+	add: #StMethodNode -> #asWebsideJson;
+	add: #StProgramNode -> #asWebsideJson;
+	add: #StProgramNode -> #websideType;
+	add: #StReturnNode -> #asWebsideJson;
 	add: #String -> #asURL;
 	add: #String -> #indexOfString:from:to:;
+	add: #StSequenceNode -> #asWebsideJson;
+	add: #StVariableNode -> #asWebsideJson;
 	add: #Symbol -> #evaluateWith:;
 	add: 'AddClassChange class' -> #websideType;
 	add: 'AddClassVariableChange class' -> #websideType;
@@ -64,6 +74,7 @@ package methodNames
 	add: 'RenameClassChange class' -> #websideType;
 	add: 'RenameClassVariableChange class' -> #websideType;
 	add: 'RenameInstanceVariableChange class' -> #websideType;
+	add: 'StProgramNode class' -> #websideType;
 	add: 'String class' -> #fromUTF8:;
 	yourself.
 
@@ -134,7 +145,7 @@ Object subclass: #WebsideAPI
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
 Object subclass: #WebsideServer
-	instanceVariableNames: 'server router baseUri port evaluations objects workspaces debuggres'
+	instanceVariableNames: 'server router baseUri port resources'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -373,13 +384,14 @@ websideType
 
 asWebsideJson
 	^super asWebsideJson
-		at: 'class' put: className;
+		at: 'class' put: self changeClass name asString;
 		yourself!
 
 fromWebsideJson: json
 	super fromWebsideJson: json.
 	className := json at: 'class' ifAbsent: [].
-	isMeta := className notNil and: [className endsWith: ' class']! !
+	isMeta := className notNil and: [className endsWith: ' class'].
+	(className notNil and: [isMeta]) ifTrue: [className := (className copyFrom: 1 to: className size - 6) asSymbol]! !
 !RefactoryClassChange categoriesFor: #asWebsideJson!accessing!public! !
 !RefactoryClassChange categoriesFor: #fromWebsideJson:!accessing!public! !
 
@@ -482,6 +494,66 @@ fromWebsideJson: json
 !RenameVariableChange categoriesFor: #asWebsideJson!printing!public! !
 !RenameVariableChange categoriesFor: #fromWebsideJson:!printing!public! !
 
+!StAssignmentNode methodsFor!
+
+asWebsideJson 	^super asWebsideJson at: 'children' put: { variable asWebsideJson . value asWebsideJson }! !
+!StAssignmentNode categoriesFor: #asWebsideJson!accessing!public! !
+
+!StCascadeNode methodsFor!
+
+asWebsideJson
+	| children |
+	children := messages collect: [:n | n asWebsideJson].
+	^super asWebsideJson
+		at: 'children' put: children asArray;
+		yourself! !
+!StCascadeNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StLiteralValueNode methodsFor!
+
+asWebsideJson	^ super asWebsideJson		at: 'value' put: token value;		yourself! !
+!StLiteralValueNode categoriesFor: #asWebsideJson!matching!public! !
+
+!StMessageNode methodsFor!
+
+asWebsideJson
+	| s children |
+	s := Dictionary new
+				at: 'type' put: 'Selector';
+				at: 'value' put: self selector;
+				at: 'start' put: selectorParts first start;
+				at: 'stop' put: selectorParts last stop;
+				yourself.
+	children := OrderedCollection with: receiver asWebsideJson with: s.
+	arguments do: [:n | children add: n asWebsideJson].
+	^super asWebsideJson
+		at: 'children' put: children asArray;
+		yourself! !
+!StMessageNode categoriesFor: #asWebsideJson!matching!public! !
+
+!StMethodNode methodsFor!
+
+asWebsideJson	| children |	children := OrderedCollection with: selector asWebsideJson.	arguments do: [ :n | children add: n asWebsideJson  ].	children add: body asWebsideJson .	^super asWebsideJson at: 'children' put: children asArray; yourself ! !
+!StMethodNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StProgramNode methodsFor!
+
+asWebsideJson	^ Dictionary new		at: 'type' put: self websideType;		at: 'start' put: self start;		at: 'end' put: self stop;		yourself!
+
+websideType	^self class websideType! !
+!StProgramNode categoriesFor: #asWebsideJson!public!replacing! !
+!StProgramNode categoriesFor: #websideType!public!replacing! !
+
+!StProgramNode class methodsFor!
+
+websideType	^self name copyFrom: 3 to: self name size - 4! !
+!StProgramNode class categoriesFor: #websideType!constants!public! !
+
+!StReturnNode methodsFor!
+
+asWebsideJson 	^super asWebsideJson at: 'children' put: { value asWebsideJson  }; yourself! !
+!StReturnNode categoriesFor: #asWebsideJson!public!visitor! !
+
 !String methodsFor!
 
 asURL
@@ -513,6 +585,16 @@ fromUTF8: aString
 		ifTrue: [aString asUtf8String]
 		ifFalse: [aString]! !
 !String class categoriesFor: #fromUTF8:!instance creation!public! !
+
+!StSequenceNode methodsFor!
+
+asWebsideJson 	| children |	children := OrderedCollection new.	temporaries do: [ :n | children add: n asWebsideJson  ].	statements do: [ :n |  children add: n asWebsideJson].	^super asWebsideJson at: 'children' put: children asArray ; yourself! !
+!StSequenceNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StVariableNode methodsFor!
+
+asWebsideJson	^ super asWebsideJson		at: 'value' put: name;		yourself! !
+!StVariableNode categoriesFor: #asWebsideJson!public!visitor! !
 
 !Symbol methodsFor!
 
@@ -1779,7 +1861,7 @@ on: aString
 WebsideAPI guid: (GUID fromString: '{0d468ed7-e8b5-4ad5-a744-fe615bb74dcb}')!
 WebsideAPI comment: 'WebsideAPI startServer
 
-WebsideAPI stoptServer'!
+WebsideAPI stopServer'!
 !WebsideAPI categoriesForClass!Unclassified! !
 !WebsideAPI methodsFor!
 
@@ -1894,6 +1976,7 @@ classVariables
 
 compilationError: aCompilationError
 	| error |
+self halt.
 	error := STONJSON toString: aCompilationError asWebsideJson.
 	^HttpServerResponse new
 		statusCode: 409;
@@ -1995,29 +2078,32 @@ method
 	^(class >> selector) asWebsideJson!
 
 methods
-	| selector methods senders global references class |
+	| selector methods senders global references class ast |
 	selector := self queriedSelector.
 	selector notNil ifTrue: [methods := self implementorsOf: selector].
 	selector := self queriedSending.
-	selector notNil ifTrue: [
-		senders := self sendersOf: selector.
-		methods := methods
-			ifNil: [senders]
-			ifNotNil: [methods intersection: senders]].
+	selector notNil
+		ifTrue: 
+			[senders := self sendersOf: selector.
+			methods := methods ifNil: [senders] ifNotNil: [methods intersection: senders]].
 	global := self queriedReferencingClass.
-	global notNil ifTrue: [
-		references := self referencesTo: global.
-		methods := methods
-			ifNil: [references]
-			ifNotNil: [methods intersection: references]].
+	global notNil
+		ifTrue: 
+			[references := self referencesTo: global.
+			methods := methods ifNil: [references] ifNotNil: [methods intersection: references]].
 	class := self requestedClass ifNil: [self queriedClass].
 	(class notNil and: [methods notNil])
 		ifTrue: [methods := methods select: [:m | m methodClass == class]].
-	methods
-		ifNil: [methods := (class ifNil: [self defaultRootClass]) methodDictionary asArray].
+	methods ifNil: [methods := (class ifNil: [self defaultRootClass]) methodDictionary asArray].
 	methods := self filterByCategory: methods.
 	methods := self filterByVariable: methods.
-	^(methods collect: [:m | m asWebsideJson]) asArray!
+	ast := (self queryAt: 'ast') = 'true'.
+	^methods collect: 
+			[:m |
+			| json |
+			json := m asWebsideJson.
+			ast ifTrue: [json at: 'ast' put: m parseTree asWebsideJson].
+			json]!
 
 newID	^IID newUnique!
 
@@ -2247,11 +2333,15 @@ baseUri
 baseUri: aString
 	baseUri := aString!
 
+debuggers	^ self resourcesAt: #debuggers!
+
 defaultBaseUri
 	^ '/dolphin'!
 
 defaultPort
 	^ 9002!
+
+evaluations	^ self resourcesAt: #evaluations!
 
 handlePreflightRequest: request
 	| response |
@@ -2292,12 +2382,7 @@ handleRequest: anHttpRequest with: anHttpResponse
 						content: payload asUtf8String]].
 	anHttpResponse headerAt: 'Access-Control-Allow-Origin' put: '*'!
 
-initialize
-	super initialize.
-	port := self defaultPort.
-	baseUri := self defaultBaseUri.
-	router := HttpRequestRouter new.
-	self initializeRoutes!
+initialize	super initialize.	port := self defaultPort.	baseUri := self defaultBaseUri.	router := HttpRequestRouter new.	self initializeRoutes; initializeResources!
 
 initializeChangesRoutes
 	router
@@ -2342,7 +2427,7 @@ initializeDebuggingRoutes
 		routePOST: '/debuggers/{id}/terminate' to: #terminateDebugger;
 		routeDELETE: '/debuggers/{id}' to: #deleteDebugger!
 
-initializeEvaluationRoutes	self		routePOST: '/evaluations' to: #evaluateExpression;		routeGET: '/evaluations' to: #activeEvaluations;		routeGET: '/evaluations/{id}' to: #activeEvaluation;		routeDELETE: '/evaluations/{id}' to: #cancelEvaluation!
+initializeEvaluationRoutes	router		routePOST: '/evaluations' to: #evaluateExpression;		routeGET: '/evaluations' to: #activeEvaluations;		routeGET: '/evaluations/{id}' to: #activeEvaluation;		routeDELETE: '/evaluations/{id}' to: #cancelEvaluation!
 
 initializeObjectsRoutes
 	router
@@ -2353,6 +2438,8 @@ initializeObjectsRoutes
 
 initializePreflightRoutes
 	router routeOPTIONS: '/*' to: [:request | self handlePreflightRequest: request]	"This is not that well"!
+
+initializeResources	resources := Dictionary new.	resources    	at: #evaluations put: Dictionary new;		at: #objects put: Dictionary new;		at: #workspaces put: Dictionary new;		at: #debuggers put: Dictionary new; at: #testRuns put: Dictionary new!
 
 initializeRoutes
 	router receiver: [WebsideAPI new server: self].
@@ -2383,22 +2470,36 @@ isPreflight: request
 	^request verb = 'OPTIONS'
 		and: [(request headerAt: 'origin') notNil or: [(request headerAt: 'Origin') notNil]]!
 
+objects	^ self resourcesAt: #objects!
+
 port
 	^ port!
 
 port: anInteger
 	port := anInteger!
 
+reset	self debuggers removeAll.	self evaluations removeAll.	self objects removeAll.	self workspaces removeAll!
+
+resourcesAt: aSymbol	^ resources at: aSymbol ifAbsent: nil!
+
+resourcesAt: aSymbol put: anObject	resources at: aSymbol put: anObject!
+
 start
 	self initializeServer.
 	server start!
 
 stop
-	server stop! !
+	server stop!
+
+testRuns	^ self resourcesAt: #testRuns!
+
+workspaces	^ self resourcesAt: #workspaces! !
 !WebsideServer categoriesFor: #baseUri!accessing!public! !
 !WebsideServer categoriesFor: #baseUri:!accessing!public! !
+!WebsideServer categoriesFor: #debuggers!accessing!public! !
 !WebsideServer categoriesFor: #defaultBaseUri!accessing!public! !
 !WebsideServer categoriesFor: #defaultPort!accessing!public! !
+!WebsideServer categoriesFor: #evaluations!accessing!public! !
 !WebsideServer categoriesFor: #handlePreflightRequest:!actions!public! !
 !WebsideServer categoriesFor: #handleRequest:with:!actions!public! !
 !WebsideServer categoriesFor: #initialize!initializing!public! !
@@ -2408,14 +2509,21 @@ stop
 !WebsideServer categoriesFor: #initializeEvaluationRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeObjectsRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializePreflightRoutes!initializing!public! !
+!WebsideServer categoriesFor: #initializeResources!initializing!public! !
 !WebsideServer categoriesFor: #initializeRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeServer!initializing!public! !
 !WebsideServer categoriesFor: #initializeWorkspacesRoutes!initializing!public! !
 !WebsideServer categoriesFor: #isPreflight:!public!testing! !
+!WebsideServer categoriesFor: #objects!accessing!public! !
 !WebsideServer categoriesFor: #port!accessing!public! !
 !WebsideServer categoriesFor: #port:!accessing!public! !
+!WebsideServer categoriesFor: #reset!actions!public! !
+!WebsideServer categoriesFor: #resourcesAt:!accessing!public! !
+!WebsideServer categoriesFor: #resourcesAt:put:!accessing!public! !
 !WebsideServer categoriesFor: #start!actions!public! !
 !WebsideServer categoriesFor: #stop!actions!public! !
+!WebsideServer categoriesFor: #testRuns!accessing!public! !
+!WebsideServer categoriesFor: #workspaces!accessing!public! !
 
 !WebsideServer class methodsFor!
 
