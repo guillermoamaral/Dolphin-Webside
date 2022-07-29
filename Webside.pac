@@ -48,6 +48,7 @@ package methodNames
 	add: #RenameVariableChange -> #fromWebsideJson:;
 	add: #StAssignmentNode -> #asWebsideJson;
 	add: #StCascadeNode -> #asWebsideJson;
+	add: #StLiteralToken -> #asWebsideJson;
 	add: #StLiteralValueNode -> #asWebsideJson;
 	add: #StMessageNode -> #asWebsideJson;
 	add: #StMethodNode -> #asWebsideJson;
@@ -510,9 +511,20 @@ asWebsideJson
 		yourself! !
 !StCascadeNode categoriesFor: #asWebsideJson!public!visitor! !
 
+!StLiteralToken methodsFor!
+
+asWebsideJson
+	^value asString! !
+!StLiteralToken categoriesFor: #asWebsideJson!printing!public! !
+
 !StLiteralValueNode methodsFor!
 
-asWebsideJson	^ super asWebsideJson		at: 'value' put: token value asString;		yourself! !
+asWebsideJson
+	| value |
+	value := token value isString ifTrue: [token value] ifFalse: [token printString].
+	^super asWebsideJson
+		at: 'value' put: value;
+		yourself! !
 !StLiteralValueNode categoriesFor: #asWebsideJson!matching!public! !
 
 !StMessageNode methodsFor!
@@ -1866,6 +1878,20 @@ WebsideAPI stopServer'!
 !WebsideAPI categoriesForClass!Unclassified! !
 !WebsideAPI methodsFor!
 
+activeDebuggers
+	^self debuggers associations collect: 
+			[:a |
+			a value asWebsideJson
+				at: 'id' put: a key asString;
+				at: 'description' put: a value name;
+				yourself]!
+
+activeEvaluation	| id evaluation |	id := self requestedId.	evaluation := self evaluations at: id ifAbsent: [^self notFound].	^self newJsonObject		at: 'id' put: id asString;		yourself!
+
+activeEvaluations	^self evaluations associations collect: 			[:a |			self newJsonObject				at: 'id' put: a key asString;				yourself]!
+
+activeWorkspaces	^ self workspaces associations		collect: [ :a | 			a value asWebsideJson				at: 'id' put: a key asString;				yourself ]!
+
 addChange
 	| change |
 	change := self requestedChange.
@@ -1876,15 +1902,31 @@ addChange
 badRequest: aString
 	^HttpServerResponse badRequest content: aString!
 
-bodyAt: aString	^ self bodyAt: aString ifAbsent: nil!
+bodyAt: aString	^ self bodyAt: aString ifAbsent: []!
 
 bodyAt: aString ifAbsent: aBlock	| json |	json := STONJSON fromString: request body.	^ json at: aString ifAbsent: aBlock!
+
+cancelEvaluation
+	| id evaluation |
+	id := self requestedId.
+	evaluation := self evaluations at: id ifAbsent: [^self notFound].
+	evaluation terminate.
+	self evaluations removeKey: id.
+	^nil!
 
 categories
 	| class |
 	class := self requestedClass.
 	class ifNil: [^self notFound].
 	^(class realMethodCategories collect: [:c | c name]) asArray!
+
+changes
+	| author package changes |
+	author := self queryAt: 'author'.
+	package := self queriedPackage ifNil: [self systemPackage].
+	changes := package changes currentChanges.
+	author ifNotNil: [changes := changes select: [:ch | ch author = author]].
+	^changes collect: [:ch | ch asWebsideJson]!
 
 classDefinition
 	| class |
@@ -1917,63 +1959,11 @@ classNamed: aString
 	class := Smalltalk at: name asSymbol ifAbsent: [^nil].
 	^metaclass ifTrue: [class class] ifFalse: [class]!
 
-classTreeFrom: aClass depth: anInteger
-	| json subclasses depth names |
-	names := self queryAt: 'names'.
-	json := names = 'true'
-				ifTrue: 
-					[Dictionary new
-						at: 'name' put: aClass name;
-						at: 'superclass' put: (aClass superclass ifNotNil: [:c | c name]);
-						yourself]
-				ifFalse: [aClass asWebsideJson].
-	(anInteger notNil and: [anInteger = 0]) ifTrue: [^json].
-	depth := anInteger notNil ifTrue: [anInteger - 1].
-	subclasses := (aClass subclasses asSortedCollection: [:a :b | a name <= b name])
-				collect: [:c | self classTreeFrom: c depth: depth].
-	json at: 'subclasses' put: subclasses asArray.
-	^json!
+classTreeFrom: aClass depth: anInteger	| json subclasses depth names |	names := self queryAt: 'names'.	json := names = 'true'				ifTrue: 					[self newJsonObject						at: 'name' put: aClass name;						at: 'superclass' put: (aClass superclass ifNotNil: [:c | c name]);						yourself]				ifFalse: [aClass asWebsideJson].	(anInteger notNil and: [anInteger = 0]) ifTrue: [^json].	depth := anInteger notNil ifTrue: [anInteger - 1].	subclasses := (aClass subclasses asSortedCollection: [:a :b | a name <= b name])				collect: [:c | self classTreeFrom: c depth: depth].	json at: 'subclasses' put: subclasses asArray.	^json!
 
-classTreeFromClasses: aCollection
-	| roots json subclasses |
-	roots := Dictionary new.
-	aCollection
-		do: 
-				[:c |
-				json := Dictionary new
-							at: 'name' put: c name;
-							yourself.
-				roots at: c name put: json];
-		do: 
-				[:c |
-				c superclass notNil
-					ifTrue: 
-						[roots at: c superclass
-							ifPresent: 
-								[:sc |
-								subclasses := sc at: 'subclasses'
-											ifAbsentPut: [SortedCollection new sortBlock: [:a :b | (a at: 'name') <= (b at: 'name')]].
-								subclasses add: (roots at: c name)]]];
-		do: 
-				[:c |
-				c superclass notNil
-					ifTrue: [(roots includesKey: c superclass name) ifTrue: [roots removeKey: c name]]].
-	^(roots asArray asSortedCollection: [:a :b | (a at: 'name') <= (b at: 'name')]) asArray!
+classTreeFromClasses: aCollection	| roots json subclasses |	roots := Dictionary new.	aCollection		do: 				[:c |				json := self newJsonObject							at: 'name' put: c name;							yourself.				roots at: c name put: json];		do: 				[:c |				c superclass notNil					ifTrue: 						[roots at: c superclass							ifPresent: 								[:sc |								subclasses := sc at: 'subclasses'											ifAbsentPut: [SortedCollection new sortBlock: [:a :b | (a at: 'name') <= (b at: 'name')]].								subclasses add: (roots at: c name)]]];		do: 				[:c |				c superclass notNil					ifTrue: [(roots includesKey: c superclass name) ifTrue: [roots removeKey: c name]]].	^(roots asArray asSortedCollection: [:a :b | (a at: 'name') <= (b at: 'name')]) asArray!
 
-classVariables
-	| class |
-	class := self requestedClass.
-	class ifNil: [^self notFound].
-	^(class withAllSuperclasses gather: 
-			[:c |
-			c classVarNames asArray sort collect: 
-					[:v |
-					Dictionary new
-						at: 'name' put: v;
-						at: 'class' put: c name , ' class';
-						at: 'type' put: 'class';
-						yourself]])
-		asArray!
+classVariables	| class |	class := self requestedClass.	class ifNil: [^self notFound].	^(class withAllSuperclasses gather: 			[:c |			c classVarNames asArray sort collect: 					[:v |					^self newJsonObject						at: 'name' put: v;						at: 'class' put: c name , ' class';						at: 'type' put: 'class';						yourself]])		asArray!
 
 compilationError: aCompilationError
 	| error |
@@ -1997,13 +1987,67 @@ compilerReceiver
 			^frame ifNotNil: [frame receiver]].
 	^nil!
 
+createDebugger
+	| id process exception context debugger |
+	id := self bodyAt: 'evaluation' ifAbsent: [^self notFound].
+	id := IID fromString: id.
+	process := self evaluations at: id ifAbsent: [^self notFound].
+	exception := process suspendedContext exception.
+	context := exception signalerContext.
+	"process suspendedContext: context."
+	debugger := process newDebugSessionNamed: exception description startedAt: context.
+	context selector == #doesNotUnderstand: ifTrue: [context := context sender].
+	debugger restart: context.
+	context selector == #halt
+		ifTrue: 
+			[debugger
+				stepOver;
+				stepOver].
+	self debuggers at: id put: debugger.
+	^debugger asWebsideJson
+		at: 'id' put: id asString;
+		at: 'description' put: debugger name;
+		yourself!
+
+createWorkspace	| id |	id := self newID.	self workspaces at: id put: #Workspace new.	^ id asString!
+
 debugExpression	| expression method receiver process context debugger id |	expression := self bodyAt: 'expression' ifAbsent: [''].	method := self compiler compile: expression.	receiver := self compilerReceiver.	process := [ method valueWithReceiver: receiver arguments: #() ]		newProcess.	context := process suspendedContext.	debugger := process		newDebugSessionNamed: 'debug it'		startedAt: context.	debugger stepIntoUntil: [ :c | c method == method ].	id := self newID.	self evaluations at: id put: process.	self debuggers at: id put: debugger.	^ id asString!
+
+debuggerFrame
+	| debugger index frame interval |
+	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].
+	index := self requestedIndex.
+	frame := debugger stack at: index ifAbsent: [^self notFound].
+	interval := debugger pcRangeForContext: frame.
+	interval := Dictionary new
+				at: 'start' put: interval first;
+				at: 'end' put: interval last;
+				yourself.
+	^frame asWebsideJson
+		at: 'index' put: index;
+		at: 'interval' put: interval;
+		yourself!
+
+debuggerFrames	| debugger |	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].	^debugger stack withIndexCollect: 			[:f :i |			self newJsonObject				at: 'index' put: i;				at: 'label' put: f method printString;				yourself]!
 
 debuggers
 	^ server debuggers!
 
 defaultRootClass
 	^Object!
+
+deleteDebugger
+	| id debugger |
+	id := self requestedId.
+	debugger := self debuggers at: id ifAbsent: [].
+	debugger notNil
+		ifTrue: 
+			[debugger terminate.
+			self debuggers removeKey: id ifAbsent: [].
+			self evaluations removeKey: id ifAbsent: []].
+	^id!
+
+deleteWorkspace	self workspaces		removeKey: self requestedId		ifAbsent: [ ^ self notFound ].	^ nil!
 
 dialect
 	^'Dolphin'!
@@ -2018,18 +2062,18 @@ evaluateExpression
 	id := self newID.
 	semaphore := Semaphore new.
 	block := 
-			[[object := Compiler evaluate: expression for: self compilerReceiver] on: Exception
+			[[object := self evaluateExpression: expression] on: Exception
 				do: 
 					[:exception |
 					semaphore signal.
-					process
-						suspendedContext: exception signalerContext;
-						suspend].
+					process suspend].
 			self evaluations removeKey: id ifAbsent: nil.
 			(sync not or: [pin]) ifTrue: [self objects at: id put: object].
 			semaphore signal.
 			object].
-	process := self evaluations at: id put: block fork.
+	process := block newProcess.
+	self evaluations at: id put: process.
+	process resume.
 	sync
 		ifTrue: 
 			[semaphore wait.
@@ -2041,6 +2085,11 @@ evaluateExpression
 		at: 'id' put: id asString;
 		at: 'expression' put: expression;
 		yourself!
+
+evaluateExpression: aString
+	^Compiler evaluate: aString for: self compilerReceiver!
+
+evaluationError: id	| process json error |	process := self evaluations at: id.	json := self newJsonObject				at: 'description' put: process suspendedFrame exception description;				at: 'evaluation' put: id asString;				yourself.	error := STONJSON toString: json.	^HttpServerResponse new		statusCode: 409;		contentType: 'application/json; charset=utf-8';		content: error asUtf8String!
 
 evaluations
 	^server evaluations!
@@ -2097,6 +2146,8 @@ filterByVariable: aCollection
 				ifTrue: [methods select: [:m | m assignsAssociation: slot] in: filtered]]].
 	^filter ifTrue: [filtered] ifFalse: [aCollection]!
 
+frameBindings	| debugger frame |	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].	frame := debugger stack at: self requestedIndex ifAbsent: [^self notFound].	^#() collect: 			[:b |			self newJsonObject				at: 'name' put: b key asString;				at: 'value' put: b value printString;				yourself]!
+
 implementorsOf: aSymbol
 	| system search environment |
 	system := SmalltalkSystem current.
@@ -2105,29 +2156,9 @@ implementorsOf: aSymbol
 	self queriedScope ifNotNil: [:class | environment := environment forClasses: {class}].
 	^(system definitionsMatching: search in: environment) allMethods asArray!
 
-instanceVariables
-	| class |
-	class := self requestedClass.
-	class isNil ifTrue: [^self notFound].
-	^(class withAllSuperclasses gather: 
-			[:c |
-			c instVarNames collect: 
-					[:v |
-					Dictionary new
-						at: 'name' put: v;
-						at: 'class' put: c name;
-						at: 'type' put: 'instance';
-						yourself]])
-		asArray!
+instanceVariables	| class |	class := self requestedClass.	class isNil ifTrue: [^self notFound].	^(class withAllSuperclasses gather: 			[:c |			c instVarNames collect: 					[:v |					self newJsonObject						at: 'name' put: v;						at: 'class' put: c name;						at: 'type' put: 'instance';						yourself]])		asArray!
 
-method
-	| class selector |
-	class := self requestedClass.
-	class ifNil: [^self notFound].
-	selector := self requestedSelector.
-	selector ifNil: [^self notFound].
-	(class includesSelector: selector) ifFalse: [^self notFound].
-	^(class >> selector) asWebsideJson!
+method	| class selector method json |	class := self requestedClass.	class ifNil: [^self notFound].	selector := self requestedSelector.	selector ifNil: [^self notFound].	(class includesSelector: selector) ifFalse: [^self notFound]. 	method := class >> selector.	json := method asWebsideJson.   	(self queryAt: 'ast') = 'true'		ifTrue: [ json at: 'ast' put: method parseTree asWebsideJson ].	^json!
 
 methods
 	| selector methods senders global references class ast |
@@ -2158,6 +2189,8 @@ methods
 			json]!
 
 newID	^IID newUnique!
+
+newJsonObject	^Dictionary new!
 
 notFound
 	^HttpServerResponse notFound!
@@ -2205,6 +2238,48 @@ packages
 	names := self queryAt: 'names'.
 	names = 'true' ifTrue: [^(packages collect: [:p | p name]) asArray sort].
 	^(packages collect: [:p | p asWebsideJson]) asArray!
+
+pinnedObject
+	| id object |
+	id := self requestedId.
+	self evaluations at: id
+		ifPresent: [:process | process isSuspended ifTrue: [^self evaluationError: id]].
+	object := self objects at: id ifAbsent: [^self notFound].
+	^object asWebsideJson
+		at: 'id' put: id asString;
+		yourself!
+
+pinnedObjects
+	^self objects associations collect: 
+			[:a |
+			a value asWebsideJson
+				at: 'id' put: a key asString;
+				yourself]!
+
+pinnedObjectSlots
+	| id object path index last |
+	id := self requestedId.
+	object := self objects at: id ifAbsent: [^self notFound].
+	path := request url segments.
+	index := path indexOf: 'objects'.
+	path
+		from: index + 2
+		to: path size - 1
+		do: 
+			[:s |
+			object := self
+						slot: s
+						of: object
+						ifAbsent: [^self notFound]].
+	last := path last.
+	last = 'instance-variables' ifTrue: [^self instanceVariablesOf: object].
+	last = 'named-slots' ifTrue: [^self namedSlotsOf: object].
+	last = 'indexed-slots' ifTrue: [^self indexedSlotsOf: object].
+	object := self
+				slot: last
+				of: object
+				ifAbsent: [^self notFound].
+	^object asWebsideJson!
 
 queriedAssigning
 	^self queryAt: 'assigning'!
@@ -2271,6 +2346,16 @@ requestedClass
 	name := self urlAt: 'name'.
 	^name ifNotNil: [self classNamed: name]!
 
+requestedId
+	| id |
+	id := self urlAt: 'id'.
+	^id ifNotNil: [IID fromString: id]!
+
+requestedIndex
+	| index |
+	index := self urlAt: 'index'.
+	^index ifNotNil: [index asInteger]!
+
 requestedPackage
 	| name |
 	name := self urlAt: 'name'.
@@ -2280,6 +2365,25 @@ requestedSelector
 	| selector |
 	selector := self urlAt: 'selector'.
 	^selector ifNotNil: [selector asSymbol]!
+
+restartDebugger
+	| debugger context update method |
+	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].
+	context := debugger stack at: self requestedIndex ifAbsent: [^self notFound].
+	update := self queryAt: 'update'.
+	method := context method.
+	(update = 'true' and: [method notNil])
+		ifTrue: [context privRefreshWith: method classBinding value >> method selector].
+	debugger restart: context.
+	^nil!
+
+resumeDebugger
+	| id debugger |
+	id := self requestedId.
+	debugger := self debuggers at: id ifAbsent: [^self notFound].
+	self debuggers removeKey: id.
+	debugger resume.
+	^nil!
 
 sendersOf: aSymbol
 	| system search environment |
@@ -2292,11 +2396,61 @@ sendersOf: aSymbol
 server: aWebsideServer
 	server := aWebsideServer!
 
+slot: aString of: anObject ifAbsent: aBlock
+	| index |
+	aString asInteger asString = aString
+		ifTrue: 
+			[index := aString asInteger.
+			(anObject isKindOf: SequenceableCollection)
+				ifTrue: 
+					[index > anObject size ifTrue: [^aBlock value].
+					^[anObject at: index] on: Error do: [anObject basicAt: index]]
+				ifFalse: 
+					[anObject class isVariable ifTrue: [^anObject at: index].
+					index > anObject class instSize ifTrue: [^aBlock value].
+					^anObject instVarAt: index]].
+	^(anObject class allInstVarNames includes: aString)
+		ifTrue: [anObject instVarNamed: aString]
+		ifFalse: [aBlock value]!
+
+stepIntoDebugger
+	| debugger context |
+	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].
+	context := debugger stack at: self requestedIndex ifAbsent: [^self notFound].
+	debugger stepInto: context.
+	^nil!
+
+stepOverDebugger
+	| debugger context |
+	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].
+	context := debugger stack at: self requestedIndex ifAbsent: [^self notFound].
+	debugger stepOver: context.
+	^nil!
+
+stepThroughDebugger
+	| debugger context |
+	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].
+	context := debugger stack at: self requestedIndex ifAbsent: [^self notFound].
+	debugger stepThrough: context.
+	^nil!
+
 subclasses
 	| class |
 	class := self requestedClass.
 	class ifNil: [^self notFound].
 	^(class subclasses collect: [:c | c asWebsideJson]) asArray!
+
+terminateDebugger
+	| id debugger |
+	id := self requestedId.
+	debugger := self debuggers at: id ifAbsent: [^self notFound].
+	self debuggers removeKey: id.
+	debugger terminate.
+	^nil!
+
+unpinObject
+	self objects removeKey: self requestedId ifAbsent: [^self notFound].
+	^nil!
 
 urlAt: aString
 	^(request propertyAt: #arguments) at: aString ifAbsent: []!
@@ -2307,40 +2461,61 @@ variables
 	class ifNil: [^self notFound].
 	^self instanceVariables , self classVariables!
 
+workspace	^ self workspaces		at: self requestedId		ifAbsent: [ self notFound ]!
+
 workspaces
 	^ server workspaces! !
+!WebsideAPI categoriesFor: #activeDebuggers!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #activeEvaluation!evaluation endpoints!public! !
+!WebsideAPI categoriesFor: #activeEvaluations!evaluation endpoints!public! !
+!WebsideAPI categoriesFor: #activeWorkspaces!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #addChange!changes endpoints!public! !
 !WebsideAPI categoriesFor: #badRequest:!private! !
 !WebsideAPI categoriesFor: #bodyAt:!public! !
 !WebsideAPI categoriesFor: #bodyAt:ifAbsent:!private! !
+!WebsideAPI categoriesFor: #cancelEvaluation!evaluation endpoints!public! !
 !WebsideAPI categoriesFor: #categories!code endpoints!public! !
+!WebsideAPI categoriesFor: #changes!changes endpoints!public! !
 !WebsideAPI categoriesFor: #classDefinition!code endpoints!public! !
 !WebsideAPI categoriesFor: #classes!code endpoints!public! !
 !WebsideAPI categoriesFor: #classNamed:!private! !
-!WebsideAPI categoriesFor: #classTreeFrom:depth:!private! !
-!WebsideAPI categoriesFor: #classTreeFromClasses:!private! !
+!WebsideAPI categoriesFor: #classTreeFrom:depth:!public! !
+!WebsideAPI categoriesFor: #classTreeFromClasses:!public! !
 !WebsideAPI categoriesFor: #classVariables!code endpoints!public! !
 !WebsideAPI categoriesFor: #compilationError:!private! !
 !WebsideAPI categoriesFor: #compilerReceiver!private! !
+!WebsideAPI categoriesFor: #createDebugger!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #createWorkspace!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #debugExpression!private! !
+!WebsideAPI categoriesFor: #debuggerFrame!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #debuggerFrames!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #debuggers!private! !
 !WebsideAPI categoriesFor: #defaultRootClass!private! !
+!WebsideAPI categoriesFor: #deleteDebugger!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #deleteWorkspace!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #dialect!code endpoints!public! !
 !WebsideAPI categoriesFor: #evaluateExpression!evaluation endpoints!public! !
+!WebsideAPI categoriesFor: #evaluateExpression:!private! !
+!WebsideAPI categoriesFor: #evaluationError:!public! !
 !WebsideAPI categoriesFor: #evaluations!private! !
 !WebsideAPI categoriesFor: #filterByCategory:!private! !
 !WebsideAPI categoriesFor: #filterByVariable:!private! !
+!WebsideAPI categoriesFor: #frameBindings!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #implementorsOf:!private! !
 !WebsideAPI categoriesFor: #instanceVariables!code endpoints!public! !
 !WebsideAPI categoriesFor: #method!code endpoints!public! !
 !WebsideAPI categoriesFor: #methods!code endpoints!public! !
 !WebsideAPI categoriesFor: #newID!private! !
+!WebsideAPI categoriesFor: #newJsonObject!private! !
 !WebsideAPI categoriesFor: #notFound!private! !
 !WebsideAPI categoriesFor: #objects!private! !
 !WebsideAPI categoriesFor: #package!code endpoints!public! !
 !WebsideAPI categoriesFor: #packageClasses!code endpoints!public! !
 !WebsideAPI categoriesFor: #packageMethods!code endpoints!public! !
 !WebsideAPI categoriesFor: #packages!code endpoints!public! !
+!WebsideAPI categoriesFor: #pinnedObject!objects endpoints!public! !
+!WebsideAPI categoriesFor: #pinnedObjects!objects endpoints!public! !
+!WebsideAPI categoriesFor: #pinnedObjectSlots!objects endpoints!public! !
 !WebsideAPI categoriesFor: #queriedAssigning!private! !
 !WebsideAPI categoriesFor: #queriedCategory!private! !
 !WebsideAPI categoriesFor: #queriedClass!private! !
@@ -2355,13 +2530,24 @@ workspaces
 !WebsideAPI categoriesFor: #request:!accessing!public! !
 !WebsideAPI categoriesFor: #requestedChange!private! !
 !WebsideAPI categoriesFor: #requestedClass!private! !
+!WebsideAPI categoriesFor: #requestedId!private! !
+!WebsideAPI categoriesFor: #requestedIndex!private! !
 !WebsideAPI categoriesFor: #requestedPackage!private! !
 !WebsideAPI categoriesFor: #requestedSelector!private! !
+!WebsideAPI categoriesFor: #restartDebugger!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #resumeDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #sendersOf:!private! !
 !WebsideAPI categoriesFor: #server:!accessing!public! !
+!WebsideAPI categoriesFor: #slot:of:ifAbsent:!private! !
+!WebsideAPI categoriesFor: #stepIntoDebugger!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #stepOverDebugger!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #stepThroughDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #subclasses!code endpoints!public! !
+!WebsideAPI categoriesFor: #terminateDebugger!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #unpinObject!objects endpoints!public! !
 !WebsideAPI categoriesFor: #urlAt:!private! !
 !WebsideAPI categoriesFor: #variables!code endpoints!public! !
+!WebsideAPI categoriesFor: #workspace!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #workspaces!private! !
 
 !WebsideAPI class methodsFor!
