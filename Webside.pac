@@ -16,7 +16,9 @@ package classNames
 	add: #URLTemplateTest;
 	add: #URLTest;
 	add: #WebsideAPI;
+	add: #WebsideResource;
 	add: #WebsideServer;
+	add: #WebsideWorkspace;
 	yourself.
 
 package methodNames
@@ -145,6 +147,11 @@ Object subclass: #WebsideAPI
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+Object subclass: #WebsideResource
+	instanceVariableNames: 'id'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
 Object subclass: #WebsideServer
 	instanceVariableNames: 'server router baseUri port resources'
 	classVariableNames: ''
@@ -157,6 +164,11 @@ TestCase subclass: #URLTemplateTest
 	classInstanceVariableNames: ''!
 TestCase subclass: #URLTest
 	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+WebsideResource subclass: #WebsideWorkspace
+	instanceVariableNames: 'bindings'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -320,12 +332,14 @@ websideType
 !Object methodsFor!
 
 asWebsideJson
+	| printed |
+	printed := [self printString] on: Error
+				do: [:e | 'Error while printing ' , self class name , ' instance'].
 	^Dictionary new
 		at: 'class' put: self class name;
 		at: 'indexable' put: self isIndexable;
-		at: 'size'
-		put: (self isIndexable ifTrue: [self size] ifFalse: [0]);
-		at: 'printString' put: self printString;
+		at: 'size' put: (self isIndexable ifTrue: [self size] ifFalse: [0]);
+		at: 'printString' put: printed;
 		yourself! !
 !Object categoriesFor: #asWebsideJson!converting!public! !
 
@@ -1963,7 +1977,7 @@ classTreeFrom: aClass depth: anInteger	| json subclasses depth names |	names :
 
 classTreeFromClasses: aCollection	| roots json subclasses |	roots := Dictionary new.	aCollection		do: 				[:c |				json := self newJsonObject							at: 'name' put: c name;							yourself.				roots at: c name put: json];		do: 				[:c |				c superclass notNil					ifTrue: 						[roots at: c superclass							ifPresent: 								[:sc |								subclasses := sc at: 'subclasses'											ifAbsentPut: [SortedCollection new sortBlock: [:a :b | (a at: 'name') <= (b at: 'name')]].								subclasses add: (roots at: c name)]]];		do: 				[:c |				c superclass notNil					ifTrue: [(roots includesKey: c superclass name) ifTrue: [roots removeKey: c name]]].	^(roots asArray asSortedCollection: [:a :b | (a at: 'name') <= (b at: 'name')]) asArray!
 
-classVariables	| class |	class := self requestedClass.	class ifNil: [^self notFound].	^(class withAllSuperclasses gather: 			[:c |			c classVarNames asArray sort collect: 					[:v |					^self newJsonObject						at: 'name' put: v;						at: 'class' put: c name , ' class';						at: 'type' put: 'class';						yourself]])		asArray!
+classVariables	| class |	class := self requestedClass.	class ifNil: [^self notFound].	^(class withAllSuperclasses gather: 			[:c |			c classVarNames asArray sort collect: 					[:v |					self newJsonObject						at: 'name' put: v;						at: 'class' put: c name , ' class';						at: 'type' put: 'class';						yourself]])		asArray!
 
 compilationError: aCompilationError
 	| error |
@@ -2009,7 +2023,7 @@ createDebugger
 		at: 'description' put: debugger name;
 		yourself!
 
-createWorkspace	| id |	id := self newID.	self workspaces at: id put: #Workspace new.	^ id asString!
+createWorkspace	| id |	id := self newID.	self workspaces at: id put: WebsideWorkspace new.	^ id asString!
 
 debugExpression	| expression method receiver process context debugger id |	expression := self bodyAt: 'expression' ifAbsent: [''].	method := self compiler compile: expression.	receiver := self compilerReceiver.	process := [ method valueWithReceiver: receiver arguments: #() ]		newProcess.	context := process suspendedContext.	debugger := process		newDebugSessionNamed: 'debug it'		startedAt: context.	debugger stepIntoUntil: [ :c | c method == method ].	id := self newID.	self evaluations at: id put: process.	self debuggers at: id put: debugger.	^ id asString!
 
@@ -2448,6 +2462,8 @@ terminateDebugger
 	debugger terminate.
 	^nil!
 
+unpinAllObjects	self objects removeAll.	^ nil!
+
 unpinObject
 	self objects removeKey: self requestedId ifAbsent: [^self notFound].
 	^nil!
@@ -2544,6 +2560,7 @@ workspaces
 !WebsideAPI categoriesFor: #stepThroughDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #subclasses!code endpoints!public! !
 !WebsideAPI categoriesFor: #terminateDebugger!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #unpinAllObjects!objects endpoints!public! !
 !WebsideAPI categoriesFor: #unpinObject!objects endpoints!public! !
 !WebsideAPI categoriesFor: #urlAt:!private! !
 !WebsideAPI categoriesFor: #variables!code endpoints!public! !
@@ -2570,6 +2587,31 @@ stopServer
 	WebsideServer allInstances do: [:s | s stop]! !
 !WebsideAPI class categoriesFor: #startServer!public!services! !
 !WebsideAPI class categoriesFor: #stopServer!public!services! !
+
+WebsideResource guid: (GUID fromString: '{fb90d8b3-e1bf-4830-b05d-2d19107070b8}')!
+WebsideResource comment: ''!
+!WebsideResource categoriesForClass!Unclassified! !
+!WebsideResource methodsFor!
+
+asWebsideJson	^super asWebsideJson at: 'id' put: id asString; yourself!
+
+id	^id!
+
+id: anIID	id := anIID!
+
+initialize	super initialize.	id := self class newId! !
+!WebsideResource categoriesFor: #asWebsideJson!public! !
+!WebsideResource categoriesFor: #id!public! !
+!WebsideResource categoriesFor: #id:!public! !
+!WebsideResource categoriesFor: #initialize!public! !
+
+!WebsideResource class methodsFor!
+
+new	^super new initialize!
+
+newId	^IID newUnique! !
+!WebsideResource class categoriesFor: #new!public! !
+!WebsideResource class categoriesFor: #newId!public! !
 
 WebsideServer guid: (GUID fromString: '{4ccc35e6-7d31-4554-8b09-5b16765a0d84}')!
 WebsideServer comment: 'WebsideAPI startServer
@@ -2680,12 +2722,7 @@ initializeDebuggingRoutes
 
 initializeEvaluationRoutes	router		routePOST: '/evaluations' to: #evaluateExpression;		routeGET: '/evaluations' to: #activeEvaluations;		routeGET: '/evaluations/{id}' to: #activeEvaluation;		routeDELETE: '/evaluations/{id}' to: #cancelEvaluation!
 
-initializeObjectsRoutes
-	router
-		routeGET: '/objects' to: #pinnedObjects;
-		routeGET: '/objects/{id}' to: #pinnedObject;
-		routeDELETE: '/objects/{id}' to: #unpinObject;
-		routeGET: '/objects/{id}/*' to: #pinnedObjectSlot!
+initializeObjectsRoutes            router		routeGET: '/objects' to: #pinnedObjects;		routeGET: '/objects/{id}' to: #pinnedObject;		routeDELETE: '/objects/{id}' to: #unpinObject;		routeGET: '/objects/{id}/*' to: #pinnedObjectSlots;		routePOST: '/objects' to: #pinObjectSlot;		routeDELETE: '/objects' to: #unpinAllObjects    !
 
 initializePreflightRoutes
 	router routeOPTIONS: '/*' to: [:request | self handlePreflightRequest: request]	"This is not that well"!
@@ -3470,6 +3507,20 @@ testWikipedia5
 !URLTest categoriesFor: #testWikipedia3!public! !
 !URLTest categoriesFor: #testWikipedia4!public! !
 !URLTest categoriesFor: #testWikipedia5!public! !
+
+WebsideWorkspace guid: (GUID fromString: '{dcba7ff2-0ed4-4a98-8467-b131777c73b8}')!
+WebsideWorkspace comment: ''!
+!WebsideWorkspace categoriesForClass!Unclassified! !
+!WebsideWorkspace methodsFor!
+
+declareVariable: aString	bindings at: aString reduced put: nil!
+
+initialize	super initialize.	bindings := Dictionary new!
+
+receiver	^nil! !
+!WebsideWorkspace categoriesFor: #declareVariable:!public! !
+!WebsideWorkspace categoriesFor: #initialize!public! !
+!WebsideWorkspace categoriesFor: #receiver!public! !
 
 "Binary Globals"!
 
