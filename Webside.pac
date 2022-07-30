@@ -2170,7 +2170,31 @@ implementorsOf: aSymbol
 	self queriedScope ifNotNil: [:class | environment := environment forClasses: {class}].
 	^(system definitionsMatching: search in: environment) allMethods asArray!
 
+indexedSlotsOf: anObject
+	| from to slot |
+	anObject class isVariable ifFalse: [^self notFound].
+	from := self
+				queryAt: 'from'
+				ifPresent: [:f | self integerFrom: f]
+				ifAbsent: [1].
+	to := self
+				queryAt: 'to'
+				ifPresent: [:t | self integerFrom: t]
+				ifAbsent: [anObject size].
+	^(from to: to) collect: 
+			[:i |
+			slot := anObject basicAt: i.
+			slot asWebsideJson
+				at: 'slot' put: i;
+				yourself]!
+
 instanceVariables	| class |	class := self requestedClass.	class isNil ifTrue: [^self notFound].	^(class withAllSuperclasses gather: 			[:c |			c instVarNames collect: 					[:v |					self newJsonObject						at: 'name' put: v;						at: 'class' put: c name;						at: 'type' put: 'instance';						yourself]])		asArray!
+
+instanceVariablesOf: anObject	^anObject class allInstVarNames		collect: [ :n | 			self newJsonObject				at: 'name' put: n;				yourself ]!
+
+integerFrom: aString
+	aString isInteger ifTrue: [^aString].
+	^[Integer fromString: aString] on: Error do: [:e | ]!
 
 method	| class selector method json |	class := self requestedClass.	class ifNil: [^self notFound].	selector := self requestedSelector.	selector ifNil: [^self notFound].	(class includesSelector: selector) ifFalse: [^self notFound]. 	method := class >> selector.	json := method asWebsideJson.   	(self queryAt: 'ast') = 'true'		ifTrue: [ json at: 'ast' put: method parseTree asWebsideJson ].	^json!
 
@@ -2201,6 +2225,8 @@ methods
 			json := m asWebsideJson.
 			ast ifTrue: [json at: 'ast' put: m parseTree asWebsideJson].
 			json]!
+
+namedSlotsOf: anObject	| slot |	^anObject class allInstVarNames collect: [ :n |		slot := self slot: n of: anObject ifAbsent: nil.		slot asWebsideJson at: 'slot' put: n; yourself  ]!
 
 newID	^IID newUnique!
 
@@ -2274,7 +2300,7 @@ pinnedObjectSlots
 	| id object path index last |
 	id := self requestedId.
 	object := self objects at: id ifAbsent: [^self notFound].
-	path := request url segments.
+	path := request fullUrl asURL segments.
 	index := path indexOf: 'objects'.
 	path
 		from: index + 2
@@ -2294,6 +2320,8 @@ pinnedObjectSlots
 				of: object
 				ifAbsent: [^self notFound].
 	^object asWebsideJson!
+
+pinObjectSlot	| slot id |	slot := self requestedSlot.	slot ifNil: [ ^ self badRequest: 'Bad object slot URI' ].	id := self newID.	self objects at: id put: slot.	^ slot asWebsideJson		at: 'id' put: id asString;		yourself!
 
 queriedAssigning
 	^self queryAt: 'assigning'!
@@ -2335,7 +2363,13 @@ queriedUsing
 	^self queryAt: 'using'!
 
 queryAt: aString
-	^request fullUrl asURL queryAt: aString!
+	^self queryAt: aString ifAbsent: nil!
+
+queryAt: aString ifAbsent: aBlock	^self queryAt: aString ifPresent: nil ifAbsent: aBlock!
+
+queryAt: aString ifPresent: aBlock	^self queryAt: aString ifPresent: aBlock ifAbsent: nil!
+
+queryAt: aString ifPresent: aBlock ifAbsent: anotherBlock	| value |	value := request fullUrl asURL queryAt: aString.	value ifNil: [ ^ anotherBlock ifNotNil: [anotherBlock value ]].	^ aBlock notNil		ifTrue: [ aBlock value: value ]		ifFalse: [ value ]!
 
 referencesTo: aClass
 	| system global environment |
@@ -2368,7 +2402,7 @@ requestedId
 requestedIndex
 	| index |
 	index := self urlAt: 'index'.
-	^index ifNotNil: [index asInteger]!
+	^index ifNotNil: [self integerFrom: index]!
 
 requestedPackage
 	| name |
@@ -2379,6 +2413,8 @@ requestedSelector
 	| selector |
 	selector := self urlAt: 'selector'.
 	^selector ifNotNil: [selector asSymbol]!
+
+requestedSlot	| uri path index id slot |	uri := self bodyAt: 'uri' ifAbsent: [ ^ nil ].	path := uri subStrings: '/'.	index := path indexOf: 'objects' ifAbsent: [ ^ nil ].	id := path at: index + 1 ifAbsent: [ ^ nil ].	id := IID fromString: id.	slot := self objects at: id ifAbsent: [ ^ nil ].	path		from: index + 2		to: path size		do: [ :s | slot := self slot: s of: slot ifAbsent: [ ^ nil ] ].	^ slot!
 
 restartDebugger
 	| debugger context update method |
@@ -2412,13 +2448,13 @@ server: aWebsideServer
 
 slot: aString of: anObject ifAbsent: aBlock
 	| index |
-	aString asInteger asString = aString
+	(self integerFrom: aString) printString = aString
 		ifTrue: 
-			[index := aString asInteger.
+			[index := self integerFrom: aString.
 			(anObject isKindOf: SequenceableCollection)
 				ifTrue: 
 					[index > anObject size ifTrue: [^aBlock value].
-					^[anObject at: index] on: Error do: [anObject basicAt: index]]
+					^[anObject at: index] on: Error do: [:e | anObject basicAt: index]]
 				ifFalse: 
 					[anObject class isVariable ifTrue: [^anObject at: index].
 					index > anObject class instSize ifTrue: [^aBlock value].
@@ -2487,7 +2523,7 @@ workspaces
 !WebsideAPI categoriesFor: #activeWorkspaces!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #addChange!changes endpoints!public! !
 !WebsideAPI categoriesFor: #badRequest:!private! !
-!WebsideAPI categoriesFor: #bodyAt:!public! !
+!WebsideAPI categoriesFor: #bodyAt:!private! !
 !WebsideAPI categoriesFor: #bodyAt:ifAbsent:!private! !
 !WebsideAPI categoriesFor: #cancelEvaluation!evaluation endpoints!public! !
 !WebsideAPI categoriesFor: #categories!code endpoints!public! !
@@ -2495,8 +2531,8 @@ workspaces
 !WebsideAPI categoriesFor: #classDefinition!code endpoints!public! !
 !WebsideAPI categoriesFor: #classes!code endpoints!public! !
 !WebsideAPI categoriesFor: #classNamed:!private! !
-!WebsideAPI categoriesFor: #classTreeFrom:depth:!public! !
-!WebsideAPI categoriesFor: #classTreeFromClasses:!public! !
+!WebsideAPI categoriesFor: #classTreeFrom:depth:!private! !
+!WebsideAPI categoriesFor: #classTreeFromClasses:!private! !
 !WebsideAPI categoriesFor: #classVariables!code endpoints!public! !
 !WebsideAPI categoriesFor: #compilationError:!private! !
 !WebsideAPI categoriesFor: #compilerReceiver!private! !
@@ -2518,9 +2554,13 @@ workspaces
 !WebsideAPI categoriesFor: #filterByVariable:!private! !
 !WebsideAPI categoriesFor: #frameBindings!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #implementorsOf:!private! !
+!WebsideAPI categoriesFor: #indexedSlotsOf:!private! !
 !WebsideAPI categoriesFor: #instanceVariables!code endpoints!public! !
+!WebsideAPI categoriesFor: #instanceVariablesOf:!public! !
+!WebsideAPI categoriesFor: #integerFrom:!private! !
 !WebsideAPI categoriesFor: #method!code endpoints!public! !
 !WebsideAPI categoriesFor: #methods!code endpoints!public! !
+!WebsideAPI categoriesFor: #namedSlotsOf:!private! !
 !WebsideAPI categoriesFor: #newID!private! !
 !WebsideAPI categoriesFor: #newJsonObject!private! !
 !WebsideAPI categoriesFor: #notFound!private! !
@@ -2532,6 +2572,7 @@ workspaces
 !WebsideAPI categoriesFor: #pinnedObject!objects endpoints!public! !
 !WebsideAPI categoriesFor: #pinnedObjects!objects endpoints!public! !
 !WebsideAPI categoriesFor: #pinnedObjectSlots!objects endpoints!public! !
+!WebsideAPI categoriesFor: #pinObjectSlot!objects endpoints!public! !
 !WebsideAPI categoriesFor: #queriedAssigning!private! !
 !WebsideAPI categoriesFor: #queriedCategory!private! !
 !WebsideAPI categoriesFor: #queriedClass!private! !
@@ -2542,6 +2583,9 @@ workspaces
 !WebsideAPI categoriesFor: #queriedSending!private! !
 !WebsideAPI categoriesFor: #queriedUsing!private! !
 !WebsideAPI categoriesFor: #queryAt:!private! !
+!WebsideAPI categoriesFor: #queryAt:ifAbsent:!private! !
+!WebsideAPI categoriesFor: #queryAt:ifPresent:!private! !
+!WebsideAPI categoriesFor: #queryAt:ifPresent:ifAbsent:!private! !
 !WebsideAPI categoriesFor: #referencesTo:!private! !
 !WebsideAPI categoriesFor: #request:!accessing!public! !
 !WebsideAPI categoriesFor: #requestedChange!private! !
@@ -2550,6 +2594,7 @@ workspaces
 !WebsideAPI categoriesFor: #requestedIndex!private! !
 !WebsideAPI categoriesFor: #requestedPackage!private! !
 !WebsideAPI categoriesFor: #requestedSelector!private! !
+!WebsideAPI categoriesFor: #requestedSlot!private! !
 !WebsideAPI categoriesFor: #restartDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #resumeDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #sendersOf:!private! !
