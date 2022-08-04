@@ -186,9 +186,17 @@ asWebsideJson
 		yourself!
 
 fromWebsideJson: json
-	| msg keywords index |
+	| superclass msg keywords index |
 	super fromWebsideJson: json.
-	definition := json at: 'definition' ifAbsent: [].
+	definition := json at: 'definition'
+				ifAbsent: 
+					[superclass := json at: 'superclass'.
+					superclass , ' subclass: #' , className
+						, ' 
+	instanceVariableNames: ''''
+	classVariableNames: ''''
+	poolDictionaries: ''''
+	classInstanceVariableNames: '''''].
 	className isNil
 		ifTrue: 
 			[msg := SmalltalkParser parseExpression: definition.
