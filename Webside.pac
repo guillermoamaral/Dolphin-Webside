@@ -2331,41 +2331,29 @@ pinnedObjectSlots
 
 pinObjectSlot	| slot id |	slot := self requestedSlot.	slot ifNil: [ ^ self badRequest: 'Bad object slot URI' ].	id := self newID.	self objects at: id put: slot.	^ slot asWebsideJson		at: 'id' put: id asString;		yourself!
 
+queriedAccessing	^ self queryAt: 'accessing'!
+
 queriedAssigning
 	^self queryAt: 'assigning'!
 
-queriedCategory
-	| category |
-	category := self queryAt: 'category'.
-	^category ifNotNil: [category asSymbol]!
+queriedCategory	^self queryAt: 'category' ifPresent: [:c | c asSymbol]!
 
-queriedClass
-	| name |
-	name := self queryAt: 'class'.
-	^name ifNotNil: [self classNamed: name]!
+queriedClass	^self queryAt: 'class' ifPresent: [:n | self classNamed: n]!
 
 queriedReferencing
 	^self queriedReferencingClass isNil ifTrue: [self queryAt: 'referencing']!
 
-queriedReferencingClass
-	| name |
-	name := self queryAt: 'referencing'.
-	^name notNil ifTrue: [self classNamed: name]!
+queriedReferencingClass	^self queryAt: 'referencingClass' ifPresent: [:n | self classNamed: n ]!
 
-queriedScope
-	| scope |
-	scope := self queryAt: 'scope'.
-	^scope ifNotNil: [self classNamed: scope]!
+queriedReferencingString	^ self queryAt: 'referencingString'!
 
-queriedSelector
-	| selector |
-	selector := self queryAt: 'selector'.
-	^selector "ifNotNil: [Compiler new findSelector: selector]"!
+queriedScope	^self queryAt: 'scope' ifPresent: [:s | self classNamed: s ]!
 
-queriedSending
-	| selector |
-	selector := self queryAt: 'sending'.
-	^selector ifNotNil: [selector asSymbol]!
+queriedSelector	^self queryAt: 'selector' ifPresent: [:s | s asSymbol]!
+
+queriedSelectorMatching	^self queryAt: 'selectorMatching'!
+
+queriedSending	^self queryAt: 'sending' ifPresent: [:s | s asSymbol]!
 
 queriedUsing
 	^self queryAt: 'using'!
@@ -2581,14 +2569,17 @@ workspaces
 !WebsideAPI categoriesFor: #pinnedObjects!objects endpoints!public! !
 !WebsideAPI categoriesFor: #pinnedObjectSlots!objects endpoints!public! !
 !WebsideAPI categoriesFor: #pinObjectSlot!objects endpoints!public! !
+!WebsideAPI categoriesFor: #queriedAccessing!public! !
 !WebsideAPI categoriesFor: #queriedAssigning!private! !
-!WebsideAPI categoriesFor: #queriedCategory!private! !
-!WebsideAPI categoriesFor: #queriedClass!private! !
+!WebsideAPI categoriesFor: #queriedCategory!public! !
+!WebsideAPI categoriesFor: #queriedClass!public! !
 !WebsideAPI categoriesFor: #queriedReferencing!private! !
-!WebsideAPI categoriesFor: #queriedReferencingClass!private! !
-!WebsideAPI categoriesFor: #queriedScope!private! !
-!WebsideAPI categoriesFor: #queriedSelector!private! !
-!WebsideAPI categoriesFor: #queriedSending!private! !
+!WebsideAPI categoriesFor: #queriedReferencingClass!public! !
+!WebsideAPI categoriesFor: #queriedReferencingString!public! !
+!WebsideAPI categoriesFor: #queriedScope!public! !
+!WebsideAPI categoriesFor: #queriedSelector!public! !
+!WebsideAPI categoriesFor: #queriedSelectorMatching!public! !
+!WebsideAPI categoriesFor: #queriedSending!public! !
 !WebsideAPI categoriesFor: #queriedUsing!private! !
 !WebsideAPI categoriesFor: #queryAt:!private! !
 !WebsideAPI categoriesFor: #queryAt:ifAbsent:!private! !
