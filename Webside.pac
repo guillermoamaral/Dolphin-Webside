@@ -573,7 +573,7 @@ asWebsideJson	| children |	children := OrderedCollection with: selector asWebs
 
 !StProgramNode methodsFor!
 
-asWebsideJson	^ Dictionary new		at: 'type' put: self websideType;		at: 'start' put: self start;		at: 'end' put: self stop;		yourself!
+asWebsideJson	^ super asWebsideJson		at: 'type' put: self websideType;		at: 'start' put: self start;		at: 'end' put: self stop;		yourself!
 
 websideType	^self class websideType! !
 !StProgramNode categoriesFor: #asWebsideJson!public!replacing! !
