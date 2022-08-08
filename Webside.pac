@@ -318,9 +318,9 @@ asWebsideJson
 	| source category |
 	source := self getSource copyWithout: 10 asCharacter.
 	category := self categories detect: [:c | c isPrivacy not and: [c isVirtual not]] ifNone: [].
-	^Dictionary new
+	^super asWebsideJson
 		at: 'selector' put: selector;
-		at: 'class' put: self methodClass name;
+		at: 'methodClass' put: self methodClass name;
 		at: 'category' put: (category ifNotNil: [:c | c name]);
 		at: 'source' put: source;
 		at: 'author' put: 'self author';
