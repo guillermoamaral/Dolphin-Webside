@@ -2071,8 +2071,7 @@ deleteDebugger
 
 deleteWorkspace	self workspaces		removeKey: self requestedId		ifAbsent: [ ^ self notFound ].	^ nil!
 
-dialect
-	^'Dolphin'!
+dialect	^'Dolphin'!
 
 evaluateExpression
 	| debug expression sync pin id semaphore object process block json |
@@ -2431,6 +2430,9 @@ resumeDebugger
 	debugger resume.
 	^nil!
 
+saveImage	SessionManager current saveImage.
+	^true!
+
 sendersOf: aSymbol
 	| system search environment |
 	system := SmalltalkSystem current.
@@ -2541,7 +2543,7 @@ workspaces
 !WebsideAPI categoriesFor: #defaultRootClass!private! !
 !WebsideAPI categoriesFor: #deleteDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #deleteWorkspace!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #dialect!code endpoints!public! !
+!WebsideAPI categoriesFor: #dialect!general endpoints!public! !
 !WebsideAPI categoriesFor: #evaluateExpression!evaluation endpoints!public! !
 !WebsideAPI categoriesFor: #evaluateExpression:!private! !
 !WebsideAPI categoriesFor: #evaluationError:!public! !
@@ -2596,6 +2598,7 @@ workspaces
 !WebsideAPI categoriesFor: #requestedSlot!private! !
 !WebsideAPI categoriesFor: #restartDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #resumeDebugger!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #saveImage!general endpoints!public! !
 !WebsideAPI categoriesFor: #sendersOf:!private! !
 !WebsideAPI categoriesFor: #server:!accessing!public! !
 !WebsideAPI categoriesFor: #slot:of:ifAbsent:!private! !
@@ -2726,26 +2729,7 @@ initializeChangesRoutes
 		routeGET: '/changes' to: #changes;
 		routePOST: '/changes' to: #addChange!
 
-initializeCodeRoutes
-	router
-		routeGET: '/dialect' to: #dialect;
-		routeGET: '/packages' to: #packages;
-		routeGET: '/packages/{name}' to: #package;
-		routeGET: '/packages/{name}/classes'
-		to: #packageClasses;
-		routeGET: '/packages/{name}/methods'
-		to: #packageMethods;
-		routeGET: '/classes' to: #classes;
-		routeGET: '/classes/{name}' to: #classDefinition;
-		routeGET: '/classes/{name}/subclasses' to: #subclasses;
-		routeGET: '/classes/{name}/variables' to: #variables;
-		routeGET: '/classes/{name}/instance-variables'
-			to: #instanceVariables;
-		routeGET: '/classes/{name}/class-variables' to: #classVariables;
-		routeGET: '/classes/{name}/categories' to: #categories;
-		routeGET: '/classes/{name}/methods' to: #methods;
-		routeGET: '/classes/{name}/methods/{selector}' to: #method;
-		routeGET: '/methods' to: #methods!
+initializeCodeRoutes	router		routeGET: '/packages' to: #packages;		routeGET: '/packages/{name}' to: #package;		routeGET: '/packages/{name}/classes'		to: #packageClasses;		routeGET: '/packages/{name}/methods'		to: #packageMethods;		routeGET: '/classes' to: #classes;		routeGET: '/classes/{name}' to: #classDefinition;		routeGET: '/classes/{name}/subclasses' to: #subclasses;		routeGET: '/classes/{name}/variables' to: #variables;		routeGET: '/classes/{name}/instance-variables'			to: #instanceVariables;		routeGET: '/classes/{name}/class-variables' to: #classVariables;		routeGET: '/classes/{name}/categories' to: #categories;		routeGET: '/classes/{name}/methods' to: #methods;		routeGET: '/classes/{name}/methods/{selector}' to: #method;		routeGET: '/methods' to: #methods!
 
 initializeDebuggingRoutes
 	router
@@ -2766,6 +2750,11 @@ initializeDebuggingRoutes
 
 initializeEvaluationRoutes	router		routePOST: '/evaluations' to: #evaluateExpression;		routeGET: '/evaluations' to: #activeEvaluations;		routeGET: '/evaluations/{id}' to: #activeEvaluation;		routeDELETE: '/evaluations/{id}' to: #cancelEvaluation!
 
+initializeGeneralRoutes
+	router
+		routeGET: '/dialect' to: #dialect;
+		routePOST: 'save' to: #saveImage!
+
 initializeObjectsRoutes            router		routeGET: '/objects' to: #pinnedObjects;		routeGET: '/objects/{id}' to: #pinnedObject;		routeDELETE: '/objects/{id}' to: #unpinObject;		routeGET: '/objects/{id}/*' to: #pinnedObjectSlots;		routePOST: '/objects' to: #pinObjectSlot;		routeDELETE: '/objects' to: #unpinAllObjects    !
 
 initializePreflightRoutes
@@ -2773,16 +2762,7 @@ initializePreflightRoutes
 
 initializeResources	resources := Dictionary new.	resources    	at: #evaluations put: Dictionary new;		at: #objects put: Dictionary new;		at: #workspaces put: Dictionary new;		at: #debuggers put: Dictionary new; at: #testRuns put: Dictionary new!
 
-initializeRoutes
-	router receiver: [WebsideAPI new server: self].
-	self
-		initializePreflightRoutes;
-		initializeCodeRoutes;
-		initializeChangesRoutes;
-		initializeEvaluationRoutes;
-		initializeObjectsRoutes;
-		initializeWorkspacesRoutes;
-		initializeDebuggingRoutes!
+initializeRoutes	router receiver: [WebsideAPI new server: self].	self		initializePreflightRoutes;        initializeGeneralRoutes;		initializeCodeRoutes;		initializeChangesRoutes;		initializeEvaluationRoutes;		initializeObjectsRoutes;		initializeWorkspacesRoutes;		initializeDebuggingRoutes!
 
 initializeServer
 	server := HttpServer new.
@@ -2839,6 +2819,7 @@ workspaces	^ self resourcesAt: #workspaces! !
 !WebsideServer categoriesFor: #initializeCodeRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeDebuggingRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeEvaluationRoutes!initializing!public! !
+!WebsideServer categoriesFor: #initializeGeneralRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeObjectsRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializePreflightRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeResources!initializing!public! !
