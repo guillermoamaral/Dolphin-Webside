@@ -16,6 +16,7 @@ package classNames
 	add: #URLTemplateTest;
 	add: #URLTest;
 	add: #WebsideAPI;
+	add: #WebsideClient;
 	add: #WebsideResource;
 	add: #WebsideServer;
 	add: #WebsideWorkspace;
@@ -91,7 +92,6 @@ package setPrerequisites: #(
 	'..\Core\Object Arts\Dolphin\IDE\Base\Development System'
 	'..\Core\Object Arts\Dolphin\Base\Dolphin'
 	'..\DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
-	'..\Core\Object Arts\Dolphin\MVP\Base\Dolphin MVP Base'
 	'..\Core\Object Arts\Dolphin\ActiveX\COM\OLE COM'
 	'..\Core\Contributions\Refactory\Refactoring Browser\Change Objects\RBChangeObjects'
 	'..\Core\Object Arts\Dolphin\System\Compiler\Smalltalk Parser'
@@ -144,6 +144,11 @@ Object subclass: #URLTemplate
 	classInstanceVariableNames: ''!
 Object subclass: #WebsideAPI
 	instanceVariableNames: 'server request'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #WebsideClient
+	instanceVariableNames: 'url client'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -1536,20 +1541,6 @@ printOn: aStream
 		printQueryOn: aStream;
 		printFragmentOn: aStream!
 
-printParametersOn: rtf
-	self hasQuery ifFalse: [^self].
-	rtf
-		cr;
-		cr;
-		useColor: Color darkGray while: [rtf bold: 'Query parameters'];
-		cr.
-	self queryOptions
-		do: [:option | 
-			rtf
-				bold: option key;
-				nextPutAll: ': ' , option value]
-		separatedBy: [rtf cr]!
-
 printPathOn: aStream
 	self printSegments: segments on: aStream!
 
@@ -1748,12 +1739,11 @@ user: aString
 !URL categoriesFor: #pathAndQuery!inquiries!public! !
 !URL categoriesFor: #port!accessing!public! !
 !URL categoriesFor: #port:!accessing!public! !
-!URL categoriesFor: #postCopy!converting!public! !
+!URL categoriesFor: #postCopy!copying!public! !
 !URL categoriesFor: #printAuthorityOn:!printing!public! !
 !URL categoriesFor: #printFragmentOn:!printing!public! !
 !URL categoriesFor: #printHostOn:!printing!public! !
 !URL categoriesFor: #printOn:!printing!public! !
-!URL categoriesFor: #printParametersOn:!printing!public! !
 !URL categoriesFor: #printPathOn:!printing!public! !
 !URL categoriesFor: #printPortOn:!printing!public! !
 !URL categoriesFor: #printQueryOn:!printing!public! !
@@ -1826,7 +1816,7 @@ hash
 	^pattern input hash
 !
 
-initializeParamenters
+initializeParameters
 	| spec segments |
 	parameters := Dictionary new.
 	spec := self trimSlashesFrom: raw.
@@ -1853,7 +1843,7 @@ matches: anURL
 
 on: aString
 	raw := aString.
-	self initializeParamenters; initializeSample; initializePattern!
+	self initializeParameters; initializeSample; initializePattern!
 
 parameters
 	^parameters asArray!
@@ -1877,7 +1867,7 @@ trimSlashesFrom: aString
 !URLTemplate categoriesFor: #description:!accessing!public! !
 !URLTemplate categoriesFor: #hasDescription!private! !
 !URLTemplate categoriesFor: #hash!comparing!public! !
-!URLTemplate categoriesFor: #initializeParamenters!private! !
+!URLTemplate categoriesFor: #initializeParameters!private! !
 !URLTemplate categoriesFor: #initializePattern!private! !
 !URLTemplate categoriesFor: #initializeSample!private! !
 !URLTemplate categoriesFor: #matches:!private! !
@@ -2635,6 +2625,9 @@ stopServer
 !WebsideAPI class categoriesFor: #startServer!public!services! !
 !WebsideAPI class categoriesFor: #stopServer!public!services! !
 
+WebsideClient guid: (GUID fromString: '{01ff30e8-7918-4d1f-8703-ba7c4f350477}')!
+WebsideClient comment: ''!
+!WebsideClient categoriesForClass!Unclassified! !
 WebsideResource guid: (GUID fromString: '{fb90d8b3-e1bf-4830-b05d-2d19107070b8}')!
 WebsideResource comment: ''!
 !WebsideResource categoriesForClass!Unclassified! !
@@ -2959,7 +2952,7 @@ testEncodedQuery
 		description: 'Query options are printed encoded'!
 
 testEquality
-	'http://www.petrovr.com' asURL = 'HTTP://WWW.PETROVR.COM' asURL!
+	self assert: 'http://www.petrovr.com' asURL = 'HTTP://WWW.PETROVR.COM' asURL!
 
 testFreeFormatter1
 	| url |
