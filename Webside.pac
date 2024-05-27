@@ -2124,49 +2124,38 @@ filterByCategory: aCollection
 		ifFalse: [aCollection]!
 
 filterByVariable: aCollection
-	| grouped filtered variable filter |
+	| grouped filtered variable filter var |
 	grouped := aCollection groupBy: #methodClass.
 	filtered := OrderedCollection new.
-	variable := self queriedReferencing.
+	variable := self queriedAccessing.
 	filter := false.
-	variable ifNotNil: [
-		filter := true.
-		grouped keysAndValuesDo: [:class :methods | | slot var |
-			slot := class allInstVarNames indexOf: variable ifAbsent: nil.
-			slot notNil
-				ifTrue: [methods
-					select: [:m | m referencesInstanceVariable: slot]
-					in: filtered].
-			var := class classVariableAssociationAt: variable.
-			var notNil
-				ifTrue: [methods
-					select: [:m | m referencesAssociation: slot]
-					in: filtered]]].
+	variable
+		ifNotNil: 
+			[filter := true.
+			grouped keysAndValuesDo: 
+					[:class :methods |
+					filtered addAll: (methods select: [:m | m accessesInstVar: variable]).
+					var := class bindingFor: variable.
+					var notNil ifTrue: [filtered addAll: (methods select: [:m | m refersToLiteral: var])]]].
 	variable := self queriedUsing.
-	variable ifNotNil: [
-		filter := true.
-		grouped keysAndValuesDo: [:class :methods | | slot var |
-			slot := class allInstVarNames indexOf: variable ifAbsent: nil.
-			slot notNil
-				ifTrue: [methods
-					select: [:m | m usesInstanceVariable: slot]
-					in: filtered].
-			var := class classVariableAssociationAt: variable.
-			var notNil
-				ifTrue: [methods select: [:m | m usesAssociation: slot] in: filtered]]].
+	variable
+		ifNotNil: 
+			[filter := true.
+			grouped keysAndValuesDo: 
+					[:class :methods |
+					filtered addAll: (methods select: [:m | m readsInstVar: variable]).
+					var := class bindingFor: variable.
+					var notNil ifTrue: [filtered addAll: (methods select: [:m | m refersToLiteral: var])]]].
 	variable := self queriedAssigning.
-	variable ifNotNil: [
-		filter := true.
-		grouped keysAndValuesDo: [:class :methods | | slot var |
-			slot := class allInstVarNames indexOf: variable ifAbsent: nil.
-			slot notNil
-				ifTrue: [methods
-					select: [:m | m assignsInstanceVariable: slot]
-					in: filtered].
-			var := class classVariableAssociationAt: variable.
-			var notNil
-				ifTrue: [methods select: [:m | m assignsAssociation: slot] in: filtered]]].
-	^filter ifTrue: [filtered] ifFalse: [aCollection]!
+	variable
+		ifNotNil: 
+			[filter := true.
+			grouped keysAndValuesDo: 
+					[:class :methods |
+					filtered addAll: (methods select: [:m | m writesInstVar: variable]).
+					var := class bindingFor: variable.
+					var notNil ifTrue: [filtered addAll: (methods select: [:m | m refersToLiteral: var])]]].
+	^filter ifTrue: [filtered asArray] ifFalse: [aCollection]!
 
 frameBindings	| debugger frame |	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].	frame := debugger stack at: self requestedIndex ifAbsent: [^self notFound].	^#() collect: 			[:b |			self newJsonObject				at: 'name' put: b key asString;				at: 'value' put: b value printString;				yourself]!
 
@@ -2578,17 +2567,17 @@ workspaces
 !WebsideAPI categoriesFor: #pinnedObjects!objects endpoints!public! !
 !WebsideAPI categoriesFor: #pinnedObjectSlots!objects endpoints!public! !
 !WebsideAPI categoriesFor: #pinObjectSlot!objects endpoints!public! !
-!WebsideAPI categoriesFor: #queriedAccessing!public! !
+!WebsideAPI categoriesFor: #queriedAccessing!private! !
 !WebsideAPI categoriesFor: #queriedAssigning!private! !
-!WebsideAPI categoriesFor: #queriedCategory!public! !
-!WebsideAPI categoriesFor: #queriedClass!public! !
+!WebsideAPI categoriesFor: #queriedCategory!private! !
+!WebsideAPI categoriesFor: #queriedClass!private! !
 !WebsideAPI categoriesFor: #queriedReferencing!private! !
-!WebsideAPI categoriesFor: #queriedReferencingClass!public! !
-!WebsideAPI categoriesFor: #queriedReferencingString!public! !
-!WebsideAPI categoriesFor: #queriedScope!public! !
-!WebsideAPI categoriesFor: #queriedSelector!public! !
-!WebsideAPI categoriesFor: #queriedSelectorMatching!public! !
-!WebsideAPI categoriesFor: #queriedSending!public! !
+!WebsideAPI categoriesFor: #queriedReferencingClass!private! !
+!WebsideAPI categoriesFor: #queriedReferencingString!private! !
+!WebsideAPI categoriesFor: #queriedScope!private! !
+!WebsideAPI categoriesFor: #queriedSelector!private! !
+!WebsideAPI categoriesFor: #queriedSelectorMatching!private! !
+!WebsideAPI categoriesFor: #queriedSending!private! !
 !WebsideAPI categoriesFor: #queriedUsing!private! !
 !WebsideAPI categoriesFor: #queryAt:!private! !
 !WebsideAPI categoriesFor: #queryAt:ifAbsent:!private! !
