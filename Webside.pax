@@ -1,0 +1,646 @@
+﻿| package |
+package := Package name: 'Webside'.
+package paxVersion: 1;
+	basicComment: ''.
+
+
+package classNames
+	add: #HttpRequestRouter;
+	add: #MatchAlgorithm;
+	add: #MatchToken;
+	add: #PercentEncoder;
+	add: #StarToken;
+	add: #StringPattern;
+	add: #URL;
+	add: #URLTemplate;
+	add: #URLTemplateTest;
+	add: #URLTest;
+	add: #WebsideAPI;
+	add: #WebsideClient;
+	add: #WebsideResource;
+	add: #WebsideServer;
+	add: #WebsideWorkspace;
+	yourself.
+
+package methodNames
+	add: #AddClassChange -> #asWebsideJson;
+	add: #AddClassChange -> #fromWebsideJson:;
+	add: #AddMethodChange -> #asWebsideJson;
+	add: #AddMethodChange -> #fromWebsideJson:;
+	add: #Character -> #isAsterisk;
+	add: #Character -> #isQuestionMark;
+	add: #ClassDescription -> #asWebsideJson;
+	add: #Collection -> #anyone;
+	add: #Collection -> #gather:;
+	add: #Collection -> #gather:in:;
+	add: #Collection -> #groupBy:;
+	add: #CompiledMethod -> #asWebsideJson;
+	add: #Object -> #asWebsideJson;
+	add: #Package -> #asWebsideJson;
+	add: #RefactoryChange -> #asWebsideJson;
+	add: #RefactoryChange -> #fromWebsideJson:;
+	add: #RefactoryClassChange -> #asWebsideJson;
+	add: #RefactoryClassChange -> #fromWebsideJson:;
+	add: #RefactoryVariableChange -> #asWebsideJson;
+	add: #RefactoryVariableChange -> #fromWebsideJson:;
+	add: #RemoveMethodChange -> #asWebsideJson;
+	add: #RemoveMethodChange -> #fromWebsideJson:;
+	add: #RenameClassChange -> #asWebsideJson;
+	add: #RenameClassChange -> #fromWebsideJson:;
+	add: #RenameVariableChange -> #asWebsideJson;
+	add: #RenameVariableChange -> #fromWebsideJson:;
+	add: #StAssignmentNode -> #asWebsideJson;
+	add: #StCascadeNode -> #asWebsideJson;
+	add: #StLiteralToken -> #asWebsideJson;
+	add: #StLiteralValueNode -> #asWebsideJson;
+	add: #StMessageNode -> #asWebsideJson;
+	add: #StMethodNode -> #asWebsideJson;
+	add: #StProgramNode -> #asWebsideJson;
+	add: #StProgramNode -> #websideType;
+	add: #StReturnNode -> #asWebsideJson;
+	add: #String -> #asURL;
+	add: #String -> #indexOfString:from:to:;
+	add: #StSequenceNode -> #asWebsideJson;
+	add: #StVariableNode -> #asWebsideJson;
+	add: #Symbol -> #evaluateWith:;
+	add: 'AddClassChange class' -> #websideType;
+	add: 'AddClassVariableChange class' -> #websideType;
+	add: 'AddInstanceVariableChange class' -> #websideType;
+	add: 'DolphinAddMethodChange class' -> #websideType;
+	add: 'RefactoryChange class' -> #acceptsWebsideJson:;
+	add: 'RefactoryChange class' -> #classForWebsideJson:;
+	add: 'RefactoryChange class' -> #fromWebsideJson:;
+	add: 'RefactoryChange class' -> #websideType;
+	add: 'RemoveClassChange class' -> #websideType;
+	add: 'RemoveClassVariableChange class' -> #websideType;
+	add: 'RemoveInstanceVariableChange class' -> #websideType;
+	add: 'RemoveMethodChange class' -> #websideType;
+	add: 'RenameClassChange class' -> #websideType;
+	add: 'RenameClassVariableChange class' -> #websideType;
+	add: 'RenameInstanceVariableChange class' -> #websideType;
+	add: 'StProgramNode class' -> #websideType;
+	add: 'String class' -> #fromUTF8:;
+	yourself.
+
+package binaryGlobalNames: (Set new
+	yourself).
+
+package globalAliases: (Set new
+	yourself).
+
+package setPrerequisites: #(
+	'..\Core\Object Arts\Dolphin\IDE\Base\Development System'
+	'..\Core\Object Arts\Dolphin\Base\Dolphin'
+	'..\DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
+	'..\Core\Object Arts\Dolphin\ActiveX\COM\OLE COM'
+	'..\Core\Contributions\Refactory\Refactoring Browser\Change Objects\RBChangeObjects'
+	'..\Core\Object Arts\Dolphin\System\Compiler\Smalltalk Parser'
+	'..\Core\Contributions\svenc\STON\STON-Core'
+	'..\Core\Contributions\Camp Smalltalk\SUnit\SUnit').
+
+package!
+
+"Class Definitions"!
+
+Object subclass: #HttpRequestRouter
+	instanceVariableNames: 'routes receiver'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #MatchAlgorithm
+	instanceVariableNames: 'string pattern start stop tokens failure ranges'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #MatchToken
+	instanceVariableNames: 'string start stop'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #PercentEncoder
+	instanceVariableNames: 'reserved'
+	classVariableNames: 'Current'
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #StarToken
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: 'current'!
+Object subclass: #StringPattern
+	instanceVariableNames: 'stream tokens'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #URL
+	instanceVariableNames: 'scheme user password host port segments query fragment'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #URLTemplate
+	instanceVariableNames: 'raw pattern parameters sample description'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #WebsideAPI
+	instanceVariableNames: 'server request'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #WebsideClient
+	instanceVariableNames: 'url client'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #WebsideResource
+	instanceVariableNames: 'id'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #WebsideServer
+	instanceVariableNames: 'server router baseUri port resources'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+TestCase subclass: #URLTemplateTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+TestCase subclass: #URLTest
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+WebsideResource subclass: #WebsideWorkspace
+	instanceVariableNames: 'bindings'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+
+"Global Aliases"!
+
+
+"Loose Methods"!
+
+!AddClassChange methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'definition' put: definition;
+		yourself!
+
+fromWebsideJson: json
+	| superclass msg keywords index |
+	super fromWebsideJson: json.
+	definition := json at: 'definition'
+				ifAbsent: 
+					[superclass := json at: 'superclass'.
+					superclass , ' subclass: #' , className
+						, ' 
+	instanceVariableNames: ''''
+	classVariableNames: ''''
+	poolDictionaries: ''''
+	classInstanceVariableNames: '''''].
+	className isNil
+		ifTrue: 
+			[msg := SmalltalkParser parseExpression: definition.
+			keywords := msg selector keywords collect: [:s | s asString].
+			index := keywords indexOf: 'subclass:'
+						ifAbsent: [keywords indexOf: 'variableByteSubclass:' ifAbsent: [keywords indexOf: 'variableSubclass:']].
+			className := (msg arguments at: index) value asString]! !
+!AddClassChange categoriesFor: #asWebsideJson!public! !
+!AddClassChange categoriesFor: #fromWebsideJson:!public! !
+
+!AddClassChange class methodsFor!
+
+websideType
+	^'AddClass'! !
+!AddClassChange class categoriesFor: #websideType!public! !
+
+!AddClassVariableChange class methodsFor!
+
+websideType
+	^'AddClassVariable'! !
+!AddClassVariableChange class categoriesFor: #websideType!public! !
+
+!AddInstanceVariableChange class methodsFor!
+
+websideType
+	^'AddInstanceVariable'! !
+!AddInstanceVariableChange class categoriesFor: #websideType!public! !
+
+!AddMethodChange methodsFor!
+
+asWebsideJson
+	| json |
+	json := super asWebsideJson.
+	source ifNotNil: [:s | json at: 'sourceCode' put: s].
+	^json
+		at: 'selector' put: self selector;
+		at: 'category' put: self protocol;
+		yourself!
+
+fromWebsideJson: json
+	| category |
+	super fromWebsideJson: json.
+	selector := json at: 'selector' ifAbsent: [].
+	selector ifNotNil: [selector := selector asSymbol].
+	source := json at: 'sourceCode' ifAbsent: [].
+	category := json at: 'category' ifAbsent: [].
+	category ifNil: [category := MethodCategory unclassified asString].
+	self protocols: {category asSymbol}! !
+!AddMethodChange categoriesFor: #asWebsideJson!public! !
+!AddMethodChange categoriesFor: #fromWebsideJson:!public! !
+
+!Character methodsFor!
+
+isAsterisk
+	^code = 42!
+
+isQuestionMark
+	^code = 63! !
+!Character categoriesFor: #isAsterisk!public!testing! !
+!Character categoriesFor: #isQuestionMark!public!testing! !
+
+!ClassDescription methodsFor!
+
+asWebsideJson
+	| definition |
+	definition := self definition copyWithout: 10 asCharacter.
+	^super asWebsideJson
+		at: 'name' put: self name;
+		at: 'definition' put: definition;
+		at: 'superclass'
+		put: (self superclass ifNotNil: [:c | c name]);
+		at: 'comment' put: self comment;
+		at: 'variable' put: self isVariable;
+		at: 'project' put: (self owningPackage ifNotNil: [:p | p name]);
+		yourself! !
+!ClassDescription categoriesFor: #asWebsideJson!converting!public! !
+
+!Collection methodsFor!
+
+anyone
+	^self detect: [:one | true] ifNone: []!
+
+gather: aBlock
+	^self gather: aBlock in: (OrderedCollection new: self size)
+!
+
+gather: aBlock in: collection
+	self do: [:each | | things |
+		things := aBlock value: each.
+		collection addAll: things].
+	^collection!
+
+groupBy: aspect
+	| answer key copy remove |
+	answer := Dictionary new.
+	(aspect numArgs = 0 or: [aspect class == BlockClosure and: [aspect numArgs = 1]]) ifTrue: [
+		self do: [:each | 
+			key := aspect evaluateWith: each.
+			(answer at: key ifAbsentPut: [OrderedCollection new]) add: each].
+		^answer].
+	copy := IdentitySet withAll: self.
+	remove := IdentitySet new.
+	self do: [:each | 
+		copy do: [:e | 
+			(aspect value: each value: e) ifTrue: [
+				remove add: e.
+				(answer at: each ifAbsentPut: [OrderedCollection new]) add: e]].
+		copy removeAll: remove.
+		remove removeAll].
+	^answer! !
+!Collection categoriesFor: #anyone!adding!public! !
+!Collection categoriesFor: #gather:!enumerating!public! !
+!Collection categoriesFor: #gather:in:!enumerating!public! !
+!Collection categoriesFor: #groupBy:!operations!public! !
+
+!CompiledMethod methodsFor!
+
+asWebsideJson
+	| source category |
+	source := self getSource copyWithout: 10 asCharacter.
+	category := self categories detect: [:c | c isPrivacy not and: [c isVirtual not]] ifNone: [].
+	^super asWebsideJson
+		at: 'selector' put: selector;
+		at: 'methodClass' put: self methodClass name;
+		at: 'category' put: (category ifNotNil: [:c | c name]);
+		at: 'source' put: source;
+		at: 'author' put: 'self author';
+		at: 'timestamp' put: 'self timestamp';
+		at: 'package' put: (self owningPackage ifNotNil: [:p | p name]);
+		at: 'overriding' put: self isOverride;
+		at: 'overriden' put: self isOverridden;
+		yourself! !
+!CompiledMethod categoriesFor: #asWebsideJson!converting!public! !
+
+!DolphinAddMethodChange class methodsFor!
+
+websideType
+	^'AddMethod'! !
+!DolphinAddMethodChange class categoriesFor: #websideType!public! !
+
+!Object methodsFor!
+
+asWebsideJson
+	| printed |
+	printed := [self printString] on: Error
+				do: [:e | 'Error while printing ' , self class name , ' instance'].
+	^Dictionary new
+		at: 'class' put: self class name;
+		at: 'indexable' put: self isIndexable;
+		at: 'size' put: (self isIndexable ifTrue: [self size] ifFalse: [0]);
+		at: 'printString' put: printed;
+		yourself! !
+!Object categoriesFor: #asWebsideJson!converting!public! !
+
+!Package methodsFor!
+
+asWebsideJson
+	| methods |
+	methods := Dictionary new.
+	self methodNames
+		do: [:a | (methods at: a key asString ifAbsentPut: [OrderedCollection new]) add: a value].
+	methods keysAndValuesDo: [:k :v | methods at: k put: v asArray].
+	^super asWebsideJson
+		at: 'name' put: name;
+		at: 'classes' put: self classNames asArray;
+		at: 'methods' put: methods;
+		yourself! !
+!Package categoriesFor: #asWebsideJson!converting!private! !
+
+!RefactoryChange methodsFor!
+
+asWebsideJson
+	^Dictionary new
+		at: 'type' put: self class websideType printString;
+		at: 'label' put: self changeString;
+		at: 'package' put: nil;
+		at: 'timestamp' put: DateAndTime now printString;
+		at: 'author' put: nil;
+		yourself!
+
+fromWebsideJson: json! !
+!RefactoryChange categoriesFor: #asWebsideJson!initialize/release!public! !
+!RefactoryChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
+
+!RefactoryChange class methodsFor!
+
+acceptsWebsideJson: json
+	| type |
+	type := json at: 'type' ifAbsent: nil.
+	^self websideType = type!
+
+classForWebsideJson: json
+	^self allSubclasses detect: [:c | c acceptsWebsideJson: json] ifNone: []!
+
+fromWebsideJson: json
+	| class |
+	class := self classForWebsideJson: json.
+	^class ifNotNil: [class new fromWebsideJson: json]!
+
+websideType
+	^nil! !
+!RefactoryChange class categoriesFor: #acceptsWebsideJson:!public! !
+!RefactoryChange class categoriesFor: #classForWebsideJson:!public! !
+!RefactoryChange class categoriesFor: #fromWebsideJson:!public! !
+!RefactoryChange class categoriesFor: #websideType!public! !
+
+!RefactoryClassChange methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'class' put: self changeClass name asString;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	className := json at: 'class' ifAbsent: [].
+	isMeta := className notNil and: [className endsWith: ' class'].
+	(className notNil and: [isMeta])
+		ifTrue: [className := (className copyFrom: 1 to: className size - 6) asSymbol]! !
+!RefactoryClassChange categoriesFor: #asWebsideJson!accessing!public! !
+!RefactoryClassChange categoriesFor: #fromWebsideJson:!accessing!public! !
+
+!RefactoryVariableChange methodsFor!
+
+asWebsideJson
+	^super asWebsideJson at: 'variable' put: variable; yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	variable := json at: 'variable' ifAbsent: nil! !
+!RefactoryVariableChange categoriesFor: #asWebsideJson!initialize/release!public! !
+!RefactoryVariableChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
+
+!RemoveClassChange class methodsFor!
+
+websideType
+	^'RemoveClass'! !
+!RemoveClassChange class categoriesFor: #websideType!public! !
+
+!RemoveClassVariableChange class methodsFor!
+
+websideType
+	^'RemoveClassVariable'! !
+!RemoveClassVariableChange class categoriesFor: #websideType!public! !
+
+!RemoveInstanceVariableChange class methodsFor!
+
+websideType
+	^'RemoveInstanceVariable'! !
+!RemoveInstanceVariableChange class categoriesFor: #websideType!public! !
+
+!RemoveMethodChange methodsFor!
+
+asWebsideJson
+	^super asWebsideJson at: 'selector' put: selector; yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	selector := json at: 'selector' ifAbsent: [].
+	selector notNil ifTrue: [selector := selector asSymbol]! !
+!RemoveMethodChange categoriesFor: #asWebsideJson!public! !
+!RemoveMethodChange categoriesFor: #fromWebsideJson:!public! !
+
+!RemoveMethodChange class methodsFor!
+
+websideType
+	^'RemoveMethod'! !
+!RemoveMethodChange class categoriesFor: #websideType!public! !
+
+!RenameClassChange methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'class' put: oldName;
+		at: 'newName' put: newName;
+		at: 'renameReferences' put: true;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	oldName := json at: 'class' ifAbsent: [].
+	newName := json at: 'newName' ifAbsent: []! !
+!RenameClassChange categoriesFor: #asWebsideJson!initialize/release!public! !
+!RenameClassChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
+
+!RenameClassChange class methodsFor!
+
+websideType
+	^'RenameClass'! !
+!RenameClassChange class categoriesFor: #websideType!instance creation!public! !
+
+!RenameClassVariableChange class methodsFor!
+
+websideType
+	^'RenameClassVariable'! !
+!RenameClassVariableChange class categoriesFor: #websideType!public! !
+
+!RenameInstanceVariableChange class methodsFor!
+
+websideType
+	^'RenameInstanceVariable'! !
+!RenameInstanceVariableChange class categoriesFor: #websideType!public! !
+
+!RenameVariableChange methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'class' put: className;
+		at: 'variable' put: oldName;
+		at: 'newName' put: newName;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	className := json at: 'class' ifAbsent: [].
+	isMeta := className notNil and: [className endsWith: ' class'].
+	oldName := json at: 'variable' ifAbsent: [].
+	newName := json at: 'newName' ifAbsent: []! !
+!RenameVariableChange categoriesFor: #asWebsideJson!printing!public! !
+!RenameVariableChange categoriesFor: #fromWebsideJson:!printing!public! !
+
+!StAssignmentNode methodsFor!
+
+asWebsideJson 	^super asWebsideJson at: 'children' put: { variable asWebsideJson . value asWebsideJson }! !
+!StAssignmentNode categoriesFor: #asWebsideJson!accessing!public! !
+
+!StCascadeNode methodsFor!
+
+asWebsideJson
+	| children |
+	children := messages collect: [:n | n asWebsideJson].
+	^super asWebsideJson
+		at: 'children' put: children asArray;
+		yourself! !
+!StCascadeNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StLiteralToken methodsFor!
+
+asWebsideJson
+	^value asString! !
+!StLiteralToken categoriesFor: #asWebsideJson!printing!public! !
+
+!StLiteralValueNode methodsFor!
+
+asWebsideJson
+	| value |
+	value := token value isString ifTrue: [token value] ifFalse: [token printString].
+	^super asWebsideJson
+		at: 'value' put: value;
+		yourself! !
+!StLiteralValueNode categoriesFor: #asWebsideJson!matching!public! !
+
+!StMessageNode methodsFor!
+
+asWebsideJson
+	| s children |
+	s := Dictionary new
+				at: 'type' put: 'Selector';
+				at: 'value' put: self selector;
+				at: 'start' put: selectorParts first start;
+				at: 'stop' put: selectorParts last stop;
+				yourself.
+	children := OrderedCollection with: receiver asWebsideJson with: s.
+	arguments do: [:n | children add: n asWebsideJson].
+	^super asWebsideJson
+		at: 'children' put: children asArray;
+		yourself! !
+!StMessageNode categoriesFor: #asWebsideJson!matching!public! !
+
+!StMethodNode methodsFor!
+
+asWebsideJson	| children |	children := OrderedCollection with: self selector asWebsideJson.	arguments do: [ :n | children add: n asWebsideJson  ].	children add: body asWebsideJson .	^super asWebsideJson at: 'children' put: children asArray; yourself ! !
+!StMethodNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StProgramNode methodsFor!
+
+asWebsideJson	^ super asWebsideJson		at: 'type' put: self websideType;		at: 'start' put: self start;		at: 'end' put: self stop;		yourself!
+
+websideType	^self class websideType! !
+!StProgramNode categoriesFor: #asWebsideJson!public!replacing! !
+!StProgramNode categoriesFor: #websideType!public!replacing! !
+
+!StProgramNode class methodsFor!
+
+websideType	^self name copyFrom: 3 to: self name size - 4! !
+!StProgramNode class categoriesFor: #websideType!constants!public! !
+
+!StReturnNode methodsFor!
+
+asWebsideJson 	^super asWebsideJson at: 'children' put: { value asWebsideJson  }; yourself! !
+!StReturnNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!String methodsFor!
+
+asURL
+	^URL fromString: self trimBlanks!
+
+indexOfString: aString from: start to: stop
+	| n limit base i |
+	n := aString size.
+	limit := stop - n.
+	base := start - 1.
+	i := 1.
+	[
+		base > limit ifTrue: [^0].
+		i <= n]
+		whileTrue: [
+			i := (self at: base + i) = (aString at: i) ifTrue: [i + 1] ifFalse: [
+				base := base + 1.
+				1]].
+	^i > 1 ifTrue: [base + 1] ifFalse: [0]
+
+! !
+!String categoriesFor: #asURL!converting!public! !
+!String categoriesFor: #indexOfString:from:to:!comparing!public! !
+
+!String class methodsFor!
+
+fromUTF8: aString
+	^(aString anySatisfy: [:byte | byte asInteger >= 128])
+		ifTrue: [aString asUtf8String]
+		ifFalse: [aString]! !
+!String class categoriesFor: #fromUTF8:!instance creation!public! !
+
+!StSequenceNode methodsFor!
+
+asWebsideJson 	| children |	children := OrderedCollection new.	temporaries do: [ :n | children add: n asWebsideJson  ].	statements do: [ :n |  children add: n asWebsideJson].	^super asWebsideJson at: 'children' put: children asArray ; yourself! !
+!StSequenceNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StVariableNode methodsFor!
+
+asWebsideJson	^ super asWebsideJson		at: 'value' put: name;		yourself! !
+!StVariableNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!Symbol methodsFor!
+
+evaluateWith: anObject
+	^anObject perform: self! !
+!Symbol categoriesFor: #evaluateWith:!converting!public! !
+
+"End of package definition"!
+
