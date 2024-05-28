@@ -412,12 +412,12 @@ websideType
 
 asWebsideJson
 	^super asWebsideJson
-		at: 'class' put: self changeClass name asString;
+		at: 'className' put: self changeClass name asString;
 		yourself!
 
 fromWebsideJson: json
 	super fromWebsideJson: json.
-	className := json at: 'class' ifAbsent: [].
+	className := json at: 'className' ifAbsent: [].
 	isMeta := className notNil and: [className endsWith: ' class'].
 	(className notNil and: [isMeta])
 		ifTrue: [className := (className copyFrom: 1 to: className size - 6) asSymbol]! !
@@ -475,14 +475,14 @@ websideType
 
 asWebsideJson
 	^super asWebsideJson
-		at: 'class' put: oldName;
+		at: 'className' put: oldName;
 		at: 'newName' put: newName;
 		at: 'renameReferences' put: true;
 		yourself!
 
 fromWebsideJson: json
 	super fromWebsideJson: json.
-	oldName := json at: 'class' ifAbsent: [].
+	oldName := json at: 'className' ifAbsent: [].
 	newName := json at: 'newName' ifAbsent: []! !
 !RenameClassChange categoriesFor: #asWebsideJson!initialize/release!public! !
 !RenameClassChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
@@ -2268,7 +2268,10 @@ packageMethods
 	| package |
 	package := self requestedPackage.
 	package ifNil: [^self notFound].
-	^package methods collect: [:m | m asWebsideJson]!
+	^package methods asArray collect: [:m | m asWebsideJson]!
+
+packageNamed: aString
+	^PackageManager current packageNamed: aString ifNone: []!
 
 packages
 	| manager root packages names |
@@ -2333,6 +2336,9 @@ queriedCategory	^self queryAt: 'category' ifPresent: [:c | c asSymbol]!
 
 queriedClass	^self queryAt: 'class' ifPresent: [:n | self classNamed: n]!
 
+queriedPackage
+	^self queryAt: 'package' ifPresent: [:n | self packageNamed: n]!
+
 queriedReferencing
 	^self queriedReferencingClass isNil ifTrue: [self queryAt: 'referencing']!
 
@@ -2396,7 +2402,7 @@ requestedIndex
 requestedPackage
 	| name |
 	name := self urlAt: 'name'.
-	^name ifNotNil: [PackageManager current packageNamed: name ifNone: []]!
+	^name ifNotNil: [self packageNamed: name]!
 
 requestedSelector
 	| selector |
@@ -2482,6 +2488,9 @@ subclasses
 	class ifNil: [^self notFound].
 	^(class subclasses collect: [:c | c asWebsideJson]) asArray!
 
+systemPackage
+	^PackageManager current systemPackage!
+
 terminateDebugger
 	| id debugger |
 	id := self requestedId.
@@ -2562,6 +2571,7 @@ workspaces
 !WebsideAPI categoriesFor: #package!code endpoints!public! !
 !WebsideAPI categoriesFor: #packageClasses!code endpoints!public! !
 !WebsideAPI categoriesFor: #packageMethods!code endpoints!public! !
+!WebsideAPI categoriesFor: #packageNamed:!private! !
 !WebsideAPI categoriesFor: #packages!code endpoints!public! !
 !WebsideAPI categoriesFor: #pinnedObject!objects endpoints!public! !
 !WebsideAPI categoriesFor: #pinnedObjects!objects endpoints!public! !
@@ -2571,6 +2581,7 @@ workspaces
 !WebsideAPI categoriesFor: #queriedAssigning!private! !
 !WebsideAPI categoriesFor: #queriedCategory!private! !
 !WebsideAPI categoriesFor: #queriedClass!private! !
+!WebsideAPI categoriesFor: #queriedPackage!private! !
 !WebsideAPI categoriesFor: #queriedReferencing!private! !
 !WebsideAPI categoriesFor: #queriedReferencingClass!private! !
 !WebsideAPI categoriesFor: #queriedReferencingString!private! !
@@ -2602,6 +2613,7 @@ workspaces
 !WebsideAPI categoriesFor: #stepOverDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #stepThroughDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #subclasses!code endpoints!public! !
+!WebsideAPI categoriesFor: #systemPackage!private! !
 !WebsideAPI categoriesFor: #terminateDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #unpinAllObjects!objects endpoints!public! !
 !WebsideAPI categoriesFor: #unpinObject!objects endpoints!public! !

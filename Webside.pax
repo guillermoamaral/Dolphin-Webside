@@ -412,12 +412,12 @@ websideType
 
 asWebsideJson
 	^super asWebsideJson
-		at: 'class' put: self changeClass name asString;
+		at: 'className' put: self changeClass name asString;
 		yourself!
 
 fromWebsideJson: json
 	super fromWebsideJson: json.
-	className := json at: 'class' ifAbsent: [].
+	className := json at: 'className' ifAbsent: [].
 	isMeta := className notNil and: [className endsWith: ' class'].
 	(className notNil and: [isMeta])
 		ifTrue: [className := (className copyFrom: 1 to: className size - 6) asSymbol]! !
@@ -475,14 +475,14 @@ websideType
 
 asWebsideJson
 	^super asWebsideJson
-		at: 'class' put: oldName;
+		at: 'className' put: oldName;
 		at: 'newName' put: newName;
 		at: 'renameReferences' put: true;
 		yourself!
 
 fromWebsideJson: json
 	super fromWebsideJson: json.
-	oldName := json at: 'class' ifAbsent: [].
+	oldName := json at: 'className' ifAbsent: [].
 	newName := json at: 'newName' ifAbsent: []! !
 !RenameClassChange categoriesFor: #asWebsideJson!initialize/release!public! !
 !RenameClassChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
