@@ -191,19 +191,32 @@ asWebsideJson
 		yourself!
 
 fromWebsideJson: json
-	| superclass msg keywords index |
+	| superclass msg keywords index instanceVariables classVariables poolDictionaries |
 	super fromWebsideJson: json.
-	definition := json at: 'definition'
-				ifAbsent: 
-					[superclass := json at: 'superclass'.
-					superclass , ' subclass: #' , className
-						, ' 
-	instanceVariableNames: ''''
-	classVariableNames: ''''
-	poolDictionaries: ''''
-	classInstanceVariableNames: '''''].
-	className isNil
-		ifTrue: 
+	definition := json at: 'definition' ifAbsent: [].
+	definition
+		ifNil: 
+			[superclass := json at: 'superclass' ifAbsent: [].
+			superclass
+				ifNotNil: 
+					[instanceVariables := json at: 'instanceVariables' ifAbsent: [#()].
+					classVariables := json at: 'classVariables' ifAbsent: [#()].
+					poolDictionaries := json at: 'poolDictionaries' ifAbsent: [#()].
+					definition := String streamContents: 
+									[:s |
+									s
+										nextPutAll: superclass;
+										nextPutAll: ' subclass: ';
+										nextPutAll: className printString;
+										nextPutAll: ' instanceVariableNames: '''.
+									instanceVariables do: [:n | s nextPutAll: n] separatedBy: [s space].
+									s nextPutAll: ''' classVariableNames: '''.
+									classVariables do: [:n | s nextPutAll: n] separatedBy: [s space].
+									s nextPutAll: ''' poolDictionaries: '''.
+									poolDictionaries do: [:n | s nextPutAll: n] separatedBy: [s space].
+									s nextPut: $']]].
+	className
+		ifNil: 
 			[msg := SmalltalkParser parseExpression: definition.
 			keywords := msg selector keywords collect: [:s | s asString].
 			index := keywords indexOf: 'subclass:'
