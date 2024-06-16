@@ -555,6 +555,12 @@ resumeDebugger
 saveImage	SessionManager current saveImage.
 	^true!
 
+selectors
+	| class |
+	class := self requestedClass.
+	class ifNil: [^self notFound].
+	^class selectors asArray!
+
 sendersOf: aSymbol
 	| system search environment |
 	system := SmalltalkSystem current.
@@ -728,6 +734,7 @@ workspaces
 !WebsideAPI categoriesFor: #restartDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #resumeDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #saveImage!general endpoints!public! !
+!WebsideAPI categoriesFor: #selectors!code endpoints!public! !
 !WebsideAPI categoriesFor: #sendersOf:!private! !
 !WebsideAPI categoriesFor: #server:!accessing!public! !
 !WebsideAPI categoriesFor: #slot:of:ifAbsent:!private! !

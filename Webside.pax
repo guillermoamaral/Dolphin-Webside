@@ -5,10 +5,14 @@ package paxVersion: 1;
 
 
 package classNames
+	add: #AddPackageChange;
 	add: #HttpRequestRouter;
 	add: #MatchAlgorithm;
 	add: #MatchToken;
 	add: #PercentEncoder;
+	add: #RefactoryPackageChange;
+	add: #RemovePackageChange;
+	add: #RenamePackageChange;
 	add: #StarToken;
 	add: #StringPattern;
 	add: #URL;
@@ -66,6 +70,7 @@ package methodNames
 	add: 'AddClassChange class' -> #websideType;
 	add: 'AddClassVariableChange class' -> #websideType;
 	add: 'AddInstanceVariableChange class' -> #websideType;
+	add: 'AddMethodChange class' -> #websideType;
 	add: 'DolphinAddMethodChange class' -> #websideType;
 	add: 'RefactoryChange class' -> #acceptsWebsideJson:;
 	add: 'RefactoryChange class' -> #classForWebsideJson:;
@@ -159,6 +164,26 @@ Object subclass: #WebsideResource
 	classInstanceVariableNames: ''!
 Object subclass: #WebsideServer
 	instanceVariableNames: 'server router baseUri port resources'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryChange subclass: #RefactoryPackageChange
+	instanceVariableNames: 'packageName'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryPackageChange subclass: #AddPackageChange
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryPackageChange subclass: #RemovePackageChange
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryPackageChange subclass: #RenamePackageChange
+	instanceVariableNames: 'newName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -265,6 +290,12 @@ fromWebsideJson: json
 	self protocols: {category asSymbol}! !
 !AddMethodChange categoriesFor: #asWebsideJson!public! !
 !AddMethodChange categoriesFor: #fromWebsideJson:!public! !
+
+!AddMethodChange class methodsFor!
+
+websideType
+	^'AbstractAddMethod'! !
+!AddMethodChange class categoriesFor: #websideType!instance creation!public! !
 
 !Character methodsFor!
 
@@ -415,7 +446,10 @@ fromWebsideJson: json
 	^class ifNotNil: [class new fromWebsideJson: json]!
 
 websideType
-	^nil! !
+	| type |
+	type := self name asString.
+	(type endsWith: 'Change') ifTrue: [type := type copyFrom: 1 to: type size - 6].
+	^type! !
 !RefactoryChange class categoriesFor: #acceptsWebsideJson:!public! !
 !RefactoryChange class categoriesFor: #classForWebsideJson:!public! !
 !RefactoryChange class categoriesFor: #fromWebsideJson:!public! !

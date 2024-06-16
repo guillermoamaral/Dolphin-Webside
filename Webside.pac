@@ -5,10 +5,14 @@ package paxVersion: 1;
 
 
 package classNames
+	add: #AddPackageChange;
 	add: #HttpRequestRouter;
 	add: #MatchAlgorithm;
 	add: #MatchToken;
 	add: #PercentEncoder;
+	add: #RefactoryPackageChange;
+	add: #RemovePackageChange;
+	add: #RenamePackageChange;
 	add: #StarToken;
 	add: #StringPattern;
 	add: #URL;
@@ -66,6 +70,7 @@ package methodNames
 	add: 'AddClassChange class' -> #websideType;
 	add: 'AddClassVariableChange class' -> #websideType;
 	add: 'AddInstanceVariableChange class' -> #websideType;
+	add: 'AddMethodChange class' -> #websideType;
 	add: 'DolphinAddMethodChange class' -> #websideType;
 	add: 'RefactoryChange class' -> #acceptsWebsideJson:;
 	add: 'RefactoryChange class' -> #classForWebsideJson:;
@@ -159,6 +164,26 @@ Object subclass: #WebsideResource
 	classInstanceVariableNames: ''!
 Object subclass: #WebsideServer
 	instanceVariableNames: 'server router baseUri port resources'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryChange subclass: #RefactoryPackageChange
+	instanceVariableNames: 'packageName'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryPackageChange subclass: #AddPackageChange
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryPackageChange subclass: #RemovePackageChange
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryPackageChange subclass: #RenamePackageChange
+	instanceVariableNames: 'newName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -265,6 +290,12 @@ fromWebsideJson: json
 	self protocols: {category asSymbol}! !
 !AddMethodChange categoriesFor: #asWebsideJson!public! !
 !AddMethodChange categoriesFor: #fromWebsideJson:!public! !
+
+!AddMethodChange class methodsFor!
+
+websideType
+	^'AbstractAddMethod'! !
+!AddMethodChange class categoriesFor: #websideType!instance creation!public! !
 
 !Character methodsFor!
 
@@ -415,7 +446,10 @@ fromWebsideJson: json
 	^class ifNotNil: [class new fromWebsideJson: json]!
 
 websideType
-	^nil! !
+	| type |
+	type := self name asString.
+	(type endsWith: 'Change') ifTrue: [type := type copyFrom: 1 to: type size - 6].
+	^type! !
 !RefactoryChange class categoriesFor: #acceptsWebsideJson:!public! !
 !RefactoryChange class categoriesFor: #classForWebsideJson:!public! !
 !RefactoryChange class categoriesFor: #fromWebsideJson:!public! !
@@ -2446,6 +2480,12 @@ resumeDebugger
 saveImage	SessionManager current saveImage.
 	^true!
 
+selectors
+	| class |
+	class := self requestedClass.
+	class ifNil: [^self notFound].
+	^class selectors asArray!
+
 sendersOf: aSymbol
 	| system search environment |
 	system := SmalltalkSystem current.
@@ -2619,6 +2659,7 @@ workspaces
 !WebsideAPI categoriesFor: #restartDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #resumeDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #saveImage!general endpoints!public! !
+!WebsideAPI categoriesFor: #selectors!code endpoints!public! !
 !WebsideAPI categoriesFor: #sendersOf:!private! !
 !WebsideAPI categoriesFor: #server:!accessing!public! !
 !WebsideAPI categoriesFor: #slot:of:ifAbsent:!private! !
@@ -2753,7 +2794,23 @@ initializeChangesRoutes
 		routeGET: '/changes' to: #changes;
 		routePOST: '/changes' to: #addChange!
 
-initializeCodeRoutes	router		routeGET: '/packages' to: #packages;		routeGET: '/packages/{name}' to: #package;		routeGET: '/packages/{name}/classes'		to: #packageClasses;		routeGET: '/packages/{name}/methods'		to: #packageMethods;		routeGET: '/classes' to: #classes;		routeGET: '/classes/{name}' to: #classDefinition;		routeGET: '/classes/{name}/subclasses' to: #subclasses;		routeGET: '/classes/{name}/variables' to: #variables;		routeGET: '/classes/{name}/instance-variables'			to: #instanceVariables;		routeGET: '/classes/{name}/class-variables' to: #classVariables;		routeGET: '/classes/{name}/categories' to: #categories;		routeGET: '/classes/{name}/methods' to: #methods;		routeGET: '/classes/{name}/methods/{selector}' to: #method;		routeGET: '/methods' to: #methods!
+initializeCodeRoutes
+	router
+		routeGET: '/packages' to: #packages;
+		routeGET: '/packages/{name}' to: #package;
+		routeGET: '/packages/{name}/classes' to: #packageClasses;
+		routeGET: '/packages/{name}/methods' to: #packageMethods;
+		routeGET: '/classes' to: #classes;
+		routeGET: '/classes/{name}' to: #classDefinition;
+		routeGET: '/classes/{name}/subclasses' to: #subclasses;
+		routeGET: '/classes/{name}/variables' to: #variables;
+		routeGET: '/classes/{name}/instance-variables' to: #instanceVariables;
+		routeGET: '/classes/{name}/class-variables' to: #classVariables;
+		routeGET: '/classes/{name}/categories' to: #categories;
+		routeGET: '/classes/{name}/methods' to: #methods;
+		routeGET: '/classes/{name}/selectors' to: #selectors;
+		routeGET: '/classes/{name}/methods/{selector}' to: #method;
+		routeGET: '/methods' to: #methods!
 
 initializeDebuggingRoutes
 	router
@@ -2866,6 +2923,88 @@ workspaces	^ self resourcesAt: #workspaces! !
 new
 	 ^super new initialize! !
 !WebsideServer class categoriesFor: #new!instance creation!public! !
+
+RefactoryPackageChange guid: (GUID fromString: '{a233a4fd-81a3-45c7-9a63-338591e63744}')!
+RefactoryPackageChange comment: ''!
+!RefactoryPackageChange categoriesForClass!Refactory-Change Objects! !
+!RefactoryPackageChange methodsFor!
+
+asUndoOperation!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'name' put: packageName;
+		yourself!
+
+executeNotifying: aBlock 
+	| undo |
+	undo := self asUndoOperation.
+	undo name: self name.
+	self primitiveExecute.
+	aBlock value.
+	^undo!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	packageName := json at: 'name' ifAbsent: []!
+
+primitiveExecute
+	^self subclassResponsibility! !
+!RefactoryPackageChange categoriesFor: #asUndoOperation!public! !
+!RefactoryPackageChange categoriesFor: #asWebsideJson!public! !
+!RefactoryPackageChange categoriesFor: #executeNotifying:!public! !
+!RefactoryPackageChange categoriesFor: #fromWebsideJson:!public! !
+!RefactoryPackageChange categoriesFor: #primitiveExecute!public! !
+
+AddPackageChange guid: (GUID fromString: '{a2e72d80-c0cb-4bf5-8398-127e871225f6}')!
+AddPackageChange comment: ''!
+!AddPackageChange categoriesForClass!Refactory-Change Objects! !
+!AddPackageChange methodsFor!
+
+primitiveExecute
+	| pm filename |
+	pm := Package manager.
+	^pm packageNamed: packageName
+		ifNone: 
+			[filename := File composePath: PackageFolder dolphinRootPathname subPath: packageName.
+			pm newPackage: filename]! !
+!AddPackageChange categoriesFor: #primitiveExecute!public! !
+
+RemovePackageChange guid: (GUID fromString: '{411f07c2-aecb-44a9-9d66-f292cff602fb}')!
+RemovePackageChange comment: ''!
+!RemovePackageChange categoriesForClass!Refactory-Change Objects! !
+!RemovePackageChange methodsFor!
+
+primitiveExecute
+	| pm package |
+	pm := Package manager.
+	package := pm packageNamed: packageName.
+	package ifNotNil: [pm removePackage: package]! !
+!RemovePackageChange categoriesFor: #primitiveExecute!public! !
+
+RenamePackageChange guid: (GUID fromString: '{64e42418-9e10-4e76-81bf-a783daad96b7}')!
+RenamePackageChange comment: ''!
+!RenamePackageChange categoriesForClass!Refactory-Change Objects! !
+!RenamePackageChange methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'name' put: packageName;
+		at: 'newName' put: newName;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	newName := json at: 'newName' ifAbsent: []!
+
+primitiveExecute
+	| pm package |
+	pm := Package manager.
+	package := pm packageNamed: packageName.
+	package ifNotNil: [pm renamePackage: package to: newName]! !
+!RenamePackageChange categoriesFor: #asWebsideJson!public! !
+!RenamePackageChange categoriesFor: #fromWebsideJson:!public! !
+!RenamePackageChange categoriesFor: #primitiveExecute!public! !
 
 URLTemplateTest guid: (GUID fromString: '{56dde46a-6c6a-4bea-93df-0767604a2c75}')!
 URLTemplateTest comment: ''!
