@@ -29,6 +29,7 @@ package classNames
 package methodNames
 	add: #AddClassChange -> #asWebsideJson;
 	add: #AddClassChange -> #fromWebsideJson:;
+	add: #AddClassChange -> #websideExecute;
 	add: #AddMethodChange -> #asWebsideJson;
 	add: #AddMethodChange -> #fromWebsideJson:;
 	add: #Character -> #isAsterisk;
@@ -43,6 +44,7 @@ package methodNames
 	add: #Package -> #asWebsideJson;
 	add: #RefactoryChange -> #asWebsideJson;
 	add: #RefactoryChange -> #fromWebsideJson:;
+	add: #RefactoryChange -> #websideExecute;
 	add: #RefactoryClassChange -> #asWebsideJson;
 	add: #RefactoryClassChange -> #fromWebsideJson:;
 	add: #RefactoryVariableChange -> #asWebsideJson;
@@ -246,9 +248,19 @@ fromWebsideJson: json
 			keywords := msg selector keywords collect: [:s | s asString].
 			index := keywords indexOf: 'subclass:'
 						ifAbsent: [keywords indexOf: 'variableByteSubclass:' ifAbsent: [keywords indexOf: 'variableSubclass:']].
-			className := (msg arguments at: index) value asString]! !
+			className := (msg arguments at: index) value asString]!
+
+websideExecute
+	| class packageName package |
+	super websideExecute.
+	class := self changeClass.
+	class ifNil: [^self].
+	packageName := self propertyAt: #packageName ifAbsent: [^self].
+	package := PackageManager current packageNamed: packageName ifNone: [^self].
+	package ifNotNil: [package addClass: self changeClass]! !
 !AddClassChange categoriesFor: #asWebsideJson!public! !
 !AddClassChange categoriesFor: #fromWebsideJson:!public! !
+!AddClassChange categoriesFor: #websideExecute!public! !
 
 !AddClassChange class methodsFor!
 
@@ -419,16 +431,21 @@ asWebsideJson
 
 asWebsideJson
 	^Dictionary new
-		at: 'type' put: self class websideType printString;
-		at: 'label' put: self changeString;
-		at: 'package' put: nil;
+		at: 'type' put: self class websideType;
+		at: 'label' put: ([self changeString] on: Error do: [:e | self class websideType]);
+		at: 'package' put: (self propertyAt: #packageName ifAbsent: []);
 		at: 'timestamp' put: DateAndTime now printString;
 		at: 'author' put: nil;
 		yourself!
 
-fromWebsideJson: json! !
+fromWebsideJson: json
+	json at: 'package' ifPresent: [:name | self propertyAt: #packageName put: name]!
+
+websideExecute
+	^self execute! !
 !RefactoryChange categoriesFor: #asWebsideJson!initialize/release!public! !
 !RefactoryChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
+!RefactoryChange categoriesFor: #websideExecute!initialize/release!public! !
 
 !RefactoryChange class methodsFor!
 
@@ -556,14 +573,14 @@ websideType
 
 asWebsideJson
 	^super asWebsideJson
-		at: 'class' put: className;
+		at: 'className' put: className;
 		at: 'variable' put: oldName;
 		at: 'newName' put: newName;
 		yourself!
 
 fromWebsideJson: json
 	super fromWebsideJson: json.
-	className := json at: 'class' ifAbsent: [].
+	className := json at: 'className' ifAbsent: [].
 	isMeta := className notNil and: [className endsWith: ' class'].
 	oldName := json at: 'variable' ifAbsent: [].
 	newName := json at: 'newName' ifAbsent: []! !
@@ -1960,7 +1977,9 @@ addChange
 	| change |
 	change := self requestedChange.
 	change ifNil: [^self badRequest: 'Change not supported'].
-	[change execute] on: Error do: [:e | ^self compilationError: e].
+	[change websideExecute] on: Error do: [:e | ^self compilationError: e].
+	"Temporary workaround until a better way of gathering system changes is implemented"
+	server addChange: change.
 	^change asWebsideJson!
 
 badRequest: aString
@@ -1988,8 +2007,10 @@ changes
 	| author package changes |
 	author := self queryAt: 'author'.
 	package := self queriedPackage ifNil: [self systemPackage].
-	changes := package changes currentChanges.
-	author ifNotNil: [changes := changes select: [:ch | ch author = author]].
+"	changes := package changes currentChanges.
+	author ifNotNil: [changes := changes select: [:ch | ch author = author]]."
+	"Temporary workaround until a better way of gathering changes is implemented"
+	changes := server changes asArray.
 	^changes collect: [:ch | ch asWebsideJson]!
 
 classDefinition
@@ -2732,11 +2753,16 @@ WebsideAPI stopServer'!
 !WebsideServer categoriesForClass!Unclassified! !
 !WebsideServer methodsFor!
 
+addChange: change
+	self changes add: change!
+
 baseUri
 	^ baseUri!
 
 baseUri: aString
 	baseUri := aString!
+
+changes	^ self resourcesAt: #changes!
 
 debuggers	^ self resourcesAt: #debuggers!
 
@@ -2840,7 +2866,16 @@ initializeObjectsRoutes            router		routeGET: '/objects' to: #pinnedObj
 initializePreflightRoutes
 	router routeOPTIONS: '/*' to: [:request | self handlePreflightRequest: request]	"This is not that well"!
 
-initializeResources	resources := Dictionary new.	resources    	at: #evaluations put: Dictionary new;		at: #objects put: Dictionary new;		at: #workspaces put: Dictionary new;		at: #debuggers put: Dictionary new; at: #testRuns put: Dictionary new!
+initializeResources
+	"Changes are stored here until a better way to gather system changes is implemented"
+	resources := Dictionary new.
+	resources
+		at: #evaluations put: Dictionary new;
+		at: #objects put: Dictionary new;
+		at: #workspaces put: Dictionary new;
+		at: #debuggers put: Dictionary new;
+		at: #testRuns put: Dictionary new;
+		at: #changes put: OrderedCollection new!
 
 initializeRoutes	router receiver: [WebsideAPI new server: self].	self		initializePreflightRoutes;        initializeGeneralRoutes;		initializeCodeRoutes;		initializeChangesRoutes;		initializeEvaluationRoutes;		initializeObjectsRoutes;		initializeWorkspacesRoutes;		initializeDebuggingRoutes!
 
@@ -2886,8 +2921,10 @@ stop
 testRuns	^ self resourcesAt: #testRuns!
 
 workspaces	^ self resourcesAt: #workspaces! !
+!WebsideServer categoriesFor: #addChange:!accessing!public! !
 !WebsideServer categoriesFor: #baseUri!accessing!public! !
 !WebsideServer categoriesFor: #baseUri:!accessing!public! !
+!WebsideServer categoriesFor: #changes!accessing!public! !
 !WebsideServer categoriesFor: #debuggers!accessing!public! !
 !WebsideServer categoriesFor: #defaultBaseUri!accessing!public! !
 !WebsideServer categoriesFor: #defaultPort!accessing!public! !

@@ -12,11 +12,16 @@ WebsideAPI stopServer'!
 !WebsideServer categoriesForClass!Unclassified! !
 !WebsideServer methodsFor!
 
+addChange: change
+	self changes add: change!
+
 baseUri
 	^ baseUri!
 
 baseUri: aString
 	baseUri := aString!
+
+changes	^ self resourcesAt: #changes!
 
 debuggers	^ self resourcesAt: #debuggers!
 
@@ -120,7 +125,16 @@ initializeObjectsRoutes            router		routeGET: '/objects' to: #pinnedObj
 initializePreflightRoutes
 	router routeOPTIONS: '/*' to: [:request | self handlePreflightRequest: request]	"This is not that well"!
 
-initializeResources	resources := Dictionary new.	resources    	at: #evaluations put: Dictionary new;		at: #objects put: Dictionary new;		at: #workspaces put: Dictionary new;		at: #debuggers put: Dictionary new; at: #testRuns put: Dictionary new!
+initializeResources
+	"Changes are stored here until a better way to gather system changes is implemented"
+	resources := Dictionary new.
+	resources
+		at: #evaluations put: Dictionary new;
+		at: #objects put: Dictionary new;
+		at: #workspaces put: Dictionary new;
+		at: #debuggers put: Dictionary new;
+		at: #testRuns put: Dictionary new;
+		at: #changes put: OrderedCollection new!
 
 initializeRoutes	router receiver: [WebsideAPI new server: self].	self		initializePreflightRoutes;        initializeGeneralRoutes;		initializeCodeRoutes;		initializeChangesRoutes;		initializeEvaluationRoutes;		initializeObjectsRoutes;		initializeWorkspacesRoutes;		initializeDebuggingRoutes!
 
@@ -166,8 +180,10 @@ stop
 testRuns	^ self resourcesAt: #testRuns!
 
 workspaces	^ self resourcesAt: #workspaces! !
+!WebsideServer categoriesFor: #addChange:!accessing!public! !
 !WebsideServer categoriesFor: #baseUri!accessing!public! !
 !WebsideServer categoriesFor: #baseUri:!accessing!public! !
+!WebsideServer categoriesFor: #changes!accessing!public! !
 !WebsideServer categoriesFor: #debuggers!accessing!public! !
 !WebsideServer categoriesFor: #defaultBaseUri!accessing!public! !
 !WebsideServer categoriesFor: #defaultPort!accessing!public! !

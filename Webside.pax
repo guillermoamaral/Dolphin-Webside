@@ -29,6 +29,7 @@ package classNames
 package methodNames
 	add: #AddClassChange -> #asWebsideJson;
 	add: #AddClassChange -> #fromWebsideJson:;
+	add: #AddClassChange -> #websideExecute;
 	add: #AddMethodChange -> #asWebsideJson;
 	add: #AddMethodChange -> #fromWebsideJson:;
 	add: #Character -> #isAsterisk;
@@ -43,6 +44,7 @@ package methodNames
 	add: #Package -> #asWebsideJson;
 	add: #RefactoryChange -> #asWebsideJson;
 	add: #RefactoryChange -> #fromWebsideJson:;
+	add: #RefactoryChange -> #websideExecute;
 	add: #RefactoryClassChange -> #asWebsideJson;
 	add: #RefactoryClassChange -> #fromWebsideJson:;
 	add: #RefactoryVariableChange -> #asWebsideJson;
@@ -246,9 +248,19 @@ fromWebsideJson: json
 			keywords := msg selector keywords collect: [:s | s asString].
 			index := keywords indexOf: 'subclass:'
 						ifAbsent: [keywords indexOf: 'variableByteSubclass:' ifAbsent: [keywords indexOf: 'variableSubclass:']].
-			className := (msg arguments at: index) value asString]! !
+			className := (msg arguments at: index) value asString]!
+
+websideExecute
+	| class packageName package |
+	super websideExecute.
+	class := self changeClass.
+	class ifNil: [^self].
+	packageName := self propertyAt: #packageName ifAbsent: [^self].
+	package := PackageManager current packageNamed: packageName ifNone: [^self].
+	package ifNotNil: [package addClass: self changeClass]! !
 !AddClassChange categoriesFor: #asWebsideJson!public! !
 !AddClassChange categoriesFor: #fromWebsideJson:!public! !
+!AddClassChange categoriesFor: #websideExecute!public! !
 
 !AddClassChange class methodsFor!
 
@@ -419,16 +431,21 @@ asWebsideJson
 
 asWebsideJson
 	^Dictionary new
-		at: 'type' put: self class websideType printString;
-		at: 'label' put: self changeString;
-		at: 'package' put: nil;
+		at: 'type' put: self class websideType;
+		at: 'label' put: ([self changeString] on: Error do: [:e | self class websideType]);
+		at: 'package' put: (self propertyAt: #packageName ifAbsent: []);
 		at: 'timestamp' put: DateAndTime now printString;
 		at: 'author' put: nil;
 		yourself!
 
-fromWebsideJson: json! !
+fromWebsideJson: json
+	json at: 'package' ifPresent: [:name | self propertyAt: #packageName put: name]!
+
+websideExecute
+	^self execute! !
 !RefactoryChange categoriesFor: #asWebsideJson!initialize/release!public! !
 !RefactoryChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
+!RefactoryChange categoriesFor: #websideExecute!initialize/release!public! !
 
 !RefactoryChange class methodsFor!
 
@@ -556,14 +573,14 @@ websideType
 
 asWebsideJson
 	^super asWebsideJson
-		at: 'class' put: className;
+		at: 'className' put: className;
 		at: 'variable' put: oldName;
 		at: 'newName' put: newName;
 		yourself!
 
 fromWebsideJson: json
 	super fromWebsideJson: json.
-	className := json at: 'class' ifAbsent: [].
+	className := json at: 'className' ifAbsent: [].
 	isMeta := className notNil and: [className endsWith: ' class'].
 	oldName := json at: 'variable' ifAbsent: [].
 	newName := json at: 'newName' ifAbsent: []! !
