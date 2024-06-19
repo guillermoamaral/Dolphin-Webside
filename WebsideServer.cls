@@ -87,11 +87,14 @@ initializeCodeRoutes
 		routeGET: '/packages/{name}/methods' to: #packageMethods;
 		routeGET: '/classes' to: #classes;
 		routeGET: '/classes/{name}' to: #classDefinition;
+		routeGET: '/classes/{name}/superclasses' to: #superclasses;
 		routeGET: '/classes/{name}/subclasses' to: #subclasses;
 		routeGET: '/classes/{name}/variables' to: #variables;
 		routeGET: '/classes/{name}/instance-variables' to: #instanceVariables;
 		routeGET: '/classes/{name}/class-variables' to: #classVariables;
 		routeGET: '/classes/{name}/categories' to: #categories;
+		routeGET: '/usual-categories' to: #usualCategories;
+		routeGET: '/classes/{name}/used-categories' to: #usedCategories;
 		routeGET: '/classes/{name}/methods' to: #methods;
 		routeGET: '/classes/{name}/selectors' to: #selectors;
 		routeGET: '/classes/{name}/methods/{selector}' to: #method;

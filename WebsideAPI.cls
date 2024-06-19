@@ -246,7 +246,7 @@ filterByCategory: aCollection
 	| category |
 	category := self queriedCategory.
 	^(category notNil and: [category notEmpty])
-		ifTrue: [aCollection select: [:m | m category = category]]
+		ifTrue: [aCollection select: [:m | m categories anySatisfy: [:c | c = category]]]
 		ifFalse: [aCollection]!
 
 filterByVariable: aCollection
@@ -618,7 +618,13 @@ subclasses
 	| class |
 	class := self requestedClass.
 	class ifNil: [^self notFound].
-	^(class subclasses collect: [:c | c asWebsideJson]) asArray!
+	^class subclasses asArray collect: [:c | c asWebsideJson]!
+
+superclasses
+	| class |
+	class := self requestedClass.
+	class ifNil: [^self notFound].
+	^class allSuperclasses asArray collect: [:c | c asWebsideJson]!
 
 systemPackage
 	^PackageManager current systemPackage!
@@ -639,6 +645,12 @@ unpinObject
 
 urlAt: aString
 	^(request propertyAt: #arguments) at: aString ifAbsent: []!
+
+usedCategories
+	^#()!
+
+usualCategories
+	^#()!
 
 variables
 	| class |
@@ -746,11 +758,14 @@ workspaces
 !WebsideAPI categoriesFor: #stepOverDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #stepThroughDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #subclasses!code endpoints!public! !
+!WebsideAPI categoriesFor: #superclasses!code endpoints!public! !
 !WebsideAPI categoriesFor: #systemPackage!private! !
 !WebsideAPI categoriesFor: #terminateDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #unpinAllObjects!objects endpoints!public! !
 !WebsideAPI categoriesFor: #unpinObject!objects endpoints!public! !
 !WebsideAPI categoriesFor: #urlAt:!private! !
+!WebsideAPI categoriesFor: #usedCategories!code endpoints!public! !
+!WebsideAPI categoriesFor: #usualCategories!code endpoints!public! !
 !WebsideAPI categoriesFor: #variables!code endpoints!public! !
 !WebsideAPI categoriesFor: #workspace!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #workspaces!private! !
