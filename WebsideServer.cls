@@ -79,26 +79,7 @@ initializeChangesRoutes
 		routeGET: '/changes' to: #changes;
 		routePOST: '/changes' to: #addChange!
 
-initializeCodeRoutes
-	router
-		routeGET: '/packages' to: #packages;
-		routeGET: '/packages/{name}' to: #package;
-		routeGET: '/packages/{name}/classes' to: #packageClasses;
-		routeGET: '/packages/{name}/methods' to: #packageMethods;
-		routeGET: '/classes' to: #classes;
-		routeGET: '/classes/{name}' to: #classDefinition;
-		routeGET: '/classes/{name}/superclasses' to: #superclasses;
-		routeGET: '/classes/{name}/subclasses' to: #subclasses;
-		routeGET: '/classes/{name}/variables' to: #variables;
-		routeGET: '/classes/{name}/instance-variables' to: #instanceVariables;
-		routeGET: '/classes/{name}/class-variables' to: #classVariables;
-		routeGET: '/classes/{name}/categories' to: #categories;
-		routeGET: '/usual-categories' to: #usualCategories;
-		routeGET: '/classes/{name}/used-categories' to: #usedCategories;
-		routeGET: '/classes/{name}/methods' to: #methods;
-		routeGET: '/classes/{name}/selectors' to: #selectors;
-		routeGET: '/classes/{name}/methods/{selector}' to: #method;
-		routeGET: '/methods' to: #methods!
+initializeCodeRoutes	router		routeGET: '/packages' to: #packages;		routeGET: '/packages/{name}' to: #package;		routeGET: '/packages/{name}/classes' to: #packageClasses;		routeGET: '/packages/{name}/methods' to: #packageMethods;		routeGET: '/classes' to: #classes;		routeGET: '/classes/{name}' to: #classDefinition;		routeGET: '/classes/{name}/superclasses' to: #superclasses;		routeGET: '/classes/{name}/subclasses' to: #subclasses;		routeGET: '/classes/{name}/variables' to: #variables;		routeGET: '/classes/{name}/instance-variables' to: #instanceVariables;		routeGET: '/classes/{name}/class-variables' to: #classVariables;		routeGET: '/classes/{name}/categories' to: #categories;		routeGET: '/usual-categories' to: #usualCategories;		routeGET: '/classes/{name}/used-categories' to: #usedCategories;		routeGET: '/classes/{name}/methods' to: #methods;		routeGET: '/classes/{name}/selectors' to: #selectors;		routeGET: '/classes/{name}/methods/{selector}' to: #method;		routeGET: '/methods' to: #methods;		routeGET: '/methodtemplate' to: #methodTemplate!
 
 initializeDebuggingRoutes
 	router
@@ -114,7 +95,14 @@ initializeDebuggingRoutes
 		routePOST: '/debuggers/{id}/terminate' to: #terminateDebugger;
 		routeDELETE: '/debuggers/{id}' to: #deleteDebugger!
 
-initializeEvaluationRoutes	router		routePOST: '/evaluations' to: #evaluateExpression;		routeGET: '/evaluations' to: #activeEvaluations;		routeGET: '/evaluations/{id}' to: #activeEvaluation;		routeDELETE: '/evaluations/{id}' to: #cancelEvaluation!
+initializeEvaluationRoutes
+	router
+		routePOST: '/evaluations' to: #evaluateExpression;
+		routeGET: '/evaluations' to: #activeEvaluations;
+		routeGET: '/evaluations/{id}' to: #activeEvaluation;
+		routeDELETE: '/evaluations/{id}' to: #cancelEvaluation;
+		routePOST: '/evaluations/{id}/pause' to: #pauseEvaluation;
+		routePOST: '/evaluations/{id}/resume' to: #resumeEvaluation!
 
 initializeGeneralRoutes
 	router

@@ -20,9 +20,20 @@ activeDebuggers
 				at: 'description' put: a value name;
 				yourself]!
 
-activeEvaluation	| id evaluation |	id := self requestedId.	evaluation := self evaluations at: id ifAbsent: [^self notFound].	^self newJsonObject		at: 'id' put: id asString;		yourself!
+activeEvaluation
+	| id object fake |
+	id := self requestedId.
+	self evaluations at: id ifPresent: [:e | ^e asWebsideJson].
+	object := self objects at: id ifAbsent: [^self notFound].
+	fake := WebsideEvaluation new.
+	^fake
+		id: id;
+		result: object;
+		finished;
+		asWebsideJson!
 
-activeEvaluations	^self evaluations associations asArray collect: 			[:a |			self newJsonObject				at: 'id' put: a key asString;				yourself]!
+activeEvaluations
+	^self evaluations values asArray collect: [:e | e asWebsideJson]!
 
 activeWorkspaces
 	^self workspaces associations asArray collect: 
@@ -51,9 +62,9 @@ cancelEvaluation
 	| id evaluation |
 	id := self requestedId.
 	evaluation := self evaluations at: id ifAbsent: [^self notFound].
-	evaluation terminate.
+	evaluation cancel.
 	self evaluations removeKey: id.
-	^nil!
+	^evaluation asWebsideJson!
 
 categories
 	| class |
@@ -136,6 +147,15 @@ compilerReceiver
 			^frame ifNotNil: [frame receiver]].
 	^nil!
 
+created: aDictionary
+	| payload |
+	payload := STON toJsonString: aDictionary.
+	^HttpServerResponse new
+		statusCode: 201;
+		reason: 'Created';
+		contentType: 'application/json; charset=utf-8';
+		content: payload asUtf8String!
+
 createDebugger
 	| id process exception context debugger |
 	id := self bodyAt: 'evaluation' ifAbsent: [^self notFound].
@@ -157,6 +177,17 @@ createDebugger
 		at: 'id' put: id asString;
 		at: 'description' put: debugger name;
 		yourself!
+
+createEvaluation
+	| expression evaluation |
+	expression := self bodyAt: 'expression' ifAbsent: [''].
+	expression isEmpty ifTrue: [^nil].
+	evaluation := WebsideEvaluation new.
+	evaluation
+		expression: expression;
+		receiver: self requestedEvaluationReceiver;
+		context: self requestedEvaluationContext.
+	^self evaluations at: evaluation id put: evaluation!
 
 createWorkspace	| id |	id := self newID.	self workspaces at: id put: WebsideWorkspace new.	^ id asString!
 
@@ -201,37 +232,24 @@ deleteWorkspace	self workspaces		removeKey: self requestedId		ifAbsent: [ ^ s
 dialect	^'Dolphin'!
 
 evaluateExpression
-	| debug expression sync pin id semaphore object process block json |
-	debug := self bodyAt: 'debug'.
-	debug == true ifTrue: [^self debugExpression].
-	expression := self bodyAt: 'expression'.
-	sync := (self bodyAt: 'sync') ifNil: [true].
-	pin := (self bodyAt: 'pin') ifNil: [false].
-	id := self newID.
-	semaphore := Semaphore new.
-	block := 
-			[[object := self evaluateExpression: expression] on: Exception
-				do: 
-					[:exception |
-					semaphore signal.
-					process suspend].
-			self evaluations removeKey: id ifAbsent: nil.
-			(sync not or: [pin]) ifTrue: [self objects at: id put: object].
-			semaphore signal.
-			object].
-	process := block newProcess.
-	self evaluations at: id put: process.
-	process resume.
-	sync
-		ifTrue: 
-			[semaphore wait.
-			object ifNil: [^self evaluationError: id].
-			json := object asWebsideJson.
-			pin ifTrue: [json at: 'id' put: id asString].
-			^json].
-	^Dictionary new
-		at: 'id' put: id asString;
-		at: 'expression' put: expression;
+	| evaluation |
+	(self bodyAt: 'debug' ifAbsent: [false]) ifTrue: [^self debugExpression].
+	(self bodyAt: 'profile' ifAbsent: [false]) ifTrue: [^self profileExpression].
+	evaluation := self createEvaluation.
+	evaluation ifNil: [^nil].
+	evaluation
+		when: #finished
+			send: #value
+			to: 
+				[self objects at: evaluation id put: evaluation result.
+				self evaluations removeKey: evaluation id];
+		evaluate.
+	(self bodyAt: 'sync' ifAbsent: [false]) ifFalse: [^self created: evaluation asWebsideJson].
+	evaluation waitForResult.
+	evaluation hasFailed ifTrue: [^self evaluationError: evaluation].
+	(self bodyAt: 'pin' ifAbsent: [false]) ifFalse: [self objects removeKey: evaluation id].
+	^evaluation result asWebsideJson
+		at: 'id' put: evaluation id asString;
 		yourself!
 
 evaluateExpression: aString
@@ -246,7 +264,7 @@ filterByCategory: aCollection
 	| category |
 	category := self queriedCategory.
 	^(category notNil and: [category notEmpty])
-		ifTrue: [aCollection select: [:m | m categories anySatisfy: [:c | c = category]]]
+		ifTrue: [aCollection select: [:m | m categories anySatisfy: [:c | c name = category]]]
 		ifFalse: [aCollection]!
 
 filterByVariable: aCollection
@@ -353,6 +371,8 @@ methods
 			ast ifTrue: [json at: 'ast' put: m parseTree asWebsideJson].
 			json]!
 
+methodTemplate	^self newJsonObject		at: 'template' put: true;		at: 'selector' put: 'messagePattern';		at: 'source'		put: 'messagePattern	"comment"	| temporaries |	statements';		yourself!
+
 namedSlotsOf: anObject	| slot |	^anObject class allInstVarNames collect: [ :n |		slot := self slot: n of: anObject ifAbsent: nil.		slot asWebsideJson at: 'slot' put: n; yourself  ]!
 
 newID	^IID newUnique!
@@ -361,6 +381,23 @@ newJsonObject	^Dictionary new!
 
 notFound
 	^HttpServerResponse notFound!
+
+objectFromPath: uri
+	| path id slot |
+	path := uri subStrings: '/'.
+	id := IID fromString: path first.
+	slot := self objects at: id ifAbsent: [^nil].
+	slot isNil ifTrue: [^nil].
+	path
+		from: 2
+		to: path size
+		do: 
+			[:s |
+			slot := self
+						slot: s
+						of: slot
+						ifAbsent: [^nil]].
+	^slot!
 
 objects
 	^server objects!
@@ -409,6 +446,13 @@ packages
 	names = 'true' ifTrue: [^(packages collect: [:p | p name]) asArray sort].
 	^(packages collect: [:p | p asWebsideJson]) asArray!
 
+pauseEvaluation
+	| id evaluation |
+	id := self requestedId.
+	evaluation := self evaluations at: id ifAbsent: [^self notFound].
+	evaluation pause.
+	^evaluation asWebsideJson!
+
 pinnedObject
 	| id object |
 	id := self requestedId.
@@ -452,6 +496,9 @@ pinnedObjectSlots
 	^object asWebsideJson!
 
 pinObjectSlot	| slot id |	slot := self requestedSlot.	slot ifNil: [ ^ self badRequest: 'Bad object slot URI' ].	id := self newID.	self objects at: id put: slot.	^ slot asWebsideJson		at: 'id' put: id asString;		yourself!
+
+profileExpression
+	^nil!
 
 queriedAccessing	^ self queryAt: 'accessing'!
 
@@ -515,6 +562,35 @@ requestedClass
 	name := self urlAt: 'name'.
 	^name ifNotNil: [self classNamed: name]!
 
+requestedEvaluationContext
+	| context id debugger index |
+	context := self bodyAt: 'context' ifAbsent: [^nil].
+	id := context at: 'debugger' ifAbsent: nil.
+	id
+		ifNotNil: 
+			[id := IID fromString: id.
+			debugger := self debuggers at: id ifAbsent: [^nil].
+			index := context at: 'frame' ifAbsent: [^nil].
+			^debugger stack at: index asInteger ifAbsent: nil].
+	^nil!
+
+requestedEvaluationReceiver
+	| context name path id debugger index frame |
+	context := self bodyAt: 'context' ifAbsent: [^nil].
+	name := context at: 'class' ifAbsent: nil.
+	name ifNotNil: [^self classNamed: name].
+	path := context at: 'object' ifAbsent: nil.
+	path ifNotNil: [^self objectFromPath: path].
+	id := context at: 'debugger' ifAbsent: nil.
+	id
+		ifNotNil: 
+			[id := IID fromString: id.
+			debugger := self debuggers at: id ifAbsent: [^nil].
+			index := context at: 'frame' ifAbsent: [^nil].
+			frame := debugger stack at: index asInteger ifAbsent: nil.
+			^frame ifNotNil: [frame receiver]].
+	^nil!
+
 requestedId
 	| id |
 	id := self urlAt: 'id'.
@@ -555,6 +631,13 @@ resumeDebugger
 	self debuggers removeKey: id.
 	debugger resume.
 	^nil!
+
+resumeEvaluation
+	| id evaluation |
+	id := self requestedId.
+	evaluation := self evaluations at: id ifAbsent: [^self notFound].
+	evaluation resume.
+	^evaluation asWebsideJson!
 
 saveImage	SessionManager current saveImage.
 	^true!
@@ -682,7 +765,9 @@ workspaces
 !WebsideAPI categoriesFor: #colors!general endpoints!public! !
 !WebsideAPI categoriesFor: #compilationError:!private! !
 !WebsideAPI categoriesFor: #compilerReceiver!private! !
+!WebsideAPI categoriesFor: #created:!private! !
 !WebsideAPI categoriesFor: #createDebugger!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #createEvaluation!private! !
 !WebsideAPI categoriesFor: #createWorkspace!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #debugExpression!private! !
 !WebsideAPI categoriesFor: #debuggerFrame!debugging endpoints!public! !
@@ -696,7 +781,7 @@ workspaces
 !WebsideAPI categoriesFor: #evaluateExpression:!private! !
 !WebsideAPI categoriesFor: #evaluationError:!public! !
 !WebsideAPI categoriesFor: #evaluations!private! !
-!WebsideAPI categoriesFor: #filterByCategory:!private! !
+!WebsideAPI categoriesFor: #filterByCategory:!public! !
 !WebsideAPI categoriesFor: #filterByVariable:!private! !
 !WebsideAPI categoriesFor: #frameBindings!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #implementorsOf:!private! !
@@ -707,20 +792,24 @@ workspaces
 !WebsideAPI categoriesFor: #logo!general endpoints!public! !
 !WebsideAPI categoriesFor: #method!code endpoints!public! !
 !WebsideAPI categoriesFor: #methods!code endpoints!public! !
+!WebsideAPI categoriesFor: #methodTemplate!code endpoints!public! !
 !WebsideAPI categoriesFor: #namedSlotsOf:!private! !
 !WebsideAPI categoriesFor: #newID!private! !
 !WebsideAPI categoriesFor: #newJsonObject!private! !
 !WebsideAPI categoriesFor: #notFound!private! !
+!WebsideAPI categoriesFor: #objectFromPath:!private! !
 !WebsideAPI categoriesFor: #objects!private! !
 !WebsideAPI categoriesFor: #package!code endpoints!public! !
 !WebsideAPI categoriesFor: #packageClasses!code endpoints!public! !
 !WebsideAPI categoriesFor: #packageMethods!code endpoints!public! !
 !WebsideAPI categoriesFor: #packageNamed:!private! !
 !WebsideAPI categoriesFor: #packages!code endpoints!public! !
+!WebsideAPI categoriesFor: #pauseEvaluation!evaluation endpoints!public! !
 !WebsideAPI categoriesFor: #pinnedObject!objects endpoints!public! !
 !WebsideAPI categoriesFor: #pinnedObjects!objects endpoints!public! !
 !WebsideAPI categoriesFor: #pinnedObjectSlots!objects endpoints!public! !
 !WebsideAPI categoriesFor: #pinObjectSlot!objects endpoints!public! !
+!WebsideAPI categoriesFor: #profileExpression!profiling endpoints!public! !
 !WebsideAPI categoriesFor: #queriedAccessing!private! !
 !WebsideAPI categoriesFor: #queriedAssigning!private! !
 !WebsideAPI categoriesFor: #queriedCategory!private! !
@@ -742,6 +831,8 @@ workspaces
 !WebsideAPI categoriesFor: #request:!accessing!public! !
 !WebsideAPI categoriesFor: #requestedChange!private! !
 !WebsideAPI categoriesFor: #requestedClass!private! !
+!WebsideAPI categoriesFor: #requestedEvaluationContext!private! !
+!WebsideAPI categoriesFor: #requestedEvaluationReceiver!private! !
 !WebsideAPI categoriesFor: #requestedId!private! !
 !WebsideAPI categoriesFor: #requestedIndex!private! !
 !WebsideAPI categoriesFor: #requestedPackage!private! !
@@ -749,6 +840,7 @@ workspaces
 !WebsideAPI categoriesFor: #requestedSlot!private! !
 !WebsideAPI categoriesFor: #restartDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #resumeDebugger!debugging endpoints!public! !
+!WebsideAPI categoriesFor: #resumeEvaluation!evaluation endpoints!public! !
 !WebsideAPI categoriesFor: #saveImage!general endpoints!public! !
 !WebsideAPI categoriesFor: #selectors!code endpoints!public! !
 !WebsideAPI categoriesFor: #sendersOf:!private! !

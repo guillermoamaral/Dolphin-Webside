@@ -21,6 +21,7 @@ package classNames
 	add: #URLTest;
 	add: #WebsideAPI;
 	add: #WebsideClient;
+	add: #WebsideEvaluation;
 	add: #WebsideResource;
 	add: #WebsideServer;
 	add: #WebsideWorkspace;
@@ -156,6 +157,11 @@ Object subclass: #WebsideAPI
 	classInstanceVariableNames: ''!
 Object subclass: #WebsideClient
 	instanceVariableNames: 'url client'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Object subclass: #WebsideEvaluation
+	instanceVariableNames: 'id expression receiver context requestor priority process state result error'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
