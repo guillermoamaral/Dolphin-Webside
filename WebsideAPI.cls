@@ -260,6 +260,9 @@ evaluationError: id	| process json error |	process := self evaluations at: id.
 evaluations
 	^server evaluations!
 
+extensions
+	^#()!
+
 filterByCategory: aCollection
 	| category |
 	category := self queriedCategory.
@@ -456,8 +459,6 @@ pauseEvaluation
 pinnedObject
 	| id object |
 	id := self requestedId.
-	self evaluations at: id
-		ifPresent: [:process | process isSuspended ifTrue: [^self evaluationError: id]].
 	object := self objects at: id ifAbsent: [^self notFound].
 	^object asWebsideJson
 		at: 'id' put: id asString;
@@ -781,6 +782,7 @@ workspaces
 !WebsideAPI categoriesFor: #evaluateExpression:!private! !
 !WebsideAPI categoriesFor: #evaluationError:!public! !
 !WebsideAPI categoriesFor: #evaluations!private! !
+!WebsideAPI categoriesFor: #extensions!extensions endpoints!public! !
 !WebsideAPI categoriesFor: #filterByCategory:!public! !
 !WebsideAPI categoriesFor: #filterByVariable:!private! !
 !WebsideAPI categoriesFor: #frameBindings!debugging endpoints!public! !

@@ -48,8 +48,12 @@ evaluateBlock: aBlock
 					process suspend].
 			self finished]
 					newProcess.
+"priority should be already set. In fact, it is initiallized as Processor userSchedulingPriority.
+However, for some reason that should be understood/modified, HttpServer loop is scheduled at a lower priority,
+making the resuming of the evaluation process to take control immediately when #resume is sent below, making synchronous
+what otherwise would be asynchronous evaluation."
 	process
-		priority: priority;
+		priority: Processor activeProcess priority - 1;
 		name: 'Webside evaluation ' , id asString;
 		resume!
 
@@ -109,7 +113,8 @@ requestor	^ requestor!
 
 requestor: anObject	requestor := anObject!
 
-result	self hasFinished ifTrue: [ ^ result ]!
+result
+	self hasFinished ifTrue: [^result]!
 
 result: anObject	result := anObject!
 
@@ -118,6 +123,9 @@ resume	self resumed.	process resume.!
 resumed
 	state := #evaluating.
 	self trigger: #resumed!
+
+state
+	 ^state!
 
 waitForResult
 	| semaphore |
@@ -166,6 +174,7 @@ wasCancelled	^ state == #cancelled! !
 !WebsideEvaluation categoriesFor: #result:!public! !
 !WebsideEvaluation categoriesFor: #resume!public! !
 !WebsideEvaluation categoriesFor: #resumed!public! !
+!WebsideEvaluation categoriesFor: #state!public! !
 !WebsideEvaluation categoriesFor: #waitForResult!public! !
 !WebsideEvaluation categoriesFor: #wasCancelled!public! !
 

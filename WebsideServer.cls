@@ -104,6 +104,9 @@ initializeEvaluationRoutes
 		routePOST: '/evaluations/{id}/pause' to: #pauseEvaluation;
 		routePOST: '/evaluations/{id}/resume' to: #resumeEvaluation!
 
+initializeExtensionsRoutes
+	router routeGET: '/extensions' to: #extensions!
+
 initializeGeneralRoutes
 	router
 		routeGET: '/dialect' to: #dialect;
@@ -127,7 +130,18 @@ initializeResources
 		at: #testRuns put: Dictionary new;
 		at: #changes put: OrderedCollection new!
 
-initializeRoutes	router receiver: [WebsideAPI new server: self].	self		initializePreflightRoutes;        initializeGeneralRoutes;		initializeCodeRoutes;		initializeChangesRoutes;		initializeEvaluationRoutes;		initializeObjectsRoutes;		initializeWorkspacesRoutes;		initializeDebuggingRoutes!
+initializeRoutes
+	router receiver: [WebsideAPI new server: self].
+	self
+		initializePreflightRoutes;
+		initializeGeneralRoutes;
+		initializeCodeRoutes;
+		initializeChangesRoutes;
+		initializeEvaluationRoutes;
+		initializeObjectsRoutes;
+		initializeWorkspacesRoutes;
+		initializeDebuggingRoutes;
+		initializeExtensionsRoutes!
 
 initializeServer
 	server := HttpServer new.
@@ -186,6 +200,7 @@ workspaces	^ self resourcesAt: #workspaces! !
 !WebsideServer categoriesFor: #initializeCodeRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeDebuggingRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeEvaluationRoutes!initializing!public! !
+!WebsideServer categoriesFor: #initializeExtensionsRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeGeneralRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeObjectsRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializePreflightRoutes!initializing!public! !

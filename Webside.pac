@@ -2208,6 +2208,9 @@ evaluationError: id	| process json error |	process := self evaluations at: id.
 evaluations
 	^server evaluations!
 
+extensions
+	^#()!
+
 filterByCategory: aCollection
 	| category |
 	category := self queriedCategory.
@@ -2404,8 +2407,6 @@ pauseEvaluation
 pinnedObject
 	| id object |
 	id := self requestedId.
-	self evaluations at: id
-		ifPresent: [:process | process isSuspended ifTrue: [^self evaluationError: id]].
 	object := self objects at: id ifAbsent: [^self notFound].
 	^object asWebsideJson
 		at: 'id' put: id asString;
@@ -2729,6 +2730,7 @@ workspaces
 !WebsideAPI categoriesFor: #evaluateExpression:!private! !
 !WebsideAPI categoriesFor: #evaluationError:!public! !
 !WebsideAPI categoriesFor: #evaluations!private! !
+!WebsideAPI categoriesFor: #extensions!extensions endpoints!public! !
 !WebsideAPI categoriesFor: #filterByCategory:!public! !
 !WebsideAPI categoriesFor: #filterByVariable:!private! !
 !WebsideAPI categoriesFor: #frameBindings!debugging endpoints!public! !
@@ -2877,8 +2879,12 @@ evaluateBlock: aBlock
 					process suspend].
 			self finished]
 					newProcess.
+"priority should be already set. In fact, it is initiallized as Processor userSchedulingPriority.
+However, for some reason that should be understood/modified, HttpServer loop is scheduled at a lower priority,
+making the resuming of the evaluation process to take control immediately when #resume is sent below, making synchronous
+what otherwise would be asynchronous evaluation."
 	process
-		priority: priority;
+		priority: Processor activeProcess priority - 1;
 		name: 'Webside evaluation ' , id asString;
 		resume!
 
@@ -2938,7 +2944,8 @@ requestor	^ requestor!
 
 requestor: anObject	requestor := anObject!
 
-result	self hasFinished ifTrue: [ ^ result ]!
+result
+	self hasFinished ifTrue: [^result]!
 
 result: anObject	result := anObject!
 
@@ -2947,6 +2954,9 @@ resume	self resumed.	process resume.!
 resumed
 	state := #evaluating.
 	self trigger: #resumed!
+
+state
+	 ^state!
 
 waitForResult
 	| semaphore |
@@ -2995,6 +3005,7 @@ wasCancelled	^ state == #cancelled! !
 !WebsideEvaluation categoriesFor: #result:!public! !
 !WebsideEvaluation categoriesFor: #resume!public! !
 !WebsideEvaluation categoriesFor: #resumed!public! !
+!WebsideEvaluation categoriesFor: #state!public! !
 !WebsideEvaluation categoriesFor: #waitForResult!public! !
 !WebsideEvaluation categoriesFor: #wasCancelled!public! !
 
@@ -3128,6 +3139,9 @@ initializeEvaluationRoutes
 		routePOST: '/evaluations/{id}/pause' to: #pauseEvaluation;
 		routePOST: '/evaluations/{id}/resume' to: #resumeEvaluation!
 
+initializeExtensionsRoutes
+	router routeGET: '/extensions' to: #extensions!
+
 initializeGeneralRoutes
 	router
 		routeGET: '/dialect' to: #dialect;
@@ -3151,7 +3165,18 @@ initializeResources
 		at: #testRuns put: Dictionary new;
 		at: #changes put: OrderedCollection new!
 
-initializeRoutes	router receiver: [WebsideAPI new server: self].	self		initializePreflightRoutes;        initializeGeneralRoutes;		initializeCodeRoutes;		initializeChangesRoutes;		initializeEvaluationRoutes;		initializeObjectsRoutes;		initializeWorkspacesRoutes;		initializeDebuggingRoutes!
+initializeRoutes
+	router receiver: [WebsideAPI new server: self].
+	self
+		initializePreflightRoutes;
+		initializeGeneralRoutes;
+		initializeCodeRoutes;
+		initializeChangesRoutes;
+		initializeEvaluationRoutes;
+		initializeObjectsRoutes;
+		initializeWorkspacesRoutes;
+		initializeDebuggingRoutes;
+		initializeExtensionsRoutes!
 
 initializeServer
 	server := HttpServer new.
@@ -3210,6 +3235,7 @@ workspaces	^ self resourcesAt: #workspaces! !
 !WebsideServer categoriesFor: #initializeCodeRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeDebuggingRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeEvaluationRoutes!initializing!public! !
+!WebsideServer categoriesFor: #initializeExtensionsRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeGeneralRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeObjectsRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializePreflightRoutes!initializing!public! !
