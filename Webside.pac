@@ -42,6 +42,7 @@ package methodNames
 	add: #Collection -> #groupBy:;
 	add: #CompiledMethod -> #asWebsideJson;
 	add: #Object -> #asWebsideJson;
+	add: #Object -> #websidePresentations;
 	add: #Package -> #asWebsideJson;
 	add: #RefactoryChange -> #asWebsideJson;
 	add: #RefactoryChange -> #fromWebsideJson:;
@@ -415,8 +416,12 @@ asWebsideJson
 		at: 'indexable' put: self isIndexable;
 		at: 'size' put: (self isIndexable ifTrue: [self size] ifFalse: [0]);
 		at: 'printString' put: printed;
-		yourself! !
+		yourself!
+
+websidePresentations
+	^#()! !
 !Object categoriesFor: #asWebsideJson!converting!public! !
+!Object categoriesFor: #websidePresentations!exceptions!private! !
 
 !Package methodsFor!
 
