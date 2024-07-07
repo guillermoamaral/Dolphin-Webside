@@ -191,6 +191,9 @@ createEvaluation
 
 createWorkspace	| id |	id := self newID.	self workspaces at: id put: WebsideWorkspace new.	^ id asString!
 
+customViewsOf: anObject
+	^anObject websideViews!
+
 debugExpression	| expression method receiver process context debugger id |	expression := self bodyAt: 'expression' ifAbsent: [''].	method := self compiler compile: expression.	receiver := self compilerReceiver.	process := [ method valueWithReceiver: receiver arguments: #() ]		newProcess.	context := process suspendedContext.	debugger := process		newDebugSessionNamed: 'debug it'		startedAt: context.	debugger stepIntoUntil: [ :c | c method == method ].	id := self newID.	self evaluations at: id put: process.	self debuggers at: id put: debugger.	^ id asString!
 
 debuggerFrame
@@ -490,6 +493,7 @@ pinnedObjectSlots
 	last = 'instance-variables' ifTrue: [^self instanceVariablesOf: object].
 	last = 'named-slots' ifTrue: [^self namedSlotsOf: object].
 	last = 'indexed-slots' ifTrue: [^self indexedSlotsOf: object].
+	last = 'custom-views' ifTrue: [^self customViewsOf: object].
 	object := self
 				slot: last
 				of: object
@@ -770,6 +774,7 @@ workspaces
 !WebsideAPI categoriesFor: #createDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #createEvaluation!private! !
 !WebsideAPI categoriesFor: #createWorkspace!public!workspaces endpoints! !
+!WebsideAPI categoriesFor: #customViewsOf:!private! !
 !WebsideAPI categoriesFor: #debugExpression!private! !
 !WebsideAPI categoriesFor: #debuggerFrame!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #debuggerFrames!debugging endpoints!public! !

@@ -42,7 +42,7 @@ package methodNames
 	add: #Collection -> #groupBy:;
 	add: #CompiledMethod -> #asWebsideJson;
 	add: #Object -> #asWebsideJson;
-	add: #Object -> #websidePresentations;
+	add: #Object -> #websideViews;
 	add: #Package -> #asWebsideJson;
 	add: #RefactoryChange -> #asWebsideJson;
 	add: #RefactoryChange -> #fromWebsideJson:;
@@ -418,10 +418,10 @@ asWebsideJson
 		at: 'printString' put: printed;
 		yourself!
 
-websidePresentations
+websideViews
 	^#()! !
 !Object categoriesFor: #asWebsideJson!converting!public! !
-!Object categoriesFor: #websidePresentations!exceptions!private! !
+!Object categoriesFor: #websideViews!exceptions!private! !
 
 !Package methodsFor!
 
