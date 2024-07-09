@@ -570,7 +570,7 @@ requestedClass
 requestedEvaluationContext
 	| context id debugger index |
 	context := self bodyAt: 'context' ifAbsent: [^nil].
-	id := context at: 'debugger' ifAbsent: nil.
+	id := context at: 'debugger' ifAbsent: [].
 	id
 		ifNotNil: 
 			[id := IID fromString: id.
@@ -582,11 +582,11 @@ requestedEvaluationContext
 requestedEvaluationReceiver
 	| context name path id debugger index frame |
 	context := self bodyAt: 'context' ifAbsent: [^nil].
-	name := context at: 'class' ifAbsent: nil.
+	name := context at: 'class' ifAbsent: [].
 	name ifNotNil: [^self classNamed: name].
-	path := context at: 'object' ifAbsent: nil.
+	path := context at: 'object' ifAbsent: [].
 	path ifNotNil: [^self objectFromPath: path].
-	id := context at: 'debugger' ifAbsent: nil.
+	id := context at: 'debugger' ifAbsent: [].
 	id
 		ifNotNil: 
 			[id := IID fromString: id.

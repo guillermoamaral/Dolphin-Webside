@@ -100,7 +100,7 @@ package globalAliases: (Set new
 package setPrerequisites: #(
 	'..\Core\Object Arts\Dolphin\IDE\Base\Development System'
 	'..\Core\Object Arts\Dolphin\Base\Dolphin'
-	'..\DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
+	'..\_DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
 	'..\Core\Object Arts\Dolphin\ActiveX\COM\OLE COM'
 	'..\Core\Contributions\Refactory\Refactoring Browser\Change Objects\RBChangeObjects'
 	'..\Core\Object Arts\Dolphin\System\Compiler\Smalltalk Parser'
@@ -413,8 +413,9 @@ asWebsideJson
 				do: [:e | 'Error while printing ' , self class name , ' instance'].
 	^Dictionary new
 		at: 'class' put: self class name;
-		at: 'indexable' put: self isIndexable;
-		at: 'size' put: (self isIndexable ifTrue: [self size] ifFalse: [0]);
+		at: 'hasNamedSlots' put: self class isPointers;
+		at: 'hasIndexedSlots' put: self isIndexable;
+		at: 'size' put: (self class isVariable ifTrue: [self size] ifFalse: [0]);
 		at: 'printString' put: printed;
 		yourself!
 
@@ -2523,7 +2524,7 @@ requestedClass
 requestedEvaluationContext
 	| context id debugger index |
 	context := self bodyAt: 'context' ifAbsent: [^nil].
-	id := context at: 'debugger' ifAbsent: nil.
+	id := context at: 'debugger' ifAbsent: [].
 	id
 		ifNotNil: 
 			[id := IID fromString: id.
@@ -2535,11 +2536,11 @@ requestedEvaluationContext
 requestedEvaluationReceiver
 	| context name path id debugger index frame |
 	context := self bodyAt: 'context' ifAbsent: [^nil].
-	name := context at: 'class' ifAbsent: nil.
+	name := context at: 'class' ifAbsent: [].
 	name ifNotNil: [^self classNamed: name].
-	path := context at: 'object' ifAbsent: nil.
+	path := context at: 'object' ifAbsent: [].
 	path ifNotNil: [^self objectFromPath: path].
-	id := context at: 'debugger' ifAbsent: nil.
+	id := context at: 'debugger' ifAbsent: [].
 	id
 		ifNotNil: 
 			[id := IID fromString: id.
