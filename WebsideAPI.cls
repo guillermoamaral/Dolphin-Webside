@@ -46,7 +46,7 @@ addChange
 	| change |
 	change := self requestedChange.
 	change ifNil: [^self badRequest: 'Change not supported'].
-	[change websideExecute] on: Error do: [:e | ^self compilationError: e].
+	[change websideExecute] on: Exception do: [:e | ^self compilationError: e].
 	"Temporary workaround until a better way of gathering system changes is implemented"
 	server addChange: change.
 	^change asWebsideJson!
@@ -76,7 +76,7 @@ changes
 	| author package changes |
 	author := self queryAt: 'author'.
 	package := self queriedPackage ifNil: [self systemPackage].
-"	changes := package changes currentChanges.
+	"	changes := package changes currentChanges.
 	author ifNotNil: [changes := changes select: [:ch | ch author = author]]."
 	"Temporary workaround until a better way of gathering changes is implemented"
 	changes := server changes asArray.

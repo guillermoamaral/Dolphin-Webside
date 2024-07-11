@@ -41,6 +41,9 @@ package methodNames
 	add: #Collection -> #gather:in:;
 	add: #Collection -> #groupBy:;
 	add: #CompiledMethod -> #asWebsideJson;
+	add: #CompilerNotification -> #asWebsideJson;
+	add: #Exception -> #asWebsideJson;
+	add: #MethodCompileFailed -> #asWebsideJson;
 	add: #Object -> #asWebsideJson;
 	add: #Object -> #websideViews;
 	add: #Package -> #asWebsideJson;
@@ -100,7 +103,7 @@ package globalAliases: (Set new
 package setPrerequisites: #(
 	'..\Core\Object Arts\Dolphin\IDE\Base\Development System'
 	'..\Core\Object Arts\Dolphin\Base\Dolphin'
-	'..\_DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
+	'..\DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
 	'..\Core\Object Arts\Dolphin\ActiveX\COM\OLE COM'
 	'..\Core\Contributions\Refactory\Refactoring Browser\Change Objects\RBChangeObjects'
 	'..\Core\Object Arts\Dolphin\System\Compiler\Smalltalk Parser'
@@ -391,19 +394,49 @@ asWebsideJson
 		at: 'methodClass' put: self methodClass name;
 		at: 'category' put: (category ifNotNil: [:c | c name]);
 		at: 'source' put: source;
-		at: 'author' put: 'self author';
-		at: 'timestamp' put: 'self timestamp';
+		at: 'author' put: 'Unknown';
+		at: 'timestamp' put: nil;
 		at: 'package' put: (self owningPackage ifNotNil: [:p | p name]);
 		at: 'overriding' put: self isOverride;
 		at: 'overriden' put: self isOverridden;
 		yourself! !
 !CompiledMethod categoriesFor: #asWebsideJson!converting!public! !
 
+!CompilerNotification methodsFor!
+
+asWebsideJson
+	| interval json |
+	interval := Dictionary new
+				at: 'start' put: position;
+				at: 'end' put: position;
+				yourself.
+	json := super asWebsideJson.
+	json
+		at: 'fullDescription' put: self errorMessage;
+		at: 'interval' put: interval.
+	^json! !
+!CompilerNotification categoriesFor: #asWebsideJson!accessing!public! !
+
 !DolphinAddMethodChange class methodsFor!
 
 websideType
 	^'AddMethod'! !
 !DolphinAddMethodChange class categoriesFor: #websideType!public! !
+
+!Exception methodsFor!
+
+asWebsideJson
+	| json |
+	json := super asWebsideJson.
+	json at: 'description' put: self description.
+	^json! !
+!Exception categoriesFor: #asWebsideJson!handling!public! !
+
+!MethodCompileFailed methodsFor!
+
+asWebsideJson
+	^compilerErrorNotification asWebsideJson! !
+!MethodCompileFailed categoriesFor: #asWebsideJson!accessing!private! !
 
 !Object methodsFor!
 
@@ -2000,7 +2033,7 @@ addChange
 	| change |
 	change := self requestedChange.
 	change ifNil: [^self badRequest: 'Change not supported'].
-	[change websideExecute] on: Error do: [:e | ^self compilationError: e].
+	[change websideExecute] on: Exception do: [:e | ^self compilationError: e].
 	"Temporary workaround until a better way of gathering system changes is implemented"
 	server addChange: change.
 	^change asWebsideJson!
@@ -2030,7 +2063,7 @@ changes
 	| author package changes |
 	author := self queryAt: 'author'.
 	package := self queriedPackage ifNil: [self systemPackage].
-"	changes := package changes currentChanges.
+	"	changes := package changes currentChanges.
 	author ifNotNil: [changes := changes select: [:ch | ch author = author]]."
 	"Temporary workaround until a better way of gathering changes is implemented"
 	changes := server changes asArray.
