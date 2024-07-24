@@ -5,13 +5,19 @@ package paxVersion: 1;
 
 
 package classNames
+	add: #AddCategoryChange;
 	add: #AddPackageChange;
+	add: #ClassifyMethodChange;
+	add: #CommentClassChange;
 	add: #HttpRequestRouter;
 	add: #MatchAlgorithm;
 	add: #MatchToken;
 	add: #PercentEncoder;
+	add: #RefactoryCategoryChange;
 	add: #RefactoryPackageChange;
+	add: #RemoveCategoryChange;
 	add: #RemovePackageChange;
+	add: #RenameCategoryChange;
 	add: #RenamePackageChange;
 	add: #StarToken;
 	add: #StringPattern;
@@ -44,9 +50,15 @@ package methodNames
 	add: #CompilerNotification -> #asWebsideJson;
 	add: #Exception -> #asWebsideJson;
 	add: #MethodCompileFailed -> #asWebsideJson;
+	add: #MethodRefactoring -> #asWebsideJson;
+	add: #MethodRefactoring -> #fromWebsideJson:;
 	add: #Object -> #asWebsideJson;
 	add: #Object -> #websideViews;
 	add: #Package -> #asWebsideJson;
+	add: #PullUpInstanceVariableRefactoring -> #fromWebsideJson:;
+	add: #Refactoring -> #asWebsideJson;
+	add: #Refactoring -> #fromWebsideJson:;
+	add: #Refactoring -> #websideExecute;
 	add: #RefactoryChange -> #asWebsideJson;
 	add: #RefactoryChange -> #fromWebsideJson:;
 	add: #RefactoryChange -> #websideExecute;
@@ -58,8 +70,11 @@ package methodNames
 	add: #RemoveMethodChange -> #fromWebsideJson:;
 	add: #RenameClassChange -> #asWebsideJson;
 	add: #RenameClassChange -> #fromWebsideJson:;
+	add: #RenameMethodRefactoring -> #asWebsideJson;
+	add: #RenameMethodRefactoring -> #fromWebsideJson:;
 	add: #RenameVariableChange -> #asWebsideJson;
 	add: #RenameVariableChange -> #fromWebsideJson:;
+	add: #StackFrame -> #asWebsideJson;
 	add: #StAssignmentNode -> #asWebsideJson;
 	add: #StCascadeNode -> #asWebsideJson;
 	add: #StLiteralToken -> #asWebsideJson;
@@ -74,11 +89,19 @@ package methodNames
 	add: #StSequenceNode -> #asWebsideJson;
 	add: #StVariableNode -> #asWebsideJson;
 	add: #Symbol -> #evaluateWith:;
+	add: #VariableRefactoring -> #asWebsideJson;
+	add: #VariableRefactoring -> #fromWebsideJson:;
 	add: 'AddClassChange class' -> #websideType;
 	add: 'AddClassVariableChange class' -> #websideType;
 	add: 'AddInstanceVariableChange class' -> #websideType;
 	add: 'AddMethodChange class' -> #websideType;
 	add: 'DolphinAddMethodChange class' -> #websideType;
+	add: 'PullUpInstanceVariableRefactoring class' -> #websideType;
+	add: 'PushDownInstanceVariableRefactoring class' -> #websideType;
+	add: 'Refactoring class' -> #acceptsWebsideJson:;
+	add: 'Refactoring class' -> #classForWebsideJson:;
+	add: 'Refactoring class' -> #fromWebsideJson:;
+	add: 'Refactoring class' -> #websideType;
 	add: 'RefactoryChange class' -> #acceptsWebsideJson:;
 	add: 'RefactoryChange class' -> #classForWebsideJson:;
 	add: 'RefactoryChange class' -> #fromWebsideJson:;
@@ -106,6 +129,7 @@ package setPrerequisites: #(
 	'..\DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
 	'..\Core\Object Arts\Dolphin\ActiveX\COM\OLE COM'
 	'..\Core\Contributions\Refactory\Refactoring Browser\Change Objects\RBChangeObjects'
+	'..\Core\Contributions\Refactory\Refactoring Browser\Refactorings\RBRefactorings'
 	'..\Core\Object Arts\Dolphin\System\Compiler\Smalltalk Parser'
 	'..\Core\Contributions\svenc\STON\STON-Core'
 	'..\Core\Contributions\Camp Smalltalk\SUnit\SUnit').
@@ -184,6 +208,36 @@ RefactoryChange subclass: #RefactoryPackageChange
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+RefactoryClassChange subclass: #ClassifyMethodChange
+	instanceVariableNames: 'selector category'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryClassChange subclass: #CommentClassChange
+	instanceVariableNames: 'comment'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryClassChange subclass: #RefactoryCategoryChange
+	instanceVariableNames: 'category'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryCategoryChange subclass: #AddCategoryChange
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryCategoryChange subclass: #RemoveCategoryChange
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryCategoryChange subclass: #RenameCategoryChange
+	instanceVariableNames: 'newName'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
 RefactoryPackageChange subclass: #AddPackageChange
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -210,7 +264,7 @@ TestCase subclass: #URLTest
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
 WebsideResource subclass: #WebsideWorkspace
-	instanceVariableNames: 'bindings'
+	instanceVariableNames: 'contents bindings'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -438,6 +492,20 @@ asWebsideJson
 	^compilerErrorNotification asWebsideJson! !
 !MethodCompileFailed categoriesFor: #asWebsideJson!accessing!private! !
 
+!MethodRefactoring methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'className' put: class name asString;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	json at: 'className'
+		ifPresent: [:n | Smalltalk at: n ifPresent: [:c | class := RBClass existingNamed: n]]! !
+!MethodRefactoring categoriesFor: #asWebsideJson!private! !
+!MethodRefactoring categoriesFor: #fromWebsideJson:!private! !
+
 !Object methodsFor!
 
 asWebsideJson
@@ -472,6 +540,78 @@ asWebsideJson
 		yourself! !
 !Package categoriesFor: #asWebsideJson!converting!private! !
 
+!PullUpInstanceVariableRefactoring methodsFor!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	json at: 'target'
+		ifPresent: 
+			[:n |
+			Smalltalk at: n
+				ifPresent: 
+					[:c |
+					class := RBClass existingNamed: n.
+					class model: model]]! !
+!PullUpInstanceVariableRefactoring categoriesFor: #fromWebsideJson:!public! !
+
+!PullUpInstanceVariableRefactoring class methodsFor!
+
+websideType
+	^'MoveUpInstanceVariable'! !
+!PullUpInstanceVariableRefactoring class categoriesFor: #websideType!public! !
+
+!PushDownInstanceVariableRefactoring class methodsFor!
+
+websideType
+	^'MoveDownInstanceVariable'! !
+!PushDownInstanceVariableRefactoring class categoriesFor: #websideType!public! !
+
+!Refactoring methodsFor!
+
+asWebsideJson
+	^Dictionary new
+		at: 'type' put: self class websideType;
+		at: 'label' put: self class websideType;
+		at: 'package' put: (self propertyAt: #packageName ifAbsent: []);
+		at: 'timestamp' put: DateAndTime now printString;
+		at: 'author' put: nil;
+		yourself!
+
+fromWebsideJson: json
+	json at: 'package' ifPresent: [:n | self propertyAt: #packageName put: n].
+	self model	"Only to initialize it"!
+
+websideExecute
+	^self execute! !
+!Refactoring categoriesFor: #asWebsideJson!public! !
+!Refactoring categoriesFor: #fromWebsideJson:!public! !
+!Refactoring categoriesFor: #websideExecute!public! !
+
+!Refactoring class methodsFor!
+
+acceptsWebsideJson: json
+	| type |
+	type := json at: 'type' ifAbsent: nil.
+	^self websideType = type!
+
+classForWebsideJson: json
+	^self allSubclasses detect: [:c | c acceptsWebsideJson: json] ifNone: []!
+
+fromWebsideJson: json
+	| class |
+	class := self classForWebsideJson: json.
+	^class ifNotNil: [class new fromWebsideJson: json]!
+
+websideType
+	| type |
+	type := self name asString.
+	(type endsWith: 'Refactoring') ifTrue: [type := type copyFrom: 1 to: type size - 11].
+	^type! !
+!Refactoring class categoriesFor: #acceptsWebsideJson:!class hierarchy-removing!public! !
+!Refactoring class categoriesFor: #classForWebsideJson:!class hierarchy-removing!public! !
+!Refactoring class categoriesFor: #fromWebsideJson:!class hierarchy-removing!public! !
+!Refactoring class categoriesFor: #websideType!class hierarchy-removing!public! !
+
 !RefactoryChange methodsFor!
 
 asWebsideJson
@@ -484,7 +624,7 @@ asWebsideJson
 		yourself!
 
 fromWebsideJson: json
-	json at: 'package' ifPresent: [:name | self propertyAt: #packageName put: name]!
+	json at: 'package' ifPresent: [:n | self propertyAt: #packageName put: n]!
 
 websideExecute
 	^self execute! !
@@ -614,6 +754,25 @@ websideType
 	^'RenameInstanceVariable'! !
 !RenameInstanceVariableChange class categoriesFor: #websideType!public! !
 
+!RenameMethodRefactoring methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'selector' put: oldSelector;
+		at: 'newSelector' put: newSelector;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	json at: 'selector' ifPresent: [:s | oldSelector := s asSymbol].
+	json at: 'newSelector'
+		ifPresent: 
+			[:s |
+			newSelector := s asSymbol.
+			permutation := 1 to: newSelector argumentCount]! !
+!RenameMethodRefactoring categoriesFor: #asWebsideJson!public!testing! !
+!RenameMethodRefactoring categoriesFor: #fromWebsideJson:!public!testing! !
+
 !RenameVariableChange methodsFor!
 
 asWebsideJson
@@ -631,6 +790,16 @@ fromWebsideJson: json
 	newName := json at: 'newName' ifAbsent: []! !
 !RenameVariableChange categoriesFor: #asWebsideJson!printing!public! !
 !RenameVariableChange categoriesFor: #fromWebsideJson:!printing!public! !
+
+!StackFrame methodsFor!
+
+asWebsideJson
+	^Dictionary new
+		at: 'label' put: self method printString;
+		at: 'class' put: self receiver class asWebsideJson;
+		at: 'method' put: self method asWebsideJson;
+		yourself! !
+!StackFrame categoriesFor: #asWebsideJson!accessing!private! !
 
 !StAssignmentNode methodsFor!
 
@@ -750,6 +919,28 @@ asWebsideJson	^ super asWebsideJson		at: 'value' put: name;		yourself! !
 evaluateWith: anObject
 	^anObject perform: self! !
 !Symbol categoriesFor: #evaluateWith:!converting!public! !
+
+!VariableRefactoring methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'className' put: class name asString;
+		at: 'variable' put: variableName;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	json at: 'className'
+		ifPresent: 
+			[:n |
+			Smalltalk at: n
+				ifPresent: 
+					[:c |
+					class := RBClass existingNamed: n.
+					class model: model]].
+	variableName := json at: 'variable' ifAbsent: []! !
+!VariableRefactoring categoriesFor: #asWebsideJson!initialize/release!public! !
+!VariableRefactoring categoriesFor: #fromWebsideJson:!initialize/release!public! !
 
 "End of package definition"!
 
@@ -2023,11 +2214,7 @@ activeEvaluations
 	^self evaluations values asArray collect: [:e | e asWebsideJson]!
 
 activeWorkspaces
-	^self workspaces associations asArray collect: 
-			[:a |
-			a value asWebsideJson
-				at: 'id' put: a key asString;
-				yourself]!
+	^self workspaces values asArray collect: [:w | w asWebsideJson]!
 
 addChange
 	| change |
@@ -2144,25 +2331,31 @@ created: aDictionary
 		content: payload asUtf8String!
 
 createDebugger
-	| id process exception context debugger |
+	| id evaluation process frame description debugger |
 	id := self bodyAt: 'evaluation' ifAbsent: [^self notFound].
 	id := IID fromString: id.
-	process := self evaluations at: id ifAbsent: [^self notFound].
-	exception := process suspendedContext exception.
-	context := exception signalerContext.
-	"process suspendedContext: context."
-	debugger := process newDebugSessionNamed: exception description startedAt: context.
-	context selector == #doesNotUnderstand: ifTrue: [context := context sender].
-	debugger restart: context.
-	context selector == #halt
+	evaluation := self evaluations at: id ifAbsent: [^self notFound].
+	process := evaluation process.
+	frame := evaluation hasFailed
+				ifTrue: [evaluation error raisingFrame]
+				ifFalse: [process suspendedFrame].
+	description := evaluation hasFailed
+				ifTrue: [evaluation error description]
+				ifFalse: ['Suspended process'].
+	debugger := Smalltalk developmentSystem debuggerClass new.
+	debugger
+		caption: description;
+		process: process topFrame: frame;
+		resumable: process isTerminated not.
+	"context selector == #halt
 		ifTrue: 
 			[debugger
 				stepOver;
-				stepOver].
+				stepOver]."
 	self debuggers at: id put: debugger.
 	^debugger asWebsideJson
 		at: 'id' put: id asString;
-		at: 'description' put: debugger name;
+		at: 'description' put: description;
 		yourself!
 
 createEvaluation
@@ -2176,7 +2369,11 @@ createEvaluation
 		context: self requestedEvaluationContext.
 	^self evaluations at: evaluation id put: evaluation!
 
-createWorkspace	| id |	id := self newID.	self workspaces at: id put: WebsideWorkspace new.	^ id asString!
+createWorkspace
+	| workspace |
+	workspace := WebsideWorkspace new.
+	self workspaces at: workspace id put: workspace.
+	^workspace asWebsideJson!
 
 customViewsOf: anObject
 	^anObject websideViews!
@@ -2187,18 +2384,27 @@ debuggerFrame
 	| debugger index frame interval |
 	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].
 	index := self requestedIndex.
-	frame := debugger stack at: index ifAbsent: [^self notFound].
-	interval := debugger pcRangeForContext: frame.
+	frame := debugger frames at: index ifAbsent: [^self notFound].
+	interval := debugger sourceRangeAt: frame ip inTextMap: frame textMap.
 	interval := Dictionary new
-				at: 'start' put: interval first;
-				at: 'end' put: interval last;
+				at: 'start' put: interval start;
+				at: 'end' put: interval stop;
 				yourself.
 	^frame asWebsideJson
 		at: 'index' put: index;
 		at: 'interval' put: interval;
 		yourself!
 
-debuggerFrames	| debugger |	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].	^debugger stack withIndexCollect: 			[:f :i |			self newJsonObject				at: 'index' put: i;				at: 'label' put: f method printString;				yourself]!
+debuggerFrames
+	| debugger frames |
+	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].
+	frames := debugger frames.
+	^(1 to: frames size) asArray collect: 
+			[:i |
+			self newJsonObject
+				at: 'index' put: i;
+				at: 'label' put: (frames at: i) method printString;
+				yourself]!
 
 debuggers
 	^ server debuggers!
@@ -2207,15 +2413,16 @@ defaultRootClass
 	^Object!
 
 deleteDebugger
-	| id debugger |
+	| id debugger evaluation |
 	id := self requestedId.
-	debugger := self debuggers at: id ifAbsent: [].
-	debugger notNil
-		ifTrue: 
-			[debugger terminate.
-			self debuggers removeKey: id ifAbsent: [].
-			self evaluations removeKey: id ifAbsent: []].
-	^id!
+	debugger := self debuggers at: id ifAbsent: [^self notFound].
+	evaluation := self evaluations detect: [:e | e process == debugger process] ifNone: [].
+	evaluation
+		ifNotNil: 
+			[evaluation process terminate.
+			self evaluations removeKey: evaluation id ifAbsent: []].
+	self debuggers removeKey: id.
+	^id asString!
 
 deleteWorkspace	self workspaces		removeKey: self requestedId		ifAbsent: [ ^ self notFound ].	^ nil!
 
@@ -2294,7 +2501,7 @@ filterByVariable: aCollection
 					var notNil ifTrue: [filtered addAll: (methods select: [:m | m refersToLiteral: var])]]].
 	^filter ifTrue: [filtered asArray] ifFalse: [aCollection]!
 
-frameBindings	| debugger frame |	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].	frame := debugger stack at: self requestedIndex ifAbsent: [^self notFound].	^#() collect: 			[:b |			self newJsonObject				at: 'name' put: b key asString;				at: 'value' put: b value printString;				yourself]!
+frameBindings	| debugger frame |	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].	frame := debugger frames at: self requestedIndex ifAbsent: [^self notFound].	^#() collect: 			[:b |			self newJsonObject				at: 'name' put: b key asString;				at: 'value' put: b value printString;				yourself]!
 
 implementorsOf: aSymbol
 	| system search environment |
@@ -2547,6 +2754,7 @@ requestedChange
 	| json change |
 	json := STONJSON fromString: request body.
 	change := RefactoryChange fromWebsideJson: json.
+	change ifNil: [change := Refactoring fromWebsideJson: json].
 	^change!
 
 requestedClass
@@ -2705,11 +2913,15 @@ systemPackage
 	^PackageManager current systemPackage!
 
 terminateDebugger
-	| id debugger |
+	| id debugger evaluation |
 	id := self requestedId.
 	debugger := self debuggers at: id ifAbsent: [^self notFound].
+	evaluation := self evaluations detect: [:e | e process == debugger process] ifNone: [].
+	evaluation
+		ifNotNil: 
+			[evaluation process terminate.
+			self evaluations removeKey: evaluation id ifAbsent: []].
 	self debuggers removeKey: id.
-	debugger terminate.
 	^nil!
 
 unpinAllObjects	self objects removeAll.	^ nil!
@@ -2717,6 +2929,13 @@ unpinAllObjects	self objects removeAll.	^ nil!
 unpinObject
 	self objects removeKey: self requestedId ifAbsent: [^self notFound].
 	^nil!
+
+updateWorkspace
+	| workspace source |
+	workspace := self workspaces at: self requestedId ifAbsent: [^self notFound].
+	source := self bodyAt: 'source' ifAbsent: ''.
+	workspace contents: source.
+	^workspace asWebsideJson!
 
 urlAt: aString
 	^(request propertyAt: #arguments) at: aString ifAbsent: []!
@@ -2733,7 +2952,20 @@ variables
 	class ifNil: [^self notFound].
 	^self instanceVariables , self classVariables!
 
-workspace	^ self workspaces		at: self requestedId		ifAbsent: [ self notFound ]!
+workspace
+	| workspace |
+	workspace := self workspaces at: self requestedId ifAbsent: [^self notFound].
+	^workspace asWebsideJson!
+
+workspaceBindings
+	| workspace |
+	workspace := self workspaces at: self requestedId ifAbsent: [^self notFound].
+	^workspace bindings associations collect: 
+			[:a |
+			self newJsonObject
+				at: 'name' put: a key;
+				at: 'value' put: a value printString;
+				yourself]!
 
 workspaces
 	^ server workspaces! !
@@ -2849,11 +3081,13 @@ workspaces
 !WebsideAPI categoriesFor: #terminateDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #unpinAllObjects!objects endpoints!public! !
 !WebsideAPI categoriesFor: #unpinObject!objects endpoints!public! !
+!WebsideAPI categoriesFor: #updateWorkspace!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #urlAt:!private! !
 !WebsideAPI categoriesFor: #usedCategories!code endpoints!public! !
 !WebsideAPI categoriesFor: #usualCategories!code endpoints!public! !
 !WebsideAPI categoriesFor: #variables!code endpoints!public! !
 !WebsideAPI categoriesFor: #workspace!public!workspaces endpoints! !
+!WebsideAPI categoriesFor: #workspaceBindings!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #workspaces!private! !
 
 !WebsideAPI class methodsFor!
@@ -3064,7 +3298,10 @@ WebsideResource comment: ''!
 !WebsideResource categoriesForClass!Unclassified! !
 !WebsideResource methodsFor!
 
-asWebsideJson	^super asWebsideJson at: 'id' put: id asString; yourself!
+asWebsideJson
+	^super asWebsideJson
+		at: 'id' put: id asString;
+		yourself!
 
 id	^id!
 
@@ -3234,7 +3471,9 @@ initializeWorkspacesRoutes
 		routePOST: '/workspaces' to: #createWorkspace;
 		routeGET: '/workspaces' to: #activeWorkspaces;
 		routeGET: '/workspaces/{id}' to: #workspace;
-		routeDELETE: '/workspaces/{id}' to: #deleteWorkspace!
+		routePUT: '/workspaces/{id}' to: #updateWorkspace;
+		routeDELETE: '/workspaces/{id}' to: #deleteWorkspace;
+		routeGET: '/workspaces/{id}/bindings' to: #workspaceBindings!
 
 isPreflight: request
 	^request verb = 'OPTIONS'
@@ -3336,6 +3575,170 @@ primitiveExecute
 !RefactoryPackageChange categoriesFor: #executeNotifying:!public! !
 !RefactoryPackageChange categoriesFor: #fromWebsideJson:!public! !
 !RefactoryPackageChange categoriesFor: #primitiveExecute!public! !
+
+ClassifyMethodChange guid: (GUID fromString: '{80aeef58-aca9-4378-b558-42c99c9ae553}')!
+ClassifyMethodChange comment: ''!
+!ClassifyMethodChange categoriesForClass!Refactory-Change Objects! !
+!ClassifyMethodChange methodsFor!
+
+asUndoOperation
+	self changeClass removeSelector: selector fromCategory: category asMethodCategory!
+
+asWebsideJson
+	| json |
+	json := super asWebsideJson.
+	^json
+		at: 'selector' put: selector;
+		at: 'category' put: category;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	selector := json at: 'selector' ifAbsent: [].
+	selector ifNotNil: [selector := selector asSymbol].
+	category := json at: 'category' ifAbsent: []!
+
+method
+	^self changeClass >> selector!
+
+primitiveExecute
+	MethodCategory setMethod: self method categories: (Array with: category asMethodCategory)! !
+!ClassifyMethodChange categoriesFor: #asUndoOperation!public! !
+!ClassifyMethodChange categoriesFor: #asWebsideJson!public! !
+!ClassifyMethodChange categoriesFor: #fromWebsideJson:!public! !
+!ClassifyMethodChange categoriesFor: #method!public! !
+!ClassifyMethodChange categoriesFor: #primitiveExecute!public! !
+
+CommentClassChange guid: (GUID fromString: '{86fa936b-3c4d-4835-88a3-9df9f185b725}')!
+CommentClassChange comment: ''!
+!CommentClassChange categoriesForClass!Refactory-Change Objects! !
+!CommentClassChange methodsFor!
+
+asUndoOperation
+	self class new comment: ''!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'comment' put: comment;
+		yourself!
+
+comment: aString
+	comment := aString!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	comment := json at: 'comment' ifAbsent: ['']!
+
+primitiveExecute
+	self changeClass comment: comment! !
+!CommentClassChange categoriesFor: #asUndoOperation!public! !
+!CommentClassChange categoriesFor: #asWebsideJson!public! !
+!CommentClassChange categoriesFor: #comment:!public! !
+!CommentClassChange categoriesFor: #fromWebsideJson:!public! !
+!CommentClassChange categoriesFor: #primitiveExecute!public! !
+
+RefactoryCategoryChange guid: (GUID fromString: '{a56b47bc-9b75-4e97-b085-6127c9cb60eb}')!
+RefactoryCategoryChange comment: ''!
+!RefactoryCategoryChange categoriesForClass!Refactory-Change Objects! !
+!RefactoryCategoryChange methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'category' put: category;
+		yourself!
+
+category: aString
+	category := aString!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	category := json at: 'category' ifAbsent: []! !
+!RefactoryCategoryChange categoriesFor: #asWebsideJson!public! !
+!RefactoryCategoryChange categoriesFor: #category:!public! !
+!RefactoryCategoryChange categoriesFor: #fromWebsideJson:!public! !
+
+AddCategoryChange guid: (GUID fromString: '{8eb4977e-9a49-4989-bafc-f2b365181fa2}')!
+AddCategoryChange comment: ''!
+!AddCategoryChange categoriesForClass!Refactory-Change Objects! !
+!AddCategoryChange methodsFor!
+
+asUndoOperation
+	^RemoveCategoryChange new
+		changeClass: self changeClass;
+		category: category;
+		yourself!
+
+primitiveExecute
+	| class catalogue existing |
+	class := self changeClass.
+	catalogue := class methodsCatalogue.
+	existing := catalogue keys detect: [:k | k name = category] ifNone: [].
+	existing ifNil: [catalogue at: category asMethodCategory put: {}]! !
+!AddCategoryChange categoriesFor: #asUndoOperation!public! !
+!AddCategoryChange categoriesFor: #primitiveExecute!public! !
+
+RemoveCategoryChange guid: (GUID fromString: '{ae6cec4f-39ab-4bad-a9c8-ebb8593dd62d}')!
+RemoveCategoryChange comment: ''!
+!RemoveCategoryChange categoriesForClass!Refactory-Change Objects! !
+!RemoveCategoryChange methodsFor!
+
+asUndoOperation
+	^AddCategoryChange new
+		changeClass: self changeClass;
+		category: category;
+		yourself!
+
+primitiveExecute
+	| class catalogue existing |
+	class := self changeClass.
+	catalogue := class methodsCatalogue.
+	existing := catalogue keys detect: [:k | k name = category] ifNone: [].
+	existing ifNotNil: [catalogue removeKey: existing]! !
+!RemoveCategoryChange categoriesFor: #asUndoOperation!public! !
+!RemoveCategoryChange categoriesFor: #primitiveExecute!public! !
+
+RenameCategoryChange guid: (GUID fromString: '{56140d1e-1ec2-4cd9-aa5a-abc85a9200d5}')!
+RenameCategoryChange comment: ''!
+!RenameCategoryChange categoriesForClass!Refactory-Change Objects! !
+!RenameCategoryChange methodsFor!
+
+asUndoOperation
+	^RenameCategoryChange new
+		changeClass: self changeClass;
+		category: newName;
+		newName: category;
+		yourself!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'newName' put: newName;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	newName := json at: 'newName' ifAbsent: []!
+
+newName: aString
+	newName := aString!
+
+primitiveExecute
+	| class catalogue source target methods |
+	class := self changeClass.
+	catalogue := class methodsCatalogue.
+	source := catalogue keys detect: [:k | k name = category] ifNone: [^self].
+	target := catalogue keys detect: [:k | k name = newName] ifNone: [].
+	methods := catalogue at: source.
+	target notNil
+		ifTrue: [methods := (catalogue at: target) copyWith: methods]
+		ifFalse: [target := newName asMethodCategory].
+	catalogue
+		at: target put: methods;
+		removeKey: source! !
+!RenameCategoryChange categoriesFor: #asUndoOperation!public! !
+!RenameCategoryChange categoriesFor: #asWebsideJson!public! !
+!RenameCategoryChange categoriesFor: #fromWebsideJson:!public! !
+!RenameCategoryChange categoriesFor: #newName:!public! !
+!RenameCategoryChange categoriesFor: #primitiveExecute!public! !
 
 AddPackageChange guid: (GUID fromString: '{a2e72d80-c0cb-4bf5-8398-127e871225f6}')!
 AddPackageChange comment: ''!
@@ -4081,11 +4484,32 @@ WebsideWorkspace comment: ''!
 !WebsideWorkspace categoriesForClass!Unclassified! !
 !WebsideWorkspace methodsFor!
 
+asWebsideJson
+	| json |
+	json := super asWebsideJson.
+	json
+		at: 'id' put: id asString;
+		at: 'source' put: contents.
+	^json!
+
+bindings
+	^bindings!
+
+contents
+	^contents!
+
+contents: aString
+	contents := aString!
+
 declareVariable: aString	bindings at: aString reduced put: nil!
 
 initialize	super initialize.	bindings := Dictionary new!
 
 receiver	^nil! !
+!WebsideWorkspace categoriesFor: #asWebsideJson!public! !
+!WebsideWorkspace categoriesFor: #bindings!public! !
+!WebsideWorkspace categoriesFor: #contents!public! !
+!WebsideWorkspace categoriesFor: #contents:!public! !
 !WebsideWorkspace categoriesFor: #declareVariable:!public! !
 !WebsideWorkspace categoriesFor: #initialize!public! !
 !WebsideWorkspace categoriesFor: #receiver!public! !

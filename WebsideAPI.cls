@@ -36,11 +36,7 @@ activeEvaluations
 	^self evaluations values asArray collect: [:e | e asWebsideJson]!
 
 activeWorkspaces
-	^self workspaces associations asArray collect: 
-			[:a |
-			a value asWebsideJson
-				at: 'id' put: a key asString;
-				yourself]!
+	^self workspaces values asArray collect: [:w | w asWebsideJson]!
 
 addChange
 	| change |
@@ -157,25 +153,31 @@ created: aDictionary
 		content: payload asUtf8String!
 
 createDebugger
-	| id process exception context debugger |
+	| id evaluation process frame description debugger |
 	id := self bodyAt: 'evaluation' ifAbsent: [^self notFound].
 	id := IID fromString: id.
-	process := self evaluations at: id ifAbsent: [^self notFound].
-	exception := process suspendedContext exception.
-	context := exception signalerContext.
-	"process suspendedContext: context."
-	debugger := process newDebugSessionNamed: exception description startedAt: context.
-	context selector == #doesNotUnderstand: ifTrue: [context := context sender].
-	debugger restart: context.
-	context selector == #halt
+	evaluation := self evaluations at: id ifAbsent: [^self notFound].
+	process := evaluation process.
+	frame := evaluation hasFailed
+				ifTrue: [evaluation error raisingFrame]
+				ifFalse: [process suspendedFrame].
+	description := evaluation hasFailed
+				ifTrue: [evaluation error description]
+				ifFalse: ['Suspended process'].
+	debugger := Smalltalk developmentSystem debuggerClass new.
+	debugger
+		caption: description;
+		process: process topFrame: frame;
+		resumable: process isTerminated not.
+	"context selector == #halt
 		ifTrue: 
 			[debugger
 				stepOver;
-				stepOver].
+				stepOver]."
 	self debuggers at: id put: debugger.
 	^debugger asWebsideJson
 		at: 'id' put: id asString;
-		at: 'description' put: debugger name;
+		at: 'description' put: description;
 		yourself!
 
 createEvaluation
@@ -189,7 +191,11 @@ createEvaluation
 		context: self requestedEvaluationContext.
 	^self evaluations at: evaluation id put: evaluation!
 
-createWorkspace	| id |	id := self newID.	self workspaces at: id put: WebsideWorkspace new.	^ id asString!
+createWorkspace
+	| workspace |
+	workspace := WebsideWorkspace new.
+	self workspaces at: workspace id put: workspace.
+	^workspace asWebsideJson!
 
 customViewsOf: anObject
 	^anObject websideViews!
@@ -200,18 +206,27 @@ debuggerFrame
 	| debugger index frame interval |
 	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].
 	index := self requestedIndex.
-	frame := debugger stack at: index ifAbsent: [^self notFound].
-	interval := debugger pcRangeForContext: frame.
+	frame := debugger frames at: index ifAbsent: [^self notFound].
+	interval := debugger sourceRangeAt: frame ip inTextMap: frame textMap.
 	interval := Dictionary new
-				at: 'start' put: interval first;
-				at: 'end' put: interval last;
+				at: 'start' put: interval start;
+				at: 'end' put: interval stop;
 				yourself.
 	^frame asWebsideJson
 		at: 'index' put: index;
 		at: 'interval' put: interval;
 		yourself!
 
-debuggerFrames	| debugger |	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].	^debugger stack withIndexCollect: 			[:f :i |			self newJsonObject				at: 'index' put: i;				at: 'label' put: f method printString;				yourself]!
+debuggerFrames
+	| debugger frames |
+	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].
+	frames := debugger frames.
+	^(1 to: frames size) asArray collect: 
+			[:i |
+			self newJsonObject
+				at: 'index' put: i;
+				at: 'label' put: (frames at: i) method printString;
+				yourself]!
 
 debuggers
 	^ server debuggers!
@@ -220,15 +235,16 @@ defaultRootClass
 	^Object!
 
 deleteDebugger
-	| id debugger |
+	| id debugger evaluation |
 	id := self requestedId.
-	debugger := self debuggers at: id ifAbsent: [].
-	debugger notNil
-		ifTrue: 
-			[debugger terminate.
-			self debuggers removeKey: id ifAbsent: [].
-			self evaluations removeKey: id ifAbsent: []].
-	^id!
+	debugger := self debuggers at: id ifAbsent: [^self notFound].
+	evaluation := self evaluations detect: [:e | e process == debugger process] ifNone: [].
+	evaluation
+		ifNotNil: 
+			[evaluation process terminate.
+			self evaluations removeKey: evaluation id ifAbsent: []].
+	self debuggers removeKey: id.
+	^id asString!
 
 deleteWorkspace	self workspaces		removeKey: self requestedId		ifAbsent: [ ^ self notFound ].	^ nil!
 
@@ -307,7 +323,7 @@ filterByVariable: aCollection
 					var notNil ifTrue: [filtered addAll: (methods select: [:m | m refersToLiteral: var])]]].
 	^filter ifTrue: [filtered asArray] ifFalse: [aCollection]!
 
-frameBindings	| debugger frame |	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].	frame := debugger stack at: self requestedIndex ifAbsent: [^self notFound].	^#() collect: 			[:b |			self newJsonObject				at: 'name' put: b key asString;				at: 'value' put: b value printString;				yourself]!
+frameBindings	| debugger frame |	debugger := self debuggers at: self requestedId ifAbsent: [^self notFound].	frame := debugger frames at: self requestedIndex ifAbsent: [^self notFound].	^#() collect: 			[:b |			self newJsonObject				at: 'name' put: b key asString;				at: 'value' put: b value printString;				yourself]!
 
 implementorsOf: aSymbol
 	| system search environment |
@@ -560,6 +576,7 @@ requestedChange
 	| json change |
 	json := STONJSON fromString: request body.
 	change := RefactoryChange fromWebsideJson: json.
+	change ifNil: [change := Refactoring fromWebsideJson: json].
 	^change!
 
 requestedClass
@@ -718,11 +735,15 @@ systemPackage
 	^PackageManager current systemPackage!
 
 terminateDebugger
-	| id debugger |
+	| id debugger evaluation |
 	id := self requestedId.
 	debugger := self debuggers at: id ifAbsent: [^self notFound].
+	evaluation := self evaluations detect: [:e | e process == debugger process] ifNone: [].
+	evaluation
+		ifNotNil: 
+			[evaluation process terminate.
+			self evaluations removeKey: evaluation id ifAbsent: []].
 	self debuggers removeKey: id.
-	debugger terminate.
 	^nil!
 
 unpinAllObjects	self objects removeAll.	^ nil!
@@ -730,6 +751,13 @@ unpinAllObjects	self objects removeAll.	^ nil!
 unpinObject
 	self objects removeKey: self requestedId ifAbsent: [^self notFound].
 	^nil!
+
+updateWorkspace
+	| workspace source |
+	workspace := self workspaces at: self requestedId ifAbsent: [^self notFound].
+	source := self bodyAt: 'source' ifAbsent: ''.
+	workspace contents: source.
+	^workspace asWebsideJson!
 
 urlAt: aString
 	^(request propertyAt: #arguments) at: aString ifAbsent: []!
@@ -746,7 +774,20 @@ variables
 	class ifNil: [^self notFound].
 	^self instanceVariables , self classVariables!
 
-workspace	^ self workspaces		at: self requestedId		ifAbsent: [ self notFound ]!
+workspace
+	| workspace |
+	workspace := self workspaces at: self requestedId ifAbsent: [^self notFound].
+	^workspace asWebsideJson!
+
+workspaceBindings
+	| workspace |
+	workspace := self workspaces at: self requestedId ifAbsent: [^self notFound].
+	^workspace bindings associations collect: 
+			[:a |
+			self newJsonObject
+				at: 'name' put: a key;
+				at: 'value' put: a value printString;
+				yourself]!
 
 workspaces
 	^ server workspaces! !
@@ -862,11 +903,13 @@ workspaces
 !WebsideAPI categoriesFor: #terminateDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #unpinAllObjects!objects endpoints!public! !
 !WebsideAPI categoriesFor: #unpinObject!objects endpoints!public! !
+!WebsideAPI categoriesFor: #updateWorkspace!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #urlAt:!private! !
 !WebsideAPI categoriesFor: #usedCategories!code endpoints!public! !
 !WebsideAPI categoriesFor: #usualCategories!code endpoints!public! !
 !WebsideAPI categoriesFor: #variables!code endpoints!public! !
 !WebsideAPI categoriesFor: #workspace!public!workspaces endpoints! !
+!WebsideAPI categoriesFor: #workspaceBindings!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #workspaces!private! !
 
 !WebsideAPI class methodsFor!

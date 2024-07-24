@@ -10,7 +10,10 @@ WebsideResource comment: ''!
 !WebsideResource categoriesForClass!Unclassified! !
 !WebsideResource methodsFor!
 
-asWebsideJson	^super asWebsideJson at: 'id' put: id asString; yourself!
+asWebsideJson
+	^super asWebsideJson
+		at: 'id' put: id asString;
+		yourself!
 
 id	^id!
 

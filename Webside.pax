@@ -5,13 +5,19 @@ package paxVersion: 1;
 
 
 package classNames
+	add: #AddCategoryChange;
 	add: #AddPackageChange;
+	add: #ClassifyMethodChange;
+	add: #CommentClassChange;
 	add: #HttpRequestRouter;
 	add: #MatchAlgorithm;
 	add: #MatchToken;
 	add: #PercentEncoder;
+	add: #RefactoryCategoryChange;
 	add: #RefactoryPackageChange;
+	add: #RemoveCategoryChange;
 	add: #RemovePackageChange;
+	add: #RenameCategoryChange;
 	add: #RenamePackageChange;
 	add: #StarToken;
 	add: #StringPattern;
@@ -44,9 +50,15 @@ package methodNames
 	add: #CompilerNotification -> #asWebsideJson;
 	add: #Exception -> #asWebsideJson;
 	add: #MethodCompileFailed -> #asWebsideJson;
+	add: #MethodRefactoring -> #asWebsideJson;
+	add: #MethodRefactoring -> #fromWebsideJson:;
 	add: #Object -> #asWebsideJson;
 	add: #Object -> #websideViews;
 	add: #Package -> #asWebsideJson;
+	add: #PullUpInstanceVariableRefactoring -> #fromWebsideJson:;
+	add: #Refactoring -> #asWebsideJson;
+	add: #Refactoring -> #fromWebsideJson:;
+	add: #Refactoring -> #websideExecute;
 	add: #RefactoryChange -> #asWebsideJson;
 	add: #RefactoryChange -> #fromWebsideJson:;
 	add: #RefactoryChange -> #websideExecute;
@@ -58,8 +70,11 @@ package methodNames
 	add: #RemoveMethodChange -> #fromWebsideJson:;
 	add: #RenameClassChange -> #asWebsideJson;
 	add: #RenameClassChange -> #fromWebsideJson:;
+	add: #RenameMethodRefactoring -> #asWebsideJson;
+	add: #RenameMethodRefactoring -> #fromWebsideJson:;
 	add: #RenameVariableChange -> #asWebsideJson;
 	add: #RenameVariableChange -> #fromWebsideJson:;
+	add: #StackFrame -> #asWebsideJson;
 	add: #StAssignmentNode -> #asWebsideJson;
 	add: #StCascadeNode -> #asWebsideJson;
 	add: #StLiteralToken -> #asWebsideJson;
@@ -74,11 +89,19 @@ package methodNames
 	add: #StSequenceNode -> #asWebsideJson;
 	add: #StVariableNode -> #asWebsideJson;
 	add: #Symbol -> #evaluateWith:;
+	add: #VariableRefactoring -> #asWebsideJson;
+	add: #VariableRefactoring -> #fromWebsideJson:;
 	add: 'AddClassChange class' -> #websideType;
 	add: 'AddClassVariableChange class' -> #websideType;
 	add: 'AddInstanceVariableChange class' -> #websideType;
 	add: 'AddMethodChange class' -> #websideType;
 	add: 'DolphinAddMethodChange class' -> #websideType;
+	add: 'PullUpInstanceVariableRefactoring class' -> #websideType;
+	add: 'PushDownInstanceVariableRefactoring class' -> #websideType;
+	add: 'Refactoring class' -> #acceptsWebsideJson:;
+	add: 'Refactoring class' -> #classForWebsideJson:;
+	add: 'Refactoring class' -> #fromWebsideJson:;
+	add: 'Refactoring class' -> #websideType;
 	add: 'RefactoryChange class' -> #acceptsWebsideJson:;
 	add: 'RefactoryChange class' -> #classForWebsideJson:;
 	add: 'RefactoryChange class' -> #fromWebsideJson:;
@@ -106,6 +129,7 @@ package setPrerequisites: #(
 	'..\DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
 	'..\Core\Object Arts\Dolphin\ActiveX\COM\OLE COM'
 	'..\Core\Contributions\Refactory\Refactoring Browser\Change Objects\RBChangeObjects'
+	'..\Core\Contributions\Refactory\Refactoring Browser\Refactorings\RBRefactorings'
 	'..\Core\Object Arts\Dolphin\System\Compiler\Smalltalk Parser'
 	'..\Core\Contributions\svenc\STON\STON-Core'
 	'..\Core\Contributions\Camp Smalltalk\SUnit\SUnit').
@@ -184,6 +208,36 @@ RefactoryChange subclass: #RefactoryPackageChange
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+RefactoryClassChange subclass: #ClassifyMethodChange
+	instanceVariableNames: 'selector category'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryClassChange subclass: #CommentClassChange
+	instanceVariableNames: 'comment'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryClassChange subclass: #RefactoryCategoryChange
+	instanceVariableNames: 'category'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryCategoryChange subclass: #AddCategoryChange
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryCategoryChange subclass: #RemoveCategoryChange
+	instanceVariableNames: ''
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+RefactoryCategoryChange subclass: #RenameCategoryChange
+	instanceVariableNames: 'newName'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
 RefactoryPackageChange subclass: #AddPackageChange
 	instanceVariableNames: ''
 	classVariableNames: ''
@@ -210,7 +264,7 @@ TestCase subclass: #URLTest
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
 WebsideResource subclass: #WebsideWorkspace
-	instanceVariableNames: 'bindings'
+	instanceVariableNames: 'contents bindings'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -438,6 +492,20 @@ asWebsideJson
 	^compilerErrorNotification asWebsideJson! !
 !MethodCompileFailed categoriesFor: #asWebsideJson!accessing!private! !
 
+!MethodRefactoring methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'className' put: class name asString;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	json at: 'className'
+		ifPresent: [:n | Smalltalk at: n ifPresent: [:c | class := RBClass existingNamed: n]]! !
+!MethodRefactoring categoriesFor: #asWebsideJson!private! !
+!MethodRefactoring categoriesFor: #fromWebsideJson:!private! !
+
 !Object methodsFor!
 
 asWebsideJson
@@ -472,6 +540,78 @@ asWebsideJson
 		yourself! !
 !Package categoriesFor: #asWebsideJson!converting!private! !
 
+!PullUpInstanceVariableRefactoring methodsFor!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	json at: 'target'
+		ifPresent: 
+			[:n |
+			Smalltalk at: n
+				ifPresent: 
+					[:c |
+					class := RBClass existingNamed: n.
+					class model: model]]! !
+!PullUpInstanceVariableRefactoring categoriesFor: #fromWebsideJson:!public! !
+
+!PullUpInstanceVariableRefactoring class methodsFor!
+
+websideType
+	^'MoveUpInstanceVariable'! !
+!PullUpInstanceVariableRefactoring class categoriesFor: #websideType!public! !
+
+!PushDownInstanceVariableRefactoring class methodsFor!
+
+websideType
+	^'MoveDownInstanceVariable'! !
+!PushDownInstanceVariableRefactoring class categoriesFor: #websideType!public! !
+
+!Refactoring methodsFor!
+
+asWebsideJson
+	^Dictionary new
+		at: 'type' put: self class websideType;
+		at: 'label' put: self class websideType;
+		at: 'package' put: (self propertyAt: #packageName ifAbsent: []);
+		at: 'timestamp' put: DateAndTime now printString;
+		at: 'author' put: nil;
+		yourself!
+
+fromWebsideJson: json
+	json at: 'package' ifPresent: [:n | self propertyAt: #packageName put: n].
+	self model	"Only to initialize it"!
+
+websideExecute
+	^self execute! !
+!Refactoring categoriesFor: #asWebsideJson!public! !
+!Refactoring categoriesFor: #fromWebsideJson:!public! !
+!Refactoring categoriesFor: #websideExecute!public! !
+
+!Refactoring class methodsFor!
+
+acceptsWebsideJson: json
+	| type |
+	type := json at: 'type' ifAbsent: nil.
+	^self websideType = type!
+
+classForWebsideJson: json
+	^self allSubclasses detect: [:c | c acceptsWebsideJson: json] ifNone: []!
+
+fromWebsideJson: json
+	| class |
+	class := self classForWebsideJson: json.
+	^class ifNotNil: [class new fromWebsideJson: json]!
+
+websideType
+	| type |
+	type := self name asString.
+	(type endsWith: 'Refactoring') ifTrue: [type := type copyFrom: 1 to: type size - 11].
+	^type! !
+!Refactoring class categoriesFor: #acceptsWebsideJson:!class hierarchy-removing!public! !
+!Refactoring class categoriesFor: #classForWebsideJson:!class hierarchy-removing!public! !
+!Refactoring class categoriesFor: #fromWebsideJson:!class hierarchy-removing!public! !
+!Refactoring class categoriesFor: #websideType!class hierarchy-removing!public! !
+
 !RefactoryChange methodsFor!
 
 asWebsideJson
@@ -484,7 +624,7 @@ asWebsideJson
 		yourself!
 
 fromWebsideJson: json
-	json at: 'package' ifPresent: [:name | self propertyAt: #packageName put: name]!
+	json at: 'package' ifPresent: [:n | self propertyAt: #packageName put: n]!
 
 websideExecute
 	^self execute! !
@@ -614,6 +754,25 @@ websideType
 	^'RenameInstanceVariable'! !
 !RenameInstanceVariableChange class categoriesFor: #websideType!public! !
 
+!RenameMethodRefactoring methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'selector' put: oldSelector;
+		at: 'newSelector' put: newSelector;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	json at: 'selector' ifPresent: [:s | oldSelector := s asSymbol].
+	json at: 'newSelector'
+		ifPresent: 
+			[:s |
+			newSelector := s asSymbol.
+			permutation := 1 to: newSelector argumentCount]! !
+!RenameMethodRefactoring categoriesFor: #asWebsideJson!public!testing! !
+!RenameMethodRefactoring categoriesFor: #fromWebsideJson:!public!testing! !
+
 !RenameVariableChange methodsFor!
 
 asWebsideJson
@@ -631,6 +790,16 @@ fromWebsideJson: json
 	newName := json at: 'newName' ifAbsent: []! !
 !RenameVariableChange categoriesFor: #asWebsideJson!printing!public! !
 !RenameVariableChange categoriesFor: #fromWebsideJson:!printing!public! !
+
+!StackFrame methodsFor!
+
+asWebsideJson
+	^Dictionary new
+		at: 'label' put: self method printString;
+		at: 'class' put: self receiver class asWebsideJson;
+		at: 'method' put: self method asWebsideJson;
+		yourself! !
+!StackFrame categoriesFor: #asWebsideJson!accessing!private! !
 
 !StAssignmentNode methodsFor!
 
@@ -750,6 +919,28 @@ asWebsideJson	^ super asWebsideJson		at: 'value' put: name;		yourself! !
 evaluateWith: anObject
 	^anObject perform: self! !
 !Symbol categoriesFor: #evaluateWith:!converting!public! !
+
+!VariableRefactoring methodsFor!
+
+asWebsideJson
+	^super asWebsideJson
+		at: 'className' put: class name asString;
+		at: 'variable' put: variableName;
+		yourself!
+
+fromWebsideJson: json
+	super fromWebsideJson: json.
+	json at: 'className'
+		ifPresent: 
+			[:n |
+			Smalltalk at: n
+				ifPresent: 
+					[:c |
+					class := RBClass existingNamed: n.
+					class model: model]].
+	variableName := json at: 'variable' ifAbsent: []! !
+!VariableRefactoring categoriesFor: #asWebsideJson!initialize/release!public! !
+!VariableRefactoring categoriesFor: #fromWebsideJson:!initialize/release!public! !
 
 "End of package definition"!
 

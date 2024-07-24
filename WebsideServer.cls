@@ -155,7 +155,9 @@ initializeWorkspacesRoutes
 		routePOST: '/workspaces' to: #createWorkspace;
 		routeGET: '/workspaces' to: #activeWorkspaces;
 		routeGET: '/workspaces/{id}' to: #workspace;
-		routeDELETE: '/workspaces/{id}' to: #deleteWorkspace!
+		routePUT: '/workspaces/{id}' to: #updateWorkspace;
+		routeDELETE: '/workspaces/{id}' to: #deleteWorkspace;
+		routeGET: '/workspaces/{id}/bindings' to: #workspaceBindings!
 
 isPreflight: request
 	^request verb = 'OPTIONS'
