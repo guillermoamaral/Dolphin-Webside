@@ -112,7 +112,8 @@ initializeGeneralRoutes
 		routeGET: '/dialect' to: #dialect;
 		routeGET: '/logo' to: #logo;
 		routeGET: '/colors' to: #colors;
-		routePOST: 'save' to: #saveImage!
+		routePOST: '/save' to: #saveImage;
+		routeGET: '/icons' to: #icons!
 
 initializeObjectsRoutes            router		routeGET: '/objects' to: #pinnedObjects;		routeGET: '/objects/{id}' to: #pinnedObject;		routeDELETE: '/objects/{id}' to: #unpinObject;		routeGET: '/objects/{id}/*' to: #pinnedObjectSlots;		routePOST: '/objects' to: #pinObjectSlot;		routeDELETE: '/objects' to: #unpinAllObjects    !
 

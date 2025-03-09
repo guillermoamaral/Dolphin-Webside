@@ -46,8 +46,13 @@ package methodNames
 	add: #Collection -> #gather:;
 	add: #Collection -> #gather:in:;
 	add: #Collection -> #groupBy:;
+	add: #CompiledCode -> #asWebsideJson;
 	add: #CompiledMethod -> #asWebsideJson;
 	add: #CompilerNotification -> #asWebsideJson;
+	add: #Debugger -> #process;
+	add: #Debugger -> #stepInto:;
+	add: #Debugger -> #stepIntoBlock:;
+	add: #Debugger -> #stepOver:;
 	add: #Exception -> #asWebsideJson;
 	add: #MethodCompileFailed -> #asWebsideJson;
 	add: #MethodRefactoring -> #asWebsideJson;
@@ -437,20 +442,31 @@ groupBy: aspect
 !Collection categoriesFor: #gather:in:!enumerating!public! !
 !Collection categoriesFor: #groupBy:!operations!public! !
 
-!CompiledMethod methodsFor!
+!CompiledCode methodsFor!
 
 asWebsideJson
-	| source category |
+	| source package |
 	source := self getSource copyWithout: 10 asCharacter.
-	category := self categories detect: [:c | c isPrivacy not and: [c isVirtual not]] ifNone: [].
+	package := self owningPackage ifNotNil: [:p | p name].
 	^super asWebsideJson
 		at: 'selector' put: selector;
-		at: 'methodClass' put: self methodClass name;
-		at: 'category' put: (category ifNotNil: [:c | c name]);
+		at: 'methodClass' put: methodClass name;
 		at: 'source' put: source;
 		at: 'author' put: 'Unknown';
 		at: 'timestamp' put: nil;
-		at: 'package' put: (self owningPackage ifNotNil: [:p | p name]);
+		at: 'package' put: package;
+		yourself! !
+!CompiledCode categoriesFor: #asWebsideJson!public! !
+
+!CompiledMethod methodsFor!
+
+asWebsideJson
+	| category |
+	category := self categories detect: [:c | c isPrivacy not and: [c isVirtual not]] ifNone: [].
+	^super asWebsideJson
+		at: 'category' put: (category ifNotNil: [:c | c name]);
+		at: 'author' put: 'Unknown';
+		at: 'timestamp' put: nil;
 		at: 'overriding' put: self isOverride;
 		at: 'overriden' put: self isOverridden;
 		yourself! !
@@ -470,6 +486,46 @@ asWebsideJson
 		at: 'interval' put: interval.
 	^json! !
 !CompilerNotification categoriesFor: #asWebsideJson!accessing!public! !
+
+!Debugger methodsFor!
+
+process
+	^process!
+
+stepInto: aStackFrame
+	"This is a handy service to enable interactions without UI (such as through WebsideAPI).
+	Of course #stepInto could (and should) be implemented by calling this method, but we
+	decided to preserve original Dolphin services untouched by the moment."
+
+	self debugState: 'Step Into'.
+	breakWhen removeAll.
+	self stepInFrame: aStackFrame!
+
+stepIntoBlock: aStackFrame
+	"This is a handy service to enable interactions without UI (such as through WebsideAPI).
+	Of course #stepIntoBlock could (and should) be implemented by calling this method, but we
+	decided to preserve original Dolphin services untouched by the moment."
+
+	self debugState: 'Step Into Block'.
+	"Break when encountering a block homed in the current method, or when returning to the current frame without encountering one"
+	self
+		breakWhen: [:f | f index = aStackFrame index or: [f isBlockFrame and: [f method = aStackFrame method]]].
+	self runDebuggedProcess!
+
+stepOver: aStackFrame
+	"This is a handy service to enable interactions without UI (such as through WebsideAPI).
+	Of course #stepOver could (and should) be implemented by calling this method, but we
+	decided to preserve original Dolphin services untouched by the moment."
+
+	self beRunning.
+	self debugState: 'Step over'.
+	self breakFrame: aStackFrame.
+	self makeDebugFrame: aStackFrame sender.
+	self resume! !
+!Debugger categoriesFor: #process!private!updating! !
+!Debugger categoriesFor: #stepInto:!public! !
+!Debugger categoriesFor: #stepIntoBlock:!public! !
+!Debugger categoriesFor: #stepOver:!public! !
 
 !DolphinAddMethodChange class methodsFor!
 
@@ -794,8 +850,10 @@ fromWebsideJson: json
 !StackFrame methodsFor!
 
 asWebsideJson
+	| label |
+	label := String streamContents: [:s | self displayOn: s].
 	^Dictionary new
-		at: 'label' put: self method printString;
+		at: 'label' put: label;
 		at: 'class' put: self receiver class asWebsideJson;
 		at: 'method' put: self method asWebsideJson;
 		yourself! !
