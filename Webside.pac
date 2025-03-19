@@ -2520,7 +2520,7 @@ evaluateExpression
 evaluateExpression: aString
 	^Compiler evaluate: aString for: self compilerReceiver!
 
-evaluationError: id	| process json error |	process := self evaluations at: id.	json := self newJsonObject				at: 'description' put: process suspendedFrame exception description;				at: 'evaluation' put: id asString;				yourself.	error := STONJSON toString: json.	^HttpServerResponse new		statusCode: 409;		contentType: 'application/json; charset=utf-8';		content: error asUtf8String!
+evaluationError: aWebsideEvaluation	| json data |	json := self newJsonObject				at: 'description' put: aWebsideEvaluation error description;				at: 'evaluation' put: aWebsideEvaluation id asString;				yourself.	data := STONJSON toString: json.	^HttpServerResponse new		statusCode: 409;		contentType: 'application/json; charset=utf-8';		content: data asUtf8String!
 
 evaluations
 	^server evaluations!
@@ -2603,7 +2603,7 @@ frameBindings
 				yourself]!
 
 icons
-	 ^ #()!
+	^#()!
 
 implementorsOf: aSymbol
 	| system search environment |
@@ -3073,6 +3073,9 @@ variables
 	class ifNil: [^self notFound].
 	^self instanceVariables , self classVariables!
 
+version
+	^SessionManager current productVersion printString!
+
 workspace
 	| workspace |
 	workspace := self workspaces at: self requestedId ifAbsent: [^self notFound].
@@ -3209,6 +3212,7 @@ workspaces
 !WebsideAPI categoriesFor: #usedCategories!code endpoints!public! !
 !WebsideAPI categoriesFor: #usualCategories!code endpoints!public! !
 !WebsideAPI categoriesFor: #variables!code endpoints!public! !
+!WebsideAPI categoriesFor: #version!general endpoints!public! !
 !WebsideAPI categoriesFor: #workspace!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #workspaceBindings!public!workspaces endpoints! !
 !WebsideAPI categoriesFor: #workspaces!private! !
