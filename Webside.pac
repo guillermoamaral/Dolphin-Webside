@@ -58,6 +58,7 @@ package methodNames
 	add: #MethodRefactoring -> #asWebsideJson;
 	add: #MethodRefactoring -> #fromWebsideJson:;
 	add: #Object -> #asWebsideJson;
+	add: #Object -> #websideIconName;
 	add: #Object -> #websideViews;
 	add: #Package -> #asWebsideJson;
 	add: #PullUpInstanceVariableRefactoring -> #fromWebsideJson:;
@@ -90,6 +91,7 @@ package methodNames
 	add: #StProgramNode -> #websideType;
 	add: #StReturnNode -> #asWebsideJson;
 	add: #String -> #asURL;
+	add: #String -> #includesString:;
 	add: #String -> #indexOfString:from:to:;
 	add: #StSequenceNode -> #asWebsideJson;
 	add: #StVariableNode -> #asWebsideJson;
@@ -131,9 +133,14 @@ package globalAliases: (Set new
 package setPrerequisites: #(
 	'..\Core\Object Arts\Dolphin\IDE\Base\Development System'
 	'..\Core\Object Arts\Dolphin\Base\Dolphin'
+	'..\Core\Object Arts\Dolphin\System\Base64\Dolphin Base64'
 	'..\DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
+	'..\Core\Object Arts\Dolphin\MVP\Base\Dolphin MVP Base'
+	'..\Core\Object Arts\Dolphin\MVP\Icons\Dolphin Text Tile Icons'
+	'..\Core\Object Arts\Dolphin\MVP\Gdiplus\Gdiplus'
 	'..\Core\Object Arts\Dolphin\ActiveX\COM\OLE COM'
 	'..\Core\Contributions\Refactory\Refactoring Browser\Change Objects\RBChangeObjects'
+	'..\Core\Contributions\Refactory\Refactoring Browser\Environments\RBEnvironments'
 	'..\Core\Contributions\Refactory\Refactoring Browser\Refactorings\RBRefactorings'
 	'..\Core\Object Arts\Dolphin\System\Compiler\Smalltalk Parser'
 	'..\Core\Contributions\svenc\STON\STON-Core'
@@ -574,11 +581,20 @@ asWebsideJson
 		at: 'hasIndexedSlots' put: self isIndexable;
 		at: 'size' put: (self class isVariable ifTrue: [self size] ifFalse: [0]);
 		at: 'printString' put: printed;
+		at: 'iconName' put: self websideIconName;
 		yourself!
+
+websideIconName
+	| icon |
+	icon := self icon.
+	icon ifNil: [^nil].
+	icon class == TextTileIcon ifTrue: [^icon text asString].
+	^[icon identifier] on: Error do: [:e | ]!
 
 websideViews
 	^#()! !
 !Object categoriesFor: #asWebsideJson!converting!public! !
+!Object categoriesFor: #websideIconName!converting!public! !
 !Object categoriesFor: #websideViews!exceptions!private! !
 
 !Package methodsFor!
@@ -935,6 +951,9 @@ asWebsideJson 	^super asWebsideJson at: 'children' put: { value asWebsideJson  
 asURL
 	^URL fromString: self trimBlanks!
 
+includesString: aString
+	^(self indexOfSubCollection: aString) > 0!
+
 indexOfString: aString from: start to: stop
 	| n limit base i |
 	n := aString size.
@@ -952,6 +971,7 @@ indexOfString: aString from: start to: stop
 
 ! !
 !String categoriesFor: #asURL!converting!public! !
+!String categoriesFor: #includesString:!comparing!public! !
 !String categoriesFor: #indexOfString:from:to:!comparing!public! !
 
 !String class methodsFor!
@@ -2345,9 +2365,35 @@ classNamed: aString
 	class := Smalltalk at: name asSymbol ifAbsent: [^nil].
 	^metaclass ifTrue: [class class] ifFalse: [class]!
 
-classTreeFrom: aClass depth: anInteger	| json subclasses depth names |	names := self queryAt: 'names'.	json := names = 'true'				ifTrue: 					[self newJsonObject						at: 'name' put: aClass name;						at: 'superclass' put: (aClass superclass ifNotNil: [:c | c name]);						yourself]				ifFalse: [aClass asWebsideJson].	(anInteger notNil and: [anInteger = 0]) ifTrue: [^json].	depth := anInteger notNil ifTrue: [anInteger - 1].	subclasses := (aClass subclasses asSortedCollection: [:a :b | a name <= b name])				collect: [:c | self classTreeFrom: c depth: depth].	json at: 'subclasses' put: subclasses asArray.	^json!
+classTreeFrom: aClass depth: anInteger	| json subclasses depth names |	names := self queryAt: 'names'.	json := names = 'true'				ifTrue: 					[self newJsonObject						at: 'name' put: aClass name;						at: 'superclass' put: (aClass superclass ifNotNil: [:c | c name]);
+						at: 'iconName' put: aClass websideIconName;						yourself]				ifFalse: [aClass asWebsideJson].	(anInteger notNil and: [anInteger = 0]) ifTrue: [^json].	depth := anInteger notNil ifTrue: [anInteger - 1].	subclasses := (aClass subclasses asSortedCollection: [:a :b | a name <= b name])				collect: [:c | self classTreeFrom: c depth: depth].	json at: 'subclasses' put: subclasses asArray.	^json!
 
-classTreeFromClasses: aCollection	| roots json subclasses |	roots := Dictionary new.	aCollection		do: 				[:c |				json := self newJsonObject							at: 'name' put: c name;							yourself.				roots at: c name put: json];		do: 				[:c |				c superclass notNil					ifTrue: 						[roots at: c superclass							ifPresent: 								[:sc |								subclasses := sc at: 'subclasses'											ifAbsentPut: [SortedCollection new sortBlock: [:a :b | (a at: 'name') <= (b at: 'name')]].								subclasses add: (roots at: c name)]]];		do: 				[:c |				c superclass notNil					ifTrue: [(roots includesKey: c superclass name) ifTrue: [roots removeKey: c name]]].	^(roots asArray asSortedCollection: [:a :b | (a at: 'name') <= (b at: 'name')]) asArray!
+classTreeFromClasses: aCollection
+	| roots json subclasses |
+	roots := Dictionary new.
+	aCollection
+		do: 
+				[:c |
+				json := self newJsonObject
+							at: 'name' put: c name;
+							at: 'iconName' put: c websideIconName;
+							yourself.
+				roots at: c name put: json];
+		do: 
+				[:c |
+				c superclass notNil
+					ifTrue: 
+						[roots at: c superclass
+							ifPresent: 
+								[:sc |
+								subclasses := sc at: 'subclasses'
+											ifAbsentPut: [SortedCollection new sortBlock: [:a :b | (a at: 'name') <= (b at: 'name')]].
+								subclasses add: (roots at: c name)]]];
+		do: 
+				[:c |
+				c superclass notNil
+					ifTrue: [(roots includesKey: c superclass name) ifTrue: [roots removeKey: c name]]].
+	^(roots asArray asSortedCollection: [:a :b | (a at: 'name') <= (b at: 'name')]) asArray!
 
 classVariables	| class |	class := self requestedClass.	class ifNil: [^self notFound].	^(class withAllSuperclasses gather: 			[:c |			c classVarNames asArray sort collect: 					[:v |					self newJsonObject						at: 'name' put: v;						at: 'class' put: c name , ' class';						at: 'type' put: 'class';						yourself]])		asArray!
 
@@ -2603,7 +2649,39 @@ frameBindings
 				yourself]!
 
 icons
-	^#()!
+	| icons |
+	icons := Icon allInstances select: [:i | (i respondsTo: #identifier) and: [i identifier isString]].
+	^icons , TextTileIcon allInstances collect: 
+			[:i |
+			| name data |
+			name := i class == TextTileIcon ifTrue: [i text asString] ifFalse: [i identifier].
+			data := self imageFromIcon: i.
+			self newJsonObject
+				at: 'name' put: name;
+				at: 'data' put: data;
+				yourself]!
+
+imageFromIcon: icon
+	| bmp tmp bytes base64 |
+	bmp := GdiplusBitmap fromIcon: icon.
+	tmp := File temporaryFilename.
+	tmp := (tmp truncateTo: tmp size - 4) , '.png'.
+	[bmp saveToFile: tmp encoderParams: nil] on: Error do: [^nil].
+	bytes := File readAllBytes: tmp.
+	base64 := '' asUtf8String writeStream.
+	Base64Codec new
+		lineLength: -4;
+		encodeFrom: bytes readStream onto: base64.
+	^base64 contents!
+
+imageNamed: aString
+	"
+	WebsideAPI new imageNamed: 'DolphinPackage.ico'
+	"
+
+	| icon |
+	icon := Icon allInstances detect: [:i | i identifier = aString] ifNone: [^nil].
+	^self imageFromIcon: icon!
 
 implementorsOf: aSymbol
 	| system search environment |
@@ -2963,6 +3041,60 @@ resumeEvaluation
 saveImage	SessionManager current saveImage.
 	^true!
 
+search
+	| text ignoreCase position condition type results |
+	text := self queryAt: 'text' ifAbsent: [^self badRequest: 'missing text'].
+	ignoreCase := (self queryAt: 'ignoreCase') = 'true'.
+	position := (self queryAt: 'condition' ifAbsent: [#beginning]) asSymbol.
+	condition := position == #beginning
+				ifTrue: [#beginsWith:]
+				ifFalse: [position == #ending ifTrue: [#endsWith:] ifFalse: [#includesString:]].
+	type := self queryAt: 'type' ifAbsent: 'all'.
+	results := OrderedCollection new.
+	(type = 'all' or: [type = 'class'])
+		ifTrue: 
+			[results addAll: (self
+						search: (BrowserEnvironment new classes reject: [:c | c isMeta])
+						for: text
+						with: #name
+						condition: condition
+						type: 'class'
+						ignoreCase: ignoreCase)].
+	(type = 'all' or: [type = 'selector'])
+		ifTrue: 
+			[results addAll: (self
+						search: Smalltalk developmentSystem allSelectors
+						for: text
+						with: #asString
+						condition: condition
+						type: 'selector'
+						ignoreCase: ignoreCase)].
+	(type = 'all' or: [type = 'package'])
+		ifTrue: 
+			[results addAll: (self
+						search: Package manager packages
+						for: text
+						with: #name
+						condition: condition
+						type: 'package'
+						ignoreCase: ignoreCase)].
+	^results asArray!
+
+search: aCollection for: aString with: aSymbol condition: anotherSymbol type: anotherString ignoreCase: aBoolean
+	^aCollection select: 
+			[:element |
+			| candidate |
+			candidate := element perform: aSymbol.
+			aBoolean ifTrue: [candidate := candidate asLowercase].
+			candidate perform: anotherSymbol with: aString]
+		thenCollect: 
+			[:element |
+			self newJsonObject
+				at: 'type' put: anotherString;
+				at: 'text' put: (element perform: aSymbol);
+				at: 'iconName' put: element websideIconName;
+				yourself]!
+
 selectors
 	| class |
 	class := self requestedClass.
@@ -3135,6 +3267,8 @@ workspaces
 !WebsideAPI categoriesFor: #filterByVariable:!private! !
 !WebsideAPI categoriesFor: #frameBindings!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #icons!general endpoints!public! !
+!WebsideAPI categoriesFor: #imageFromIcon:!private! !
+!WebsideAPI categoriesFor: #imageNamed:!private! !
 !WebsideAPI categoriesFor: #implementorsOf:!private! !
 !WebsideAPI categoriesFor: #indexedSlotsOf:!private! !
 !WebsideAPI categoriesFor: #instanceVariables!code endpoints!public! !
@@ -3194,6 +3328,8 @@ workspaces
 !WebsideAPI categoriesFor: #resumeDebugger!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #resumeEvaluation!evaluation endpoints!public! !
 !WebsideAPI categoriesFor: #saveImage!general endpoints!public! !
+!WebsideAPI categoriesFor: #search!code endpoints!public! !
+!WebsideAPI categoriesFor: #search:for:with:condition:type:ignoreCase:!private! !
 !WebsideAPI categoriesFor: #selectors!code endpoints!public! !
 !WebsideAPI categoriesFor: #sendersOf:!private! !
 !WebsideAPI categoriesFor: #server:!accessing!public! !
@@ -3522,7 +3658,28 @@ initializeChangesRoutes
 		routeGET: '/changes' to: #changes;
 		routePOST: '/changes' to: #addChange!
 
-initializeCodeRoutes	router		routeGET: '/packages' to: #packages;		routeGET: '/packages/{name}' to: #package;		routeGET: '/packages/{name}/classes' to: #packageClasses;		routeGET: '/packages/{name}/methods' to: #packageMethods;		routeGET: '/classes' to: #classes;		routeGET: '/classes/{name}' to: #classDefinition;		routeGET: '/classes/{name}/superclasses' to: #superclasses;		routeGET: '/classes/{name}/subclasses' to: #subclasses;		routeGET: '/classes/{name}/variables' to: #variables;		routeGET: '/classes/{name}/instance-variables' to: #instanceVariables;		routeGET: '/classes/{name}/class-variables' to: #classVariables;		routeGET: '/classes/{name}/categories' to: #categories;		routeGET: '/usual-categories' to: #usualCategories;		routeGET: '/classes/{name}/used-categories' to: #usedCategories;		routeGET: '/classes/{name}/methods' to: #methods;		routeGET: '/classes/{name}/selectors' to: #selectors;		routeGET: '/classes/{name}/methods/{selector}' to: #method;		routeGET: '/methods' to: #methods;		routeGET: '/methodtemplate' to: #methodTemplate!
+initializeCodeRoutes
+	router
+		routeGET: '/packages' to: #packages;
+		routeGET: '/packages/{name}' to: #package;
+		routeGET: '/packages/{name}/classes' to: #packageClasses;
+		routeGET: '/packages/{name}/methods' to: #packageMethods;
+		routeGET: '/classes' to: #classes;
+		routeGET: '/classes/{name}' to: #classDefinition;
+		routeGET: '/classes/{name}/superclasses' to: #superclasses;
+		routeGET: '/classes/{name}/subclasses' to: #subclasses;
+		routeGET: '/classes/{name}/variables' to: #variables;
+		routeGET: '/classes/{name}/instance-variables' to: #instanceVariables;
+		routeGET: '/classes/{name}/class-variables' to: #classVariables;
+		routeGET: '/classes/{name}/categories' to: #categories;
+		routeGET: '/usual-categories' to: #usualCategories;
+		routeGET: '/classes/{name}/used-categories' to: #usedCategories;
+		routeGET: '/classes/{name}/methods' to: #methods;
+		routeGET: '/classes/{name}/selectors' to: #selectors;
+		routeGET: '/classes/{name}/methods/{selector}' to: #method;
+		routeGET: '/methods' to: #methods;
+		routeGET: '/methodtemplate' to: #methodTemplate;
+		routeGET: '/search' to: #search!
 
 initializeDebuggingRoutes
 	router
