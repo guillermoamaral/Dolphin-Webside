@@ -589,7 +589,7 @@ websideIconName
 	icon := self icon.
 	icon ifNil: [^nil].
 	icon class == TextTileIcon ifTrue: [^icon text asString].
-	^[icon identifier] on: Error do: [:e | ]!
+	^[icon identifier asLowercase] on: Error do: [:e | ]!
 
 websideViews
 	^#()! !

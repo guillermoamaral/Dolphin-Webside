@@ -393,39 +393,12 @@ frameBindings
 				yourself]!
 
 icons
-	| icons |
-	icons := Icon allInstances select: [:i | (i respondsTo: #identifier) and: [i identifier isString]].
-	^icons , TextTileIcon allInstances collect: 
-			[:i |
-			| name data |
-			name := i class == TextTileIcon ifTrue: [i text asString] ifFalse: [i identifier].
-			data := self imageFromIcon: i.
+	^server icons associations asArray collect: 
+			[:a |
 			self newJsonObject
-				at: 'name' put: name;
-				at: 'data' put: data;
+				at: 'name' put: a key;
+				at: 'data' put: a value;
 				yourself]!
-
-imageFromIcon: icon
-	| bmp tmp bytes base64 |
-	bmp := GdiplusBitmap fromIcon: icon.
-	tmp := File temporaryFilename.
-	tmp := (tmp truncateTo: tmp size - 4) , '.png'.
-	[bmp saveToFile: tmp encoderParams: nil] on: Error do: [^nil].
-	bytes := File readAllBytes: tmp.
-	base64 := '' asUtf8String writeStream.
-	Base64Codec new
-		lineLength: -4;
-		encodeFrom: bytes readStream onto: base64.
-	^base64 contents!
-
-imageNamed: aString
-	"
-	WebsideAPI new imageNamed: 'DolphinPackage.ico'
-	"
-
-	| icon |
-	icon := Icon allInstances detect: [:i | i identifier = aString] ifNone: [^nil].
-	^self imageFromIcon: icon!
 
 implementorsOf: aSymbol
 	| system search environment |
@@ -492,9 +465,14 @@ logo	^'iVBORw0KGgoAAAANSUhEUgAAAxgAAAMWCAYAAABydyAUAAAABGdBTUEAALGPC/xhBQAAAYRp
 method	| class selector method json |	class := self requestedClass.	class ifNil: [^self notFound].	selector := self requestedSelector.	selector ifNil: [^self notFound].	(class includesSelector: selector) ifFalse: [^self notFound]. 	method := class >> selector.	json := method asWebsideJson.   	(self queryAt: 'ast') = 'true'		ifTrue: [ json at: 'ast' put: method parseTree asWebsideJson ].	^json!
 
 methods
-	| selector methods senders global references class ast |
+	| selector methods pattern matching senders global references class |
 	selector := self queriedSelector.
 	selector notNil ifTrue: [methods := self implementorsOf: selector].
+	pattern := self queriedSelectorMatching.
+	pattern notNil
+		ifTrue: 
+			[matching := self methodsWithSelectorMatching: pattern.
+			methods := methods ifNil: [matching] ifNotNil: [methods intersection: matching]].
 	selector := self queriedSending.
 	selector notNil
 		ifTrue: 
@@ -513,6 +491,10 @@ methods
 	methods := self filterByVariable: methods.
 	(self queryAt: 'count') = 'true' ifTrue: [^methods size].
 	^self jsonFromMethods: methods!
+
+methodsWithSelectorMatching: aString
+	^(SmalltalkSystem current systemEnvironment implementorsMatching: '*' , aString , '*') allMethods
+		asArray!
 
 methodTemplate	^self newJsonObject		at: 'template' put: true;		at: 'selector' put: 'messagePattern';		at: 'source'		put: 'messagePattern	"comment"	| temporaries |	statements';		yourself!
 
@@ -1011,8 +993,6 @@ workspaces
 !WebsideAPI categoriesFor: #filterByVariable:!private! !
 !WebsideAPI categoriesFor: #frameBindings!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #icons!general endpoints!public! !
-!WebsideAPI categoriesFor: #imageFromIcon:!private! !
-!WebsideAPI categoriesFor: #imageNamed:!private! !
 !WebsideAPI categoriesFor: #implementorsOf:!private! !
 !WebsideAPI categoriesFor: #indexedSlotsOf:!private! !
 !WebsideAPI categoriesFor: #instanceVariables!code endpoints!public! !
@@ -1022,6 +1002,7 @@ workspaces
 !WebsideAPI categoriesFor: #logo!general endpoints!public! !
 !WebsideAPI categoriesFor: #method!code endpoints!public! !
 !WebsideAPI categoriesFor: #methods!code endpoints!public! !
+!WebsideAPI categoriesFor: #methodsWithSelectorMatching:!private! !
 !WebsideAPI categoriesFor: #methodTemplate!code endpoints!public! !
 !WebsideAPI categoriesFor: #namedSlotsOf:!private! !
 !WebsideAPI categoriesFor: #newID!private! !

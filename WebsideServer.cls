@@ -72,6 +72,25 @@ handleRequest: anHttpRequest with: anHttpResponse
 						content: payload asUtf8String]].
 	anHttpResponse headerAt: 'Access-Control-Allow-Origin' put: '*'!
 
+icons
+	| icons |
+	icons := self resourcesAt: #icons.
+	icons isNil ifTrue: [self initializeIcons].
+	^self resourcesAt: #icons!
+
+imageFromIcon: icon
+	| bmp tmp bytes base64 |
+	bmp := GdiplusBitmap fromIcon: icon.
+	tmp := File temporaryFilename.
+	tmp := (tmp truncateTo: tmp size - 4) , '.png'.
+	[bmp saveToFile: tmp encoderParams: nil] on: Error do: [^nil].
+	bytes := File readAllBytes: tmp.
+	base64 := '' asUtf8String writeStream.
+	Base64Codec new
+		lineLength: -4;
+		encodeFrom: bytes readStream onto: base64.
+	^base64 contents!
+
 initialize	super initialize.	port := self defaultPort.	baseUri := self defaultBaseUri.	router := HttpRequestRouter new.	self initializeRoutes; initializeResources!
 
 initializeChangesRoutes
@@ -134,7 +153,22 @@ initializeGeneralRoutes
 		routeGET: '/logo' to: #logo;
 		routeGET: '/colors' to: #colors;
 		routePOST: '/save' to: #saveImage;
-		routeGET: '/icons' to: #icons!
+		routeGET: '/icons' to: #icons;
+		routeGET: '/version' to: #version!
+
+initializeIcons
+	| icons |
+	icons := Dictionary new.
+	(Icon allInstances select: [:i | (i respondsTo: #identifier) and: [i identifier isString]])
+		, TextTileIcon allInstances do: 
+				[:i |
+				| name data |
+				name := i class == TextTileIcon ifTrue: [i text asString] ifFalse: [i identifier asLowercase].
+				(icons includesKey: name)
+					ifFalse: 
+						[data := self imageFromIcon: i.
+						icons at: name put: data]].
+	self resourcesAt: #icons put: icons!
 
 initializeObjectsRoutes            router		routeGET: '/objects' to: #pinnedObjects;		routeGET: '/objects/{id}' to: #pinnedObject;		routeDELETE: '/objects/{id}' to: #unpinObject;		routeGET: '/objects/{id}/*' to: #pinnedObjectSlots;		routePOST: '/objects' to: #pinObjectSlot;		routeDELETE: '/objects' to: #unpinAllObjects    !
 
@@ -185,7 +219,8 @@ isPreflight: request
 	^request verb = 'OPTIONS'
 		and: [(request headerAt: 'origin') notNil or: [(request headerAt: 'Origin') notNil]]!
 
-objects	^ self resourcesAt: #objects!
+objects
+	^self resourcesAt: #objects!
 
 port
 	^ port!
@@ -195,7 +230,8 @@ port: anInteger
 
 reset	self debuggers removeAll.	self evaluations removeAll.	self objects removeAll.	self workspaces removeAll!
 
-resourcesAt: aSymbol	^ resources at: aSymbol ifAbsent: nil!
+resourcesAt: aSymbol
+	^resources at: aSymbol ifAbsent: []!
 
 resourcesAt: aSymbol put: anObject	resources at: aSymbol put: anObject!
 
@@ -219,6 +255,8 @@ workspaces	^ self resourcesAt: #workspaces! !
 !WebsideServer categoriesFor: #evaluations!accessing!public! !
 !WebsideServer categoriesFor: #handlePreflightRequest:!actions!public! !
 !WebsideServer categoriesFor: #handleRequest:with:!actions!public! !
+!WebsideServer categoriesFor: #icons!accessing!public! !
+!WebsideServer categoriesFor: #imageFromIcon:!private! !
 !WebsideServer categoriesFor: #initialize!initializing!public! !
 !WebsideServer categoriesFor: #initializeChangesRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeCodeRoutes!initializing!public! !
@@ -226,6 +264,7 @@ workspaces	^ self resourcesAt: #workspaces! !
 !WebsideServer categoriesFor: #initializeEvaluationRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeExtensionsRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeGeneralRoutes!initializing!public! !
+!WebsideServer categoriesFor: #initializeIcons!initializing!public! !
 !WebsideServer categoriesFor: #initializeObjectsRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializePreflightRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeResources!initializing!public! !

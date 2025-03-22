@@ -589,7 +589,7 @@ websideIconName
 	icon := self icon.
 	icon ifNil: [^nil].
 	icon class == TextTileIcon ifTrue: [^icon text asString].
-	^[icon identifier] on: Error do: [:e | ]!
+	^[icon identifier asLowercase] on: Error do: [:e | ]!
 
 websideViews
 	^#()! !
@@ -2649,39 +2649,12 @@ frameBindings
 				yourself]!
 
 icons
-	| icons |
-	icons := Icon allInstances select: [:i | (i respondsTo: #identifier) and: [i identifier isString]].
-	^icons , TextTileIcon allInstances collect: 
-			[:i |
-			| name data |
-			name := i class == TextTileIcon ifTrue: [i text asString] ifFalse: [i identifier].
-			data := self imageFromIcon: i.
+	^server icons associations asArray collect: 
+			[:a |
 			self newJsonObject
-				at: 'name' put: name;
-				at: 'data' put: data;
+				at: 'name' put: a key;
+				at: 'data' put: a value;
 				yourself]!
-
-imageFromIcon: icon
-	| bmp tmp bytes base64 |
-	bmp := GdiplusBitmap fromIcon: icon.
-	tmp := File temporaryFilename.
-	tmp := (tmp truncateTo: tmp size - 4) , '.png'.
-	[bmp saveToFile: tmp encoderParams: nil] on: Error do: [^nil].
-	bytes := File readAllBytes: tmp.
-	base64 := '' asUtf8String writeStream.
-	Base64Codec new
-		lineLength: -4;
-		encodeFrom: bytes readStream onto: base64.
-	^base64 contents!
-
-imageNamed: aString
-	"
-	WebsideAPI new imageNamed: 'DolphinPackage.ico'
-	"
-
-	| icon |
-	icon := Icon allInstances detect: [:i | i identifier = aString] ifNone: [^nil].
-	^self imageFromIcon: icon!
 
 implementorsOf: aSymbol
 	| system search environment |
@@ -2748,9 +2721,14 @@ logo	^'iVBORw0KGgoAAAANSUhEUgAAAxgAAAMWCAYAAABydyAUAAAABGdBTUEAALGPC/xhBQAAAYRp
 method	| class selector method json |	class := self requestedClass.	class ifNil: [^self notFound].	selector := self requestedSelector.	selector ifNil: [^self notFound].	(class includesSelector: selector) ifFalse: [^self notFound]. 	method := class >> selector.	json := method asWebsideJson.   	(self queryAt: 'ast') = 'true'		ifTrue: [ json at: 'ast' put: method parseTree asWebsideJson ].	^json!
 
 methods
-	| selector methods senders global references class ast |
+	| selector methods pattern matching senders global references class |
 	selector := self queriedSelector.
 	selector notNil ifTrue: [methods := self implementorsOf: selector].
+	pattern := self queriedSelectorMatching.
+	pattern notNil
+		ifTrue: 
+			[matching := self methodsWithSelectorMatching: pattern.
+			methods := methods ifNil: [matching] ifNotNil: [methods intersection: matching]].
 	selector := self queriedSending.
 	selector notNil
 		ifTrue: 
@@ -2769,6 +2747,10 @@ methods
 	methods := self filterByVariable: methods.
 	(self queryAt: 'count') = 'true' ifTrue: [^methods size].
 	^self jsonFromMethods: methods!
+
+methodsWithSelectorMatching: aString
+	^(SmalltalkSystem current systemEnvironment implementorsMatching: '*' , aString , '*') allMethods
+		asArray!
 
 methodTemplate	^self newJsonObject		at: 'template' put: true;		at: 'selector' put: 'messagePattern';		at: 'source'		put: 'messagePattern	"comment"	| temporaries |	statements';		yourself!
 
@@ -3267,8 +3249,6 @@ workspaces
 !WebsideAPI categoriesFor: #filterByVariable:!private! !
 !WebsideAPI categoriesFor: #frameBindings!debugging endpoints!public! !
 !WebsideAPI categoriesFor: #icons!general endpoints!public! !
-!WebsideAPI categoriesFor: #imageFromIcon:!private! !
-!WebsideAPI categoriesFor: #imageNamed:!private! !
 !WebsideAPI categoriesFor: #implementorsOf:!private! !
 !WebsideAPI categoriesFor: #indexedSlotsOf:!private! !
 !WebsideAPI categoriesFor: #instanceVariables!code endpoints!public! !
@@ -3278,6 +3258,7 @@ workspaces
 !WebsideAPI categoriesFor: #logo!general endpoints!public! !
 !WebsideAPI categoriesFor: #method!code endpoints!public! !
 !WebsideAPI categoriesFor: #methods!code endpoints!public! !
+!WebsideAPI categoriesFor: #methodsWithSelectorMatching:!private! !
 !WebsideAPI categoriesFor: #methodTemplate!code endpoints!public! !
 !WebsideAPI categoriesFor: #namedSlotsOf:!private! !
 !WebsideAPI categoriesFor: #newID!private! !
@@ -3651,6 +3632,25 @@ handleRequest: anHttpRequest with: anHttpResponse
 						content: payload asUtf8String]].
 	anHttpResponse headerAt: 'Access-Control-Allow-Origin' put: '*'!
 
+icons
+	| icons |
+	icons := self resourcesAt: #icons.
+	icons isNil ifTrue: [self initializeIcons].
+	^self resourcesAt: #icons!
+
+imageFromIcon: icon
+	| bmp tmp bytes base64 |
+	bmp := GdiplusBitmap fromIcon: icon.
+	tmp := File temporaryFilename.
+	tmp := (tmp truncateTo: tmp size - 4) , '.png'.
+	[bmp saveToFile: tmp encoderParams: nil] on: Error do: [^nil].
+	bytes := File readAllBytes: tmp.
+	base64 := '' asUtf8String writeStream.
+	Base64Codec new
+		lineLength: -4;
+		encodeFrom: bytes readStream onto: base64.
+	^base64 contents!
+
 initialize	super initialize.	port := self defaultPort.	baseUri := self defaultBaseUri.	router := HttpRequestRouter new.	self initializeRoutes; initializeResources!
 
 initializeChangesRoutes
@@ -3713,7 +3713,22 @@ initializeGeneralRoutes
 		routeGET: '/logo' to: #logo;
 		routeGET: '/colors' to: #colors;
 		routePOST: '/save' to: #saveImage;
-		routeGET: '/icons' to: #icons!
+		routeGET: '/icons' to: #icons;
+		routeGET: '/version' to: #version!
+
+initializeIcons
+	| icons |
+	icons := Dictionary new.
+	(Icon allInstances select: [:i | (i respondsTo: #identifier) and: [i identifier isString]])
+		, TextTileIcon allInstances do: 
+				[:i |
+				| name data |
+				name := i class == TextTileIcon ifTrue: [i text asString] ifFalse: [i identifier asLowercase].
+				(icons includesKey: name)
+					ifFalse: 
+						[data := self imageFromIcon: i.
+						icons at: name put: data]].
+	self resourcesAt: #icons put: icons!
 
 initializeObjectsRoutes            router		routeGET: '/objects' to: #pinnedObjects;		routeGET: '/objects/{id}' to: #pinnedObject;		routeDELETE: '/objects/{id}' to: #unpinObject;		routeGET: '/objects/{id}/*' to: #pinnedObjectSlots;		routePOST: '/objects' to: #pinObjectSlot;		routeDELETE: '/objects' to: #unpinAllObjects    !
 
@@ -3764,7 +3779,8 @@ isPreflight: request
 	^request verb = 'OPTIONS'
 		and: [(request headerAt: 'origin') notNil or: [(request headerAt: 'Origin') notNil]]!
 
-objects	^ self resourcesAt: #objects!
+objects
+	^self resourcesAt: #objects!
 
 port
 	^ port!
@@ -3774,7 +3790,8 @@ port: anInteger
 
 reset	self debuggers removeAll.	self evaluations removeAll.	self objects removeAll.	self workspaces removeAll!
 
-resourcesAt: aSymbol	^ resources at: aSymbol ifAbsent: nil!
+resourcesAt: aSymbol
+	^resources at: aSymbol ifAbsent: []!
 
 resourcesAt: aSymbol put: anObject	resources at: aSymbol put: anObject!
 
@@ -3798,6 +3815,8 @@ workspaces	^ self resourcesAt: #workspaces! !
 !WebsideServer categoriesFor: #evaluations!accessing!public! !
 !WebsideServer categoriesFor: #handlePreflightRequest:!actions!public! !
 !WebsideServer categoriesFor: #handleRequest:with:!actions!public! !
+!WebsideServer categoriesFor: #icons!accessing!public! !
+!WebsideServer categoriesFor: #imageFromIcon:!private! !
 !WebsideServer categoriesFor: #initialize!initializing!public! !
 !WebsideServer categoriesFor: #initializeChangesRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeCodeRoutes!initializing!public! !
@@ -3805,6 +3824,7 @@ workspaces	^ self resourcesAt: #workspaces! !
 !WebsideServer categoriesFor: #initializeEvaluationRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeExtensionsRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeGeneralRoutes!initializing!public! !
+!WebsideServer categoriesFor: #initializeIcons!initializing!public! !
 !WebsideServer categoriesFor: #initializeObjectsRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializePreflightRoutes!initializing!public! !
 !WebsideServer categoriesFor: #initializeResources!initializing!public! !
