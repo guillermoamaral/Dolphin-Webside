@@ -2944,15 +2944,20 @@ evaluations
 	^server evaluations!
 
 extensions
-	^OrderedCollection new
+	^(OrderedCollection new
 		add: (self newJsonObject
-			at: 'type' put: 'search';
-			at: 'elementType' put: 'system';
-			at: 'label' put: 'Methods with compilation issues';
-			at: 'get'
-			put: '/methods-with-issues';
-			yourself);
-		yourself asArray!
+					at: 'type' put: 'search';
+					at: 'elementType' put: 'system';
+					at: 'label' put: 'Methods with compilation issues';
+					at: 'get' put: '/methods-with-issues';
+					yourself);
+		add: (self newJsonObject
+					at: 'type' put: 'search';
+					at: 'elementType' put: 'system';
+					at: 'label' put: 'Methods with compilation failures';
+					at: 'get' put: '/methods-with-compilation-failure';
+					yourself);
+		yourself) asArray!
 
 filterByCategory: aCollection
 	| category |
@@ -3141,6 +3146,12 @@ methods
 	methods := self filterByVariable: methods.
 	(self queryAt: 'count') = 'true' ifTrue: [^methods size].
 	^self jsonFromMethods: methods!
+
+methodsFailingCompilation
+	| system |
+	system := SmalltalkSystem current.
+	^(system methodsThatFailedToCompileIn: system systemEnvironment) allMethods
+		asArray collect: [:m | m asWebsideJson]!
 
 methodsWithIssues
 	| system |
@@ -3663,6 +3674,7 @@ jsonFromMethods:!private! !
 logo!general endpoints!public! !
 method!code endpoints!public! !
 methods!code endpoints!public! !
+methodsFailingCompilation!extensions endpoints!public! !
 methodsWithIssues!extensions endpoints!public! !
 methodsWithSelectorMatching:!private! !
 methodTemplate!code endpoints!public! !
@@ -4110,7 +4122,7 @@ imageFromIcon: icon
 	bmp := GdiplusBitmap fromIcon: icon.
 	tmp := File temporaryFilename.
 	tmp := (tmp truncateTo: tmp size - 4) , '.png'.
-	[bmp saveToFile: tmp encoderParams: nil] on: Error do: [^nil].
+	[bmp saveToFile: tmp encoderParams: nil] on: Error do: [:e | ^nil].
 	bytes := File readAllBytes: tmp.
 	base64 := '' asUtf8String writeStream.
 	Base64Codec new
@@ -4177,7 +4189,8 @@ initializeEvaluationRoutes
 initializeExtensionsRoutes
 	router
 		routeGET: '/extensions' to: #extensions;
-		routeGET: 'methods-with-issues' to: #methodsWithIssues!
+		routeGET: 'methods-with-issues' to: #methodsWithIssues;
+		routeGET: 'methods-with-compilation-failure' to: #methodsFailingCompilation!
 
 initializeGeneralRoutes
 	router
@@ -4191,15 +4204,16 @@ initializeGeneralRoutes
 initializeIcons
 	| icons |
 	icons := Dictionary new.
-	(Icon allInstances select: [:i | (i respondsTo: #identifier) and: [i identifier isString]])
-		, TextTileIcon allInstances do: 
-				[:i |
-				| name data |
-				name := i class == TextTileIcon ifTrue: [i text asString] ifFalse: [i identifier asLowercase].
-				(icons includesKey: name)
-					ifFalse: 
-						[data := self imageFromIcon: i.
-						icons at: name put: data]].
+	((ProtoObject withAllSubclasses collect: [:c | c icon]) , Icon allInstances
+		select: [:i | (i respondsTo: #identifier) and: [i identifier isString]]) , TextTileIcon allInstances
+		do: 
+			[:i |
+			| name data |
+			name := i class == TextTileIcon ifTrue: [i text asString] ifFalse: [i identifier asLowercase].
+			(icons includesKey: name)
+				ifFalse: 
+					[data := self imageFromIcon: i.
+					icons at: name put: data]].
 	self resourcesAt: #icons put: icons!
 
 initializeObjectsRoutes            router		routeGET: '/objects' to: #pinnedObjects;		routeGET: '/objects/{id}' to: #pinnedObject;		routeDELETE: '/objects/{id}' to: #unpinObject;		routeGET: '/objects/{id}/*' to: #pinnedObjectSlots;		routePOST: '/objects' to: #pinObjectSlot;		routeDELETE: '/objects' to: #unpinAllObjects    !

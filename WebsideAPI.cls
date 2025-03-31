@@ -351,15 +351,20 @@ evaluations
 	^server evaluations!
 
 extensions
-	^OrderedCollection new
+	^(OrderedCollection new
 		add: (self newJsonObject
-			at: 'type' put: 'search';
-			at: 'elementType' put: 'system';
-			at: 'label' put: 'Methods with compilation issues';
-			at: 'get'
-			put: '/methods-with-issues';
-			yourself);
-		yourself asArray!
+					at: 'type' put: 'search';
+					at: 'elementType' put: 'system';
+					at: 'label' put: 'Methods with compilation issues';
+					at: 'get' put: '/methods-with-issues';
+					yourself);
+		add: (self newJsonObject
+					at: 'type' put: 'search';
+					at: 'elementType' put: 'system';
+					at: 'label' put: 'Methods with compilation failures';
+					at: 'get' put: '/methods-with-compilation-failure';
+					yourself);
+		yourself) asArray!
 
 filterByCategory: aCollection
 	| category |
@@ -548,6 +553,12 @@ methods
 	methods := self filterByVariable: methods.
 	(self queryAt: 'count') = 'true' ifTrue: [^methods size].
 	^self jsonFromMethods: methods!
+
+methodsFailingCompilation
+	| system |
+	system := SmalltalkSystem current.
+	^(system methodsThatFailedToCompileIn: system systemEnvironment) allMethods
+		asArray collect: [:m | m asWebsideJson]!
 
 methodsWithIssues
 	| system |
@@ -1070,6 +1081,7 @@ jsonFromMethods:!private! !
 logo!general endpoints!public! !
 method!code endpoints!public! !
 methods!code endpoints!public! !
+methodsFailingCompilation!extensions endpoints!public! !
 methodsWithIssues!extensions endpoints!public! !
 methodsWithSelectorMatching:!private! !
 methodTemplate!code endpoints!public! !
