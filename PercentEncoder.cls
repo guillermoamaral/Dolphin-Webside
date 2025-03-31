@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #PercentEncoder
 	instanceVariableNames: 'reserved'
 	classVariableNames: 'Current'
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 PercentEncoder guid: (GUID fromString: '{183707c5-6b54-4780-b5d8-71fa30c46297}')!
+
 PercentEncoder comment: ''!
+
 !PercentEncoder categoriesForClass!Unclassified! !
+
 !PercentEncoder methodsFor!
 
 decode: aString
@@ -46,10 +50,13 @@ initialize
 
 initializeReserved
 	reserved := ' ?:@&=+$#;%/\!!'! !
-!PercentEncoder categoriesFor: #decode:!public!services! !
-!PercentEncoder categoriesFor: #encode:!public!services! !
-!PercentEncoder categoriesFor: #initialize!initializing!public! !
-!PercentEncoder categoriesFor: #initializeReserved!initializing!public! !
+
+!PercentEncoder categoriesForMethods!
+decode:!public!services! !
+encode:!public!services! !
+initialize!initializing!public! !
+initializeReserved!initializing!public! !
+!
 
 !PercentEncoder class methodsFor!
 
@@ -65,8 +72,11 @@ encode: aString
 
 new
 	^super new initialize! !
-!PercentEncoder class categoriesFor: #current!accessing!public! !
-!PercentEncoder class categoriesFor: #decode:!public!services! !
-!PercentEncoder class categoriesFor: #encode:!public!services! !
-!PercentEncoder class categoriesFor: #new!instance creation!public! !
+
+!PercentEncoder class categoriesForMethods!
+current!accessing!public! !
+decode:!public!services! !
+encode:!public!services! !
+new!instance creation!public! !
+!
 

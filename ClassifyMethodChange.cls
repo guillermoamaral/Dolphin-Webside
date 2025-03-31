@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 RefactoryClassChange subclass: #ClassifyMethodChange
 	instanceVariableNames: 'selector category'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 ClassifyMethodChange guid: (GUID fromString: '{80aeef58-aca9-4378-b558-42c99c9ae553}')!
+
 ClassifyMethodChange comment: ''!
+
 !ClassifyMethodChange categoriesForClass!Refactory-Change Objects! !
+
 !ClassifyMethodChange methodsFor!
 
 asUndoOperation
@@ -32,9 +36,12 @@ method
 
 primitiveExecute
 	MethodCategory setMethod: self method categories: (Array with: category asMethodCategory)! !
-!ClassifyMethodChange categoriesFor: #asUndoOperation!public! !
-!ClassifyMethodChange categoriesFor: #asWebsideJson!public! !
-!ClassifyMethodChange categoriesFor: #fromWebsideJson:!public! !
-!ClassifyMethodChange categoriesFor: #method!public! !
-!ClassifyMethodChange categoriesFor: #primitiveExecute!public! !
+
+!ClassifyMethodChange categoriesForMethods!
+asUndoOperation!public! !
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+method!public! !
+primitiveExecute!public! !
+!
 

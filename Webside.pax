@@ -3,7 +3,6 @@ package := Package name: 'Webside'.
 package paxVersion: 1;
 	basicComment: ''.
 
-
 package classNames
 	add: #AddCategoryChange;
 	add: #AddPackageChange;
@@ -137,7 +136,7 @@ package setPrerequisites: #(
 	'..\Core\Object Arts\Dolphin\IDE\Base\Development System'
 	'..\Core\Object Arts\Dolphin\Base\Dolphin'
 	'..\Core\Object Arts\Dolphin\System\Base64\Dolphin Base64'
-	'..\DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
+	'..\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
 	'..\Core\Object Arts\Dolphin\MVP\Base\Dolphin MVP Base'
 	'..\Core\Object Arts\Dolphin\MVP\Icons\Dolphin Text Tile Icons'
 	'..\Core\Object Arts\Dolphin\MVP\Gdiplus\Gdiplus'
@@ -158,144 +157,168 @@ Object subclass: #FakeListPresenter
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #HttpRequestRouter
 	instanceVariableNames: 'routes receiver'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #MatchAlgorithm
 	instanceVariableNames: 'string pattern start stop tokens failure ranges'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #MatchToken
 	instanceVariableNames: 'string start stop'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #PercentEncoder
 	instanceVariableNames: 'reserved'
 	classVariableNames: 'Current'
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #StarToken
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: 'current'!
+
 Object subclass: #StringPattern
 	instanceVariableNames: 'stream tokens'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #URL
 	instanceVariableNames: 'scheme user password host port segments query fragment'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #URLTemplate
 	instanceVariableNames: 'raw pattern parameters sample description'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #WebsideAPI
 	instanceVariableNames: 'server request'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #WebsideClient
 	instanceVariableNames: 'url client'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #WebsideEvaluation
 	instanceVariableNames: 'id expression receiver context requestor priority process state result error semaphore'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #WebsideResource
 	instanceVariableNames: 'id'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #WebsideServer
 	instanceVariableNames: 'server router baseUri port resources'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Exception subclass: #WebsideException
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryChange subclass: #RefactoryPackageChange
 	instanceVariableNames: 'packageName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryClassChange subclass: #ClassifyMethodChange
 	instanceVariableNames: 'selector category'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryClassChange subclass: #CommentClassChange
 	instanceVariableNames: 'comment'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryClassChange subclass: #RefactoryCategoryChange
 	instanceVariableNames: 'category'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryCategoryChange subclass: #AddCategoryChange
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryCategoryChange subclass: #RemoveCategoryChange
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryCategoryChange subclass: #RenameCategoryChange
 	instanceVariableNames: 'newName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryPackageChange subclass: #AddPackageChange
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryPackageChange subclass: #RemovePackageChange
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryPackageChange subclass: #RenamePackageChange
 	instanceVariableNames: 'newName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 TestCase subclass: #URLTemplateTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 TestCase subclass: #URLTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 WebsideResource subclass: #WebsideWorkspace
 	instanceVariableNames: 'contents bindings'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
-
-"Global Aliases"!
-
 
 "Loose Methods"!
 
@@ -347,27 +370,39 @@ websideExecute
 	packageName := self propertyAt: #packageName ifAbsent: [^self].
 	package := PackageManager current packageNamed: packageName ifNone: [^self].
 	package ifNotNil: [package addClass: self changeClass]! !
-!AddClassChange categoriesFor: #asWebsideJson!public! !
-!AddClassChange categoriesFor: #fromWebsideJson:!public! !
-!AddClassChange categoriesFor: #websideExecute!public! !
+
+!AddClassChange categoriesForMethods!
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+websideExecute!public! !
+!
 
 !AddClassChange class methodsFor!
 
 websideType
 	^'AddClass'! !
-!AddClassChange class categoriesFor: #websideType!public! !
+
+!AddClassChange class categoriesForMethods!
+websideType!public! !
+!
 
 !AddClassVariableChange class methodsFor!
 
 websideType
 	^'AddClassVariable'! !
-!AddClassVariableChange class categoriesFor: #websideType!public! !
+
+!AddClassVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !AddInstanceVariableChange class methodsFor!
 
 websideType
 	^'AddInstanceVariable'! !
-!AddInstanceVariableChange class categoriesFor: #websideType!public! !
+
+!AddInstanceVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !AddMethodChange methodsFor!
 
@@ -389,14 +424,20 @@ fromWebsideJson: json
 	category := json at: 'category' ifAbsent: [].
 	category ifNil: [category := MethodCategory unclassified asString].
 	self protocols: {category asSymbol}! !
-!AddMethodChange categoriesFor: #asWebsideJson!public! !
-!AddMethodChange categoriesFor: #fromWebsideJson:!public! !
+
+!AddMethodChange categoriesForMethods!
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+!
 
 !AddMethodChange class methodsFor!
 
 websideType
 	^'AbstractAddMethod'! !
-!AddMethodChange class categoriesFor: #websideType!instance creation!public! !
+
+!AddMethodChange class categoriesForMethods!
+websideType!instance creation!public! !
+!
 
 !Character methodsFor!
 
@@ -405,8 +446,11 @@ isAsterisk
 
 isQuestionMark
 	^code = 63! !
-!Character categoriesFor: #isAsterisk!public!testing! !
-!Character categoriesFor: #isQuestionMark!public!testing! !
+
+!Character categoriesForMethods!
+isAsterisk!public!testing! !
+isQuestionMark!public!testing! !
+!
 
 !ClassDescription methodsFor!
 
@@ -422,7 +466,10 @@ asWebsideJson
 		at: 'variable' put: self isVariable;
 		at: 'project' put: (self owningPackage ifNotNil: [:p | p name]);
 		yourself! !
-!ClassDescription categoriesFor: #asWebsideJson!converting!public! !
+
+!ClassDescription categoriesForMethods!
+asWebsideJson!converting!public! !
+!
 
 !Collection methodsFor!
 
@@ -457,10 +504,13 @@ groupBy: aspect
 		copy removeAll: remove.
 		remove removeAll].
 	^answer! !
-!Collection categoriesFor: #anyone!adding!public! !
-!Collection categoriesFor: #gather:!enumerating!public! !
-!Collection categoriesFor: #gather:in:!enumerating!public! !
-!Collection categoriesFor: #groupBy:!operations!public! !
+
+!Collection categoriesForMethods!
+anyone!adding!public! !
+gather:!enumerating!public! !
+gather:in:!enumerating!public! !
+groupBy:!operations!public! !
+!
 
 !CompiledCode methodsFor!
 
@@ -476,7 +526,10 @@ asWebsideJson
 		at: 'timestamp' put: nil;
 		at: 'package' put: package;
 		yourself! !
-!CompiledCode categoriesFor: #asWebsideJson!public! !
+
+!CompiledCode categoriesForMethods!
+asWebsideJson!public! !
+!
 
 !CompiledMethod methodsFor!
 
@@ -490,7 +543,10 @@ asWebsideJson
 		at: 'overriding' put: self isOverride;
 		at: 'overriden' put: self isOverridden;
 		yourself! !
-!CompiledMethod categoriesFor: #asWebsideJson!converting!public! !
+
+!CompiledMethod categoriesForMethods!
+asWebsideJson!converting!public! !
+!
 
 !CompilerNotification methodsFor!
 
@@ -505,7 +561,10 @@ asWebsideJson
 		at: 'fullDescription' put: self errorMessage;
 		at: 'interval' put: interval.
 	^json! !
-!CompilerNotification categoriesFor: #asWebsideJson!accessing!public! !
+
+!CompilerNotification categoriesForMethods!
+asWebsideJson!accessing!public! !
+!
 
 !Debugger methodsFor!
 
@@ -549,17 +608,23 @@ stepOver: aStackFrame
 	self breakFrame: aStackFrame.
 	self makeDebugFrame: aStackFrame sender.
 	self resume! !
-!Debugger categoriesFor: #adaptToWebside!public! !
-!Debugger categoriesFor: #process!private!updating! !
-!Debugger categoriesFor: #stepInto:!public! !
-!Debugger categoriesFor: #stepIntoBlock:!public! !
-!Debugger categoriesFor: #stepOver:!public! !
+
+!Debugger categoriesForMethods!
+adaptToWebside!public! !
+process!private!updating! !
+stepInto:!public! !
+stepIntoBlock:!public! !
+stepOver:!public! !
+!
 
 !DolphinAddMethodChange class methodsFor!
 
 websideType
 	^'AddMethod'! !
-!DolphinAddMethodChange class categoriesFor: #websideType!public! !
+
+!DolphinAddMethodChange class categoriesForMethods!
+websideType!public! !
+!
 
 !Exception methodsFor!
 
@@ -568,13 +633,19 @@ asWebsideJson
 	json := super asWebsideJson.
 	json at: 'description' put: self description.
 	^json! !
-!Exception categoriesFor: #asWebsideJson!handling!public! !
+
+!Exception categoriesForMethods!
+asWebsideJson!handling!public! !
+!
 
 !MethodCompileFailed methodsFor!
 
 asWebsideJson
 	^compilerErrorNotification asWebsideJson! !
-!MethodCompileFailed categoriesFor: #asWebsideJson!accessing!private! !
+
+!MethodCompileFailed categoriesForMethods!
+asWebsideJson!accessing!private! !
+!
 
 !MethodRefactoring methodsFor!
 
@@ -587,8 +658,11 @@ fromWebsideJson: json
 	super fromWebsideJson: json.
 	json at: 'className'
 		ifPresent: [:n | Smalltalk at: n ifPresent: [:c | class := RBClass existingNamed: n]]! !
-!MethodRefactoring categoriesFor: #asWebsideJson!private! !
-!MethodRefactoring categoriesFor: #fromWebsideJson:!private! !
+
+!MethodRefactoring categoriesForMethods!
+asWebsideJson!private! !
+fromWebsideJson:!private! !
+!
 
 !Object methodsFor!
 
@@ -614,9 +688,12 @@ websideIconName
 
 websideViews
 	^#()! !
-!Object categoriesFor: #asWebsideJson!converting!public! !
-!Object categoriesFor: #websideIconName!converting!public! !
-!Object categoriesFor: #websideViews!exceptions!private! !
+
+!Object categoriesForMethods!
+asWebsideJson!converting!public! !
+websideIconName!converting!public! !
+websideViews!exceptions!private! !
+!
 
 !Package methodsFor!
 
@@ -631,7 +708,10 @@ asWebsideJson
 		at: 'classes' put: self classNames asArray;
 		at: 'methods' put: methods;
 		yourself! !
-!Package categoriesFor: #asWebsideJson!converting!private! !
+
+!Package categoriesForMethods!
+asWebsideJson!converting!private! !
+!
 
 !PullUpInstanceVariableRefactoring methodsFor!
 
@@ -645,19 +725,28 @@ fromWebsideJson: json
 					[:c |
 					class := RBClass existingNamed: n.
 					class model: model]]! !
-!PullUpInstanceVariableRefactoring categoriesFor: #fromWebsideJson:!public! !
+
+!PullUpInstanceVariableRefactoring categoriesForMethods!
+fromWebsideJson:!public! !
+!
 
 !PullUpInstanceVariableRefactoring class methodsFor!
 
 websideType
 	^'MoveUpInstanceVariable'! !
-!PullUpInstanceVariableRefactoring class categoriesFor: #websideType!public! !
+
+!PullUpInstanceVariableRefactoring class categoriesForMethods!
+websideType!public! !
+!
 
 !PushDownInstanceVariableRefactoring class methodsFor!
 
 websideType
 	^'MoveDownInstanceVariable'! !
-!PushDownInstanceVariableRefactoring class categoriesFor: #websideType!public! !
+
+!PushDownInstanceVariableRefactoring class categoriesForMethods!
+websideType!public! !
+!
 
 !Refactoring methodsFor!
 
@@ -676,9 +765,12 @@ fromWebsideJson: json
 
 websideExecute
 	^self execute! !
-!Refactoring categoriesFor: #asWebsideJson!public! !
-!Refactoring categoriesFor: #fromWebsideJson:!public! !
-!Refactoring categoriesFor: #websideExecute!public! !
+
+!Refactoring categoriesForMethods!
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+websideExecute!public! !
+!
 
 !Refactoring class methodsFor!
 
@@ -700,10 +792,13 @@ websideType
 	type := self name asString.
 	(type endsWith: 'Refactoring') ifTrue: [type := type copyFrom: 1 to: type size - 11].
 	^type! !
-!Refactoring class categoriesFor: #acceptsWebsideJson:!class hierarchy-removing!public! !
-!Refactoring class categoriesFor: #classForWebsideJson:!class hierarchy-removing!public! !
-!Refactoring class categoriesFor: #fromWebsideJson:!class hierarchy-removing!public! !
-!Refactoring class categoriesFor: #websideType!class hierarchy-removing!public! !
+
+!Refactoring class categoriesForMethods!
+acceptsWebsideJson:!class hierarchy-removing!public! !
+classForWebsideJson:!class hierarchy-removing!public! !
+fromWebsideJson:!class hierarchy-removing!public! !
+websideType!class hierarchy-removing!public! !
+!
 
 !RefactoryChange methodsFor!
 
@@ -721,9 +816,12 @@ fromWebsideJson: json
 
 websideExecute
 	^self execute! !
-!RefactoryChange categoriesFor: #asWebsideJson!initialize/release!public! !
-!RefactoryChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
-!RefactoryChange categoriesFor: #websideExecute!initialize/release!public! !
+
+!RefactoryChange categoriesForMethods!
+asWebsideJson!initialize/release!public! !
+fromWebsideJson:!initialize/release!public! !
+websideExecute!initialize/release!public! !
+!
 
 !RefactoryChange class methodsFor!
 
@@ -745,10 +843,13 @@ websideType
 	type := self name asString.
 	(type endsWith: 'Change') ifTrue: [type := type copyFrom: 1 to: type size - 6].
 	^type! !
-!RefactoryChange class categoriesFor: #acceptsWebsideJson:!public! !
-!RefactoryChange class categoriesFor: #classForWebsideJson:!public! !
-!RefactoryChange class categoriesFor: #fromWebsideJson:!public! !
-!RefactoryChange class categoriesFor: #websideType!public! !
+
+!RefactoryChange class categoriesForMethods!
+acceptsWebsideJson:!public! !
+classForWebsideJson:!public! !
+fromWebsideJson:!public! !
+websideType!public! !
+!
 
 !RefactoryClassChange methodsFor!
 
@@ -763,8 +864,11 @@ fromWebsideJson: json
 	isMeta := className notNil and: [className endsWith: ' class'].
 	(className notNil and: [isMeta])
 		ifTrue: [className := (className copyFrom: 1 to: className size - 6) asSymbol]! !
-!RefactoryClassChange categoriesFor: #asWebsideJson!accessing!public! !
-!RefactoryClassChange categoriesFor: #fromWebsideJson:!accessing!public! !
+
+!RefactoryClassChange categoriesForMethods!
+asWebsideJson!accessing!public! !
+fromWebsideJson:!accessing!public! !
+!
 
 !RefactoryVariableChange methodsFor!
 
@@ -774,26 +878,38 @@ asWebsideJson
 fromWebsideJson: json
 	super fromWebsideJson: json.
 	variable := json at: 'variable' ifAbsent: nil! !
-!RefactoryVariableChange categoriesFor: #asWebsideJson!initialize/release!public! !
-!RefactoryVariableChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
+
+!RefactoryVariableChange categoriesForMethods!
+asWebsideJson!initialize/release!public! !
+fromWebsideJson:!initialize/release!public! !
+!
 
 !RemoveClassChange class methodsFor!
 
 websideType
 	^'RemoveClass'! !
-!RemoveClassChange class categoriesFor: #websideType!public! !
+
+!RemoveClassChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RemoveClassVariableChange class methodsFor!
 
 websideType
 	^'RemoveClassVariable'! !
-!RemoveClassVariableChange class categoriesFor: #websideType!public! !
+
+!RemoveClassVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RemoveInstanceVariableChange class methodsFor!
 
 websideType
 	^'RemoveInstanceVariable'! !
-!RemoveInstanceVariableChange class categoriesFor: #websideType!public! !
+
+!RemoveInstanceVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RemoveMethodChange methodsFor!
 
@@ -804,14 +920,20 @@ fromWebsideJson: json
 	super fromWebsideJson: json.
 	selector := json at: 'selector' ifAbsent: [].
 	selector notNil ifTrue: [selector := selector asSymbol]! !
-!RemoveMethodChange categoriesFor: #asWebsideJson!public! !
-!RemoveMethodChange categoriesFor: #fromWebsideJson:!public! !
+
+!RemoveMethodChange categoriesForMethods!
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+!
 
 !RemoveMethodChange class methodsFor!
 
 websideType
 	^'RemoveMethod'! !
-!RemoveMethodChange class categoriesFor: #websideType!public! !
+
+!RemoveMethodChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RenameClassChange methodsFor!
 
@@ -826,26 +948,38 @@ fromWebsideJson: json
 	super fromWebsideJson: json.
 	oldName := json at: 'className' ifAbsent: [].
 	newName := json at: 'newName' ifAbsent: []! !
-!RenameClassChange categoriesFor: #asWebsideJson!initialize/release!public! !
-!RenameClassChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
+
+!RenameClassChange categoriesForMethods!
+asWebsideJson!initialize/release!public! !
+fromWebsideJson:!initialize/release!public! !
+!
 
 !RenameClassChange class methodsFor!
 
 websideType
 	^'RenameClass'! !
-!RenameClassChange class categoriesFor: #websideType!instance creation!public! !
+
+!RenameClassChange class categoriesForMethods!
+websideType!instance creation!public! !
+!
 
 !RenameClassVariableChange class methodsFor!
 
 websideType
 	^'RenameClassVariable'! !
-!RenameClassVariableChange class categoriesFor: #websideType!public! !
+
+!RenameClassVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RenameInstanceVariableChange class methodsFor!
 
 websideType
 	^'RenameInstanceVariable'! !
-!RenameInstanceVariableChange class categoriesFor: #websideType!public! !
+
+!RenameInstanceVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RenameMethodRefactoring methodsFor!
 
@@ -863,8 +997,11 @@ fromWebsideJson: json
 			[:s |
 			newSelector := s asSymbol.
 			permutation := 1 to: newSelector argumentCount]! !
-!RenameMethodRefactoring categoriesFor: #asWebsideJson!public!testing! !
-!RenameMethodRefactoring categoriesFor: #fromWebsideJson:!public!testing! !
+
+!RenameMethodRefactoring categoriesForMethods!
+asWebsideJson!public!testing! !
+fromWebsideJson:!public!testing! !
+!
 
 !RenameVariableChange methodsFor!
 
@@ -881,8 +1018,11 @@ fromWebsideJson: json
 	isMeta := className notNil and: [className endsWith: ' class'].
 	oldName := json at: 'variable' ifAbsent: [].
 	newName := json at: 'newName' ifAbsent: []! !
-!RenameVariableChange categoriesFor: #asWebsideJson!printing!public! !
-!RenameVariableChange categoriesFor: #fromWebsideJson:!printing!public! !
+
+!RenameVariableChange categoriesForMethods!
+asWebsideJson!printing!public! !
+fromWebsideJson:!printing!public! !
+!
 
 !StackFrame methodsFor!
 
@@ -894,12 +1034,18 @@ asWebsideJson
 		at: 'class' put: self receiver class asWebsideJson;
 		at: 'method' put: self method asWebsideJson;
 		yourself! !
-!StackFrame categoriesFor: #asWebsideJson!accessing!private! !
+
+!StackFrame categoriesForMethods!
+asWebsideJson!accessing!private! !
+!
 
 !StAssignmentNode methodsFor!
 
 asWebsideJson 	^super asWebsideJson at: 'children' put: { variable asWebsideJson . value asWebsideJson }! !
-!StAssignmentNode categoriesFor: #asWebsideJson!accessing!public! !
+
+!StAssignmentNode categoriesForMethods!
+asWebsideJson!accessing!public! !
+!
 
 !StCascadeNode methodsFor!
 
@@ -909,13 +1055,19 @@ asWebsideJson
 	^super asWebsideJson
 		at: 'children' put: children asArray;
 		yourself! !
-!StCascadeNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StCascadeNode categoriesForMethods!
+asWebsideJson!public!visitor! !
+!
 
 !StLiteralToken methodsFor!
 
 asWebsideJson
 	^value asString! !
-!StLiteralToken categoriesFor: #asWebsideJson!printing!public! !
+
+!StLiteralToken categoriesForMethods!
+asWebsideJson!printing!public! !
+!
 
 !StLiteralValueNode methodsFor!
 
@@ -925,7 +1077,10 @@ asWebsideJson
 	^super asWebsideJson
 		at: 'value' put: value;
 		yourself! !
-!StLiteralValueNode categoriesFor: #asWebsideJson!matching!public! !
+
+!StLiteralValueNode categoriesForMethods!
+asWebsideJson!matching!public! !
+!
 
 !StMessageNode methodsFor!
 
@@ -942,30 +1097,45 @@ asWebsideJson
 	^super asWebsideJson
 		at: 'children' put: children asArray;
 		yourself! !
-!StMessageNode categoriesFor: #asWebsideJson!matching!public! !
+
+!StMessageNode categoriesForMethods!
+asWebsideJson!matching!public! !
+!
 
 !StMethodNode methodsFor!
 
 asWebsideJson	| children |	children := OrderedCollection with: self selector asWebsideJson.	arguments do: [ :n | children add: n asWebsideJson  ].	children add: body asWebsideJson .	^super asWebsideJson at: 'children' put: children asArray; yourself ! !
-!StMethodNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StMethodNode categoriesForMethods!
+asWebsideJson!public!visitor! !
+!
 
 !StProgramNode methodsFor!
 
 asWebsideJson	^ super asWebsideJson		at: 'type' put: self websideType;		at: 'start' put: self start;		at: 'end' put: self stop;		yourself!
 
 websideType	^self class websideType! !
-!StProgramNode categoriesFor: #asWebsideJson!public!replacing! !
-!StProgramNode categoriesFor: #websideType!public!replacing! !
+
+!StProgramNode categoriesForMethods!
+asWebsideJson!public!replacing! !
+websideType!public!replacing! !
+!
 
 !StProgramNode class methodsFor!
 
 websideType	^self name copyFrom: 3 to: self name size - 4! !
-!StProgramNode class categoriesFor: #websideType!constants!public! !
+
+!StProgramNode class categoriesForMethods!
+websideType!constants!public! !
+!
 
 !StReturnNode methodsFor!
 
 asWebsideJson 	^super asWebsideJson at: 'children' put: { value asWebsideJson  }; yourself! !
-!StReturnNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StReturnNode categoriesForMethods!
+asWebsideJson!public!visitor! !
+!
 
 !String methodsFor!
 
@@ -991,9 +1161,12 @@ indexOfString: aString from: start to: stop
 	^i > 1 ifTrue: [base + 1] ifFalse: [0]
 
 ! !
-!String categoriesFor: #asURL!converting!public! !
-!String categoriesFor: #includesString:!comparing!public! !
-!String categoriesFor: #indexOfString:from:to:!comparing!public! !
+
+!String categoriesForMethods!
+asURL!converting!public! !
+includesString:!comparing!public! !
+indexOfString:from:to:!comparing!public! !
+!
 
 !String class methodsFor!
 
@@ -1001,23 +1174,35 @@ fromUTF8: aString
 	^(aString anySatisfy: [:byte | byte asInteger >= 128])
 		ifTrue: [aString asUtf8String]
 		ifFalse: [aString]! !
-!String class categoriesFor: #fromUTF8:!instance creation!public! !
+
+!String class categoriesForMethods!
+fromUTF8:!instance creation!public! !
+!
 
 !StSequenceNode methodsFor!
 
 asWebsideJson 	| children |	children := OrderedCollection new.	temporaries do: [ :n | children add: n asWebsideJson  ].	statements do: [ :n |  children add: n asWebsideJson].	^super asWebsideJson at: 'children' put: children asArray ; yourself! !
-!StSequenceNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StSequenceNode categoriesForMethods!
+asWebsideJson!public!visitor! !
+!
 
 !StVariableNode methodsFor!
 
 asWebsideJson	^ super asWebsideJson		at: 'value' put: name;		yourself! !
-!StVariableNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StVariableNode categoriesForMethods!
+asWebsideJson!public!visitor! !
+!
 
 !Symbol methodsFor!
 
 evaluateWith: anObject
 	^anObject perform: self! !
-!Symbol categoriesFor: #evaluateWith:!converting!public! !
+
+!Symbol categoriesForMethods!
+evaluateWith:!converting!public! !
+!
 
 !VariableRefactoring methodsFor!
 
@@ -1038,8 +1223,11 @@ fromWebsideJson: json
 					class := RBClass existingNamed: n.
 					class model: model]].
 	variableName := json at: 'variable' ifAbsent: []! !
-!VariableRefactoring categoriesFor: #asWebsideJson!initialize/release!public! !
-!VariableRefactoring categoriesFor: #fromWebsideJson:!initialize/release!public! !
+
+!VariableRefactoring categoriesForMethods!
+asWebsideJson!initialize/release!public! !
+fromWebsideJson:!initialize/release!public! !
+!
 
 "End of package definition"!
 

@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 RefactoryCategoryChange subclass: #RenameCategoryChange
 	instanceVariableNames: 'newName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RenameCategoryChange guid: (GUID fromString: '{56140d1e-1ec2-4cd9-aa5a-abc85a9200d5}')!
+
 RenameCategoryChange comment: ''!
+
 !RenameCategoryChange categoriesForClass!Refactory-Change Objects! !
+
 !RenameCategoryChange methodsFor!
 
 asUndoOperation
@@ -42,9 +46,12 @@ primitiveExecute
 	catalogue
 		at: target put: methods;
 		removeKey: source! !
-!RenameCategoryChange categoriesFor: #asUndoOperation!public! !
-!RenameCategoryChange categoriesFor: #asWebsideJson!public! !
-!RenameCategoryChange categoriesFor: #fromWebsideJson:!public! !
-!RenameCategoryChange categoriesFor: #newName:!public! !
-!RenameCategoryChange categoriesFor: #primitiveExecute!public! !
+
+!RenameCategoryChange categoriesForMethods!
+asUndoOperation!public! !
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+newName:!public! !
+primitiveExecute!public! !
+!
 

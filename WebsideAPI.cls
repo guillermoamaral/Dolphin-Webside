@@ -1,15 +1,19 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #WebsideAPI
 	instanceVariableNames: 'server request'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 WebsideAPI guid: (GUID fromString: '{0d468ed7-e8b5-4ad5-a744-fe615bb74dcb}')!
+
 WebsideAPI comment: 'WebsideAPI startServer.
 WebsideServer allInstances do: [:s | s stop].
 WebsideAPI stopServer.'!
+
 !WebsideAPI categoriesForClass!Unclassified! !
+
 !WebsideAPI methodsFor!
 
 activeDebuggers
@@ -160,6 +164,9 @@ colors
 		at: 'primary' put: '#1d7bb9';
 		at: 'secondary' put: '#1565C0';
 		yourself!
+
+commandDefinitions
+	 ^#()!
 
 compilationError: aCompilationError
 	| error |
@@ -344,7 +351,15 @@ evaluations
 	^server evaluations!
 
 extensions
-	^#()!
+	^OrderedCollection new
+		add: (self newJsonObject
+			at: 'type' put: 'search';
+			at: 'elementType' put: 'system';
+			at: 'label' put: 'Methods with compilation issues';
+			at: 'get'
+			put: '/methods-with-issues';
+			yourself);
+		yourself asArray!
 
 filterByCategory: aCollection
 	| category |
@@ -533,6 +548,12 @@ methods
 	methods := self filterByVariable: methods.
 	(self queryAt: 'count') = 'true' ifTrue: [^methods size].
 	^self jsonFromMethods: methods!
+
+methodsWithIssues
+	| system |
+	system := SmalltalkSystem current.
+	^(system selectMethods: [:m | m hasCompilationIssues] in: system systemEnvironment) allMethods
+		asArray collect: [:m | m asWebsideJson]!
 
 methodsWithSelectorMatching: aString
 	^(SmalltalkSystem current systemEnvironment implementorsMatching: '*' , aString , '*') allMethods
@@ -995,132 +1016,137 @@ workspaceBindings
 
 workspaces
 	^ server workspaces! !
-!WebsideAPI categoriesFor: #activeDebuggers!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #activeEvaluation!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #activeEvaluations!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #activeWorkspaces!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #addChange!changes endpoints!public! !
-!WebsideAPI categoriesFor: #badRequest:!private! !
-!WebsideAPI categoriesFor: #bodyAt:!private! !
-!WebsideAPI categoriesFor: #bodyAt:ifAbsent:!private! !
-!WebsideAPI categoriesFor: #cancelEvaluation!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #categories!code endpoints!public! !
-!WebsideAPI categoriesFor: #changes!changes endpoints!public! !
-!WebsideAPI categoriesFor: #classDefinition!code endpoints!public! !
-!WebsideAPI categoriesFor: #classes!code endpoints!public! !
-!WebsideAPI categoriesFor: #classNamed:!private! !
-!WebsideAPI categoriesFor: #classTreeFrom:depth:!private! !
-!WebsideAPI categoriesFor: #classTreeFromClasses:!private! !
-!WebsideAPI categoriesFor: #classVariables!code endpoints!public! !
-!WebsideAPI categoriesFor: #colors!general endpoints!public! !
-!WebsideAPI categoriesFor: #compilationError:!private! !
-!WebsideAPI categoriesFor: #compilerReceiver!private! !
-!WebsideAPI categoriesFor: #created:!private! !
-!WebsideAPI categoriesFor: #createDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #createEvaluation!private! !
-!WebsideAPI categoriesFor: #createWorkspace!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #customViewsOf:!private! !
-!WebsideAPI categoriesFor: #debugExpression!private! !
-!WebsideAPI categoriesFor: #debuggerFrame!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #debuggerFrames!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #debuggers!private! !
-!WebsideAPI categoriesFor: #defaultRootClass!private! !
-!WebsideAPI categoriesFor: #deleteDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #deleteWorkspace!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #dialect!general endpoints!public! !
-!WebsideAPI categoriesFor: #evaluateExpression!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #evaluateExpression:!private! !
-!WebsideAPI categoriesFor: #evaluationError:!public! !
-!WebsideAPI categoriesFor: #evaluations!private! !
-!WebsideAPI categoriesFor: #extensions!extensions endpoints!public! !
-!WebsideAPI categoriesFor: #filterByCategory:!public! !
-!WebsideAPI categoriesFor: #filterByVariable:!private! !
-!WebsideAPI categoriesFor: #frameBindings!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #icons!general endpoints!public! !
-!WebsideAPI categoriesFor: #implementorsOf:!private! !
-!WebsideAPI categoriesFor: #indexedSlotsOf:!private! !
-!WebsideAPI categoriesFor: #instanceVariables!code endpoints!public! !
-!WebsideAPI categoriesFor: #instanceVariablesOf:!public! !
-!WebsideAPI categoriesFor: #integerFrom:!private! !
-!WebsideAPI categoriesFor: #jsonFromMethods:!private! !
-!WebsideAPI categoriesFor: #logo!general endpoints!public! !
-!WebsideAPI categoriesFor: #method!code endpoints!public! !
-!WebsideAPI categoriesFor: #methods!code endpoints!public! !
-!WebsideAPI categoriesFor: #methodsWithSelectorMatching:!private! !
-!WebsideAPI categoriesFor: #methodTemplate!code endpoints!public! !
-!WebsideAPI categoriesFor: #namedSlotsOf:!private! !
-!WebsideAPI categoriesFor: #newID!private! !
-!WebsideAPI categoriesFor: #newJsonObject!private! !
-!WebsideAPI categoriesFor: #notFound!private! !
-!WebsideAPI categoriesFor: #objectFromPath:!private! !
-!WebsideAPI categoriesFor: #objects!private! !
-!WebsideAPI categoriesFor: #package!code endpoints!public! !
-!WebsideAPI categoriesFor: #packageClasses!code endpoints!public! !
-!WebsideAPI categoriesFor: #packageMethods!code endpoints!public! !
-!WebsideAPI categoriesFor: #packageNamed:!private! !
-!WebsideAPI categoriesFor: #packages!code endpoints!public! !
-!WebsideAPI categoriesFor: #pauseEvaluation!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #pinnedObject!objects endpoints!public! !
-!WebsideAPI categoriesFor: #pinnedObjects!objects endpoints!public! !
-!WebsideAPI categoriesFor: #pinnedObjectSlots!objects endpoints!public! !
-!WebsideAPI categoriesFor: #pinObjectSlot!objects endpoints!public! !
-!WebsideAPI categoriesFor: #profileExpression!profiling endpoints!public! !
-!WebsideAPI categoriesFor: #queriedAccessing!private! !
-!WebsideAPI categoriesFor: #queriedAssigning!private! !
-!WebsideAPI categoriesFor: #queriedCategory!private! !
-!WebsideAPI categoriesFor: #queriedClass!private! !
-!WebsideAPI categoriesFor: #queriedPackage!private! !
-!WebsideAPI categoriesFor: #queriedReferencing!private! !
-!WebsideAPI categoriesFor: #queriedReferencingClass!private! !
-!WebsideAPI categoriesFor: #queriedReferencingString!private! !
-!WebsideAPI categoriesFor: #queriedScope!private! !
-!WebsideAPI categoriesFor: #queriedSelector!private! !
-!WebsideAPI categoriesFor: #queriedSelectorMatching!private! !
-!WebsideAPI categoriesFor: #queriedSending!private! !
-!WebsideAPI categoriesFor: #queriedUsing!private! !
-!WebsideAPI categoriesFor: #queryAt:!private! !
-!WebsideAPI categoriesFor: #queryAt:ifAbsent:!private! !
-!WebsideAPI categoriesFor: #queryAt:ifPresent:!private! !
-!WebsideAPI categoriesFor: #queryAt:ifPresent:ifAbsent:!private! !
-!WebsideAPI categoriesFor: #referencesTo:!private! !
-!WebsideAPI categoriesFor: #request:!accessing!public! !
-!WebsideAPI categoriesFor: #requestedChange!private! !
-!WebsideAPI categoriesFor: #requestedClass!private! !
-!WebsideAPI categoriesFor: #requestedEvaluationContext!private! !
-!WebsideAPI categoriesFor: #requestedEvaluationReceiver!private! !
-!WebsideAPI categoriesFor: #requestedId!private! !
-!WebsideAPI categoriesFor: #requestedIndex!private! !
-!WebsideAPI categoriesFor: #requestedPackage!private! !
-!WebsideAPI categoriesFor: #requestedSelector!private! !
-!WebsideAPI categoriesFor: #requestedSlot!private! !
-!WebsideAPI categoriesFor: #restartDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #resumeDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #resumeEvaluation!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #saveImage!general endpoints!public! !
-!WebsideAPI categoriesFor: #search!code endpoints!public! !
-!WebsideAPI categoriesFor: #search:for:with:condition:type:ignoreCase:!private! !
-!WebsideAPI categoriesFor: #selectors!code endpoints!public! !
-!WebsideAPI categoriesFor: #sendersOf:!private! !
-!WebsideAPI categoriesFor: #server:!accessing!public! !
-!WebsideAPI categoriesFor: #slot:of:ifAbsent:!private! !
-!WebsideAPI categoriesFor: #stepIntoDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #stepOverDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #stepThroughDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #subclasses!code endpoints!public! !
-!WebsideAPI categoriesFor: #superclasses!code endpoints!public! !
-!WebsideAPI categoriesFor: #systemPackage!private! !
-!WebsideAPI categoriesFor: #terminateDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #unpinAllObjects!objects endpoints!public! !
-!WebsideAPI categoriesFor: #unpinObject!objects endpoints!public! !
-!WebsideAPI categoriesFor: #updateWorkspace!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #urlAt:!private! !
-!WebsideAPI categoriesFor: #usedCategories!code endpoints!public! !
-!WebsideAPI categoriesFor: #usualCategories!code endpoints!public! !
-!WebsideAPI categoriesFor: #variables!code endpoints!public! !
-!WebsideAPI categoriesFor: #version!general endpoints!public! !
-!WebsideAPI categoriesFor: #workspace!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #workspaceBindings!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #workspaces!private! !
+
+!WebsideAPI categoriesForMethods!
+activeDebuggers!debugging endpoints!public! !
+activeEvaluation!evaluation endpoints!public! !
+activeEvaluations!evaluation endpoints!public! !
+activeWorkspaces!public!workspaces endpoints! !
+addChange!changes endpoints!public! !
+badRequest:!private! !
+bodyAt:!private! !
+bodyAt:ifAbsent:!private! !
+cancelEvaluation!evaluation endpoints!public! !
+categories!code endpoints!public! !
+changes!changes endpoints!public! !
+classDefinition!code endpoints!public! !
+classes!code endpoints!public! !
+classNamed:!private! !
+classTreeFrom:depth:!private! !
+classTreeFromClasses:!private! !
+classVariables!code endpoints!public! !
+colors!general endpoints!public! !
+commandDefinitions!commands endpoints!public! !
+compilationError:!private! !
+compilerReceiver!private! !
+created:!private! !
+createDebugger!debugging endpoints!public! !
+createEvaluation!private! !
+createWorkspace!public!workspaces endpoints! !
+customViewsOf:!private! !
+debugExpression!private! !
+debuggerFrame!debugging endpoints!public! !
+debuggerFrames!debugging endpoints!public! !
+debuggers!private! !
+defaultRootClass!private! !
+deleteDebugger!debugging endpoints!public! !
+deleteWorkspace!public!workspaces endpoints! !
+dialect!general endpoints!public! !
+evaluateExpression!evaluation endpoints!public! !
+evaluateExpression:!private! !
+evaluationError:!public! !
+evaluations!private! !
+extensions!extensions endpoints!public! !
+filterByCategory:!public! !
+filterByVariable:!private! !
+frameBindings!debugging endpoints!public! !
+icons!general endpoints!public! !
+implementorsOf:!private! !
+indexedSlotsOf:!private! !
+instanceVariables!code endpoints!public! !
+instanceVariablesOf:!public! !
+integerFrom:!private! !
+jsonFromMethods:!private! !
+logo!general endpoints!public! !
+method!code endpoints!public! !
+methods!code endpoints!public! !
+methodsWithIssues!extensions endpoints!public! !
+methodsWithSelectorMatching:!private! !
+methodTemplate!code endpoints!public! !
+namedSlotsOf:!private! !
+newID!private! !
+newJsonObject!private! !
+notFound!private! !
+objectFromPath:!private! !
+objects!private! !
+package!code endpoints!public! !
+packageClasses!code endpoints!public! !
+packageMethods!code endpoints!public! !
+packageNamed:!private! !
+packages!code endpoints!public! !
+pauseEvaluation!evaluation endpoints!public! !
+pinnedObject!objects endpoints!public! !
+pinnedObjects!objects endpoints!public! !
+pinnedObjectSlots!objects endpoints!public! !
+pinObjectSlot!objects endpoints!public! !
+profileExpression!profiling endpoints!public! !
+queriedAccessing!private! !
+queriedAssigning!private! !
+queriedCategory!private! !
+queriedClass!private! !
+queriedPackage!private! !
+queriedReferencing!private! !
+queriedReferencingClass!private! !
+queriedReferencingString!private! !
+queriedScope!private! !
+queriedSelector!private! !
+queriedSelectorMatching!private! !
+queriedSending!private! !
+queriedUsing!private! !
+queryAt:!private! !
+queryAt:ifAbsent:!private! !
+queryAt:ifPresent:!private! !
+queryAt:ifPresent:ifAbsent:!private! !
+referencesTo:!private! !
+request:!accessing!public! !
+requestedChange!private! !
+requestedClass!private! !
+requestedEvaluationContext!private! !
+requestedEvaluationReceiver!private! !
+requestedId!private! !
+requestedIndex!private! !
+requestedPackage!private! !
+requestedSelector!private! !
+requestedSlot!private! !
+restartDebugger!debugging endpoints!public! !
+resumeDebugger!debugging endpoints!public! !
+resumeEvaluation!evaluation endpoints!public! !
+saveImage!general endpoints!public! !
+search!code endpoints!public! !
+search:for:with:condition:type:ignoreCase:!private! !
+selectors!code endpoints!public! !
+sendersOf:!private! !
+server:!accessing!public! !
+slot:of:ifAbsent:!private! !
+stepIntoDebugger!debugging endpoints!public! !
+stepOverDebugger!debugging endpoints!public! !
+stepThroughDebugger!debugging endpoints!public! !
+subclasses!code endpoints!public! !
+superclasses!code endpoints!public! !
+systemPackage!private! !
+terminateDebugger!debugging endpoints!public! !
+unpinAllObjects!objects endpoints!public! !
+unpinObject!objects endpoints!public! !
+updateWorkspace!public!workspaces endpoints! !
+urlAt:!private! !
+usedCategories!code endpoints!public! !
+usualCategories!code endpoints!public! !
+variables!code endpoints!public! !
+version!general endpoints!public! !
+workspace!public!workspaces endpoints! !
+workspaceBindings!public!workspaces endpoints! !
+workspaces!private! !
+!
 
 !WebsideAPI class methodsFor!
 
@@ -1140,6 +1166,9 @@ stopServer
 	"
 
 	WebsideServer allInstances do: [:s | s stop]! !
-!WebsideAPI class categoriesFor: #startServer!public!services! !
-!WebsideAPI class categoriesFor: #stopServer!public!services! !
+
+!WebsideAPI class categoriesForMethods!
+startServer!public!services! !
+stopServer!public!services! !
+!
 

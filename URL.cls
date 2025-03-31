@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #URL
 	instanceVariableNames: 'scheme user password host port segments query fragment'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 URL guid: (GUID fromString: '{4516f8c3-aa63-452c-8c04-353175f5a128}')!
+
 URL comment: 'URL fromString: ''http://server:123/this/is/the/paht?one=1'''!
+
 !URL categoriesForClass!Unclassified! !
+
 !URL methodsFor!
 
 , aString
@@ -491,105 +495,108 @@ user
 
 user: aString
 	user := aString! !
-!URL categoriesFor: #,!public!services! !
-!URL categoriesFor: #/!public!services! !
-!URL categoriesFor: #=!comparing!public! !
-!URL categoriesFor: #addPath:!accessing!public! !
-!URL categoriesFor: #addSegment:!accessing!public! !
-!URL categoriesFor: #addSegments:!accessing!public! !
-!URL categoriesFor: #addTrailingSlash!accessing!public! !
-!URL categoriesFor: #asHttp!converting!public! !
-!URL categoriesFor: #asJson!converting!public! !
-!URL categoriesFor: #asURL!converting!public! !
-!URL categoriesFor: #asWebSocketURL!converting!public! !
-!URL categoriesFor: #asWs!converting!public! !
-!URL categoriesFor: #asWss!converting!public! !
-!URL categoriesFor: #baseUri!inquiries!public! !
-!URL categoriesFor: #baseUri:!accessing!public! !
-!URL categoriesFor: #baseUrl!inquiries!public! !
-!URL categoriesFor: #beHttp!accessing!public! !
-!URL categoriesFor: #beHttps!accessing!public! !
-!URL categoriesFor: #beWs!accessing!public! !
-!URL categoriesFor: #beWss!accessing!public! !
-!URL categoriesFor: #decodeString:!private! !
-!URL categoriesFor: #defaultPort!public!services! !
-!URL categoriesFor: #encodedFragment:!accessing!public! !
-!URL categoriesFor: #encodedPassword:!accessing!public! !
-!URL categoriesFor: #encodedPath:!accessing!public! !
-!URL categoriesFor: #encodedQueryAt:put:!accessing!public! !
-!URL categoriesFor: #encodedUser:!accessing!public! !
-!URL categoriesFor: #encodeString:!private! !
-!URL categoriesFor: #firstSegment!inquiries!public! !
-!URL categoriesFor: #fragment!accessing!public! !
-!URL categoriesFor: #fragment:!accessing!public! !
-!URL categoriesFor: #hasExplicitPort!public!testing! !
-!URL categoriesFor: #hash!comparing!public! !
-!URL categoriesFor: #hashFragment!inquiries!public! !
-!URL categoriesFor: #hasPath!public!testing! !
-!URL categoriesFor: #hasQuery!public!testing! !
-!URL categoriesFor: #hasScheme!public!testing! !
-!URL categoriesFor: #hasTrailingSlash!public!testing! !
-!URL categoriesFor: #host!accessing!public! !
-!URL categoriesFor: #host:!accessing!public! !
-!URL categoriesFor: #initialize!initializing!public! !
-!URL categoriesFor: #isAbsolute!public!testing! !
-!URL categoriesFor: #isEmpty!public!testing! !
-!URL categoriesFor: #isHttp!public!testing! !
-!URL categoriesFor: #isHttps!public!testing! !
-!URL categoriesFor: #isRelative!public!testing! !
-!URL categoriesFor: #isSecure!public!testing! !
-!URL categoriesFor: #isSlash!public!testing! !
-!URL categoriesFor: #isWebSocketURL!public!testing! !
-!URL categoriesFor: #isWs!public!testing! !
-!URL categoriesFor: #isWss!public!testing! !
-!URL categoriesFor: #parseAuthorityFrom:!parsing!private! !
-!URL categoriesFor: #parseFrom:!parsing!private! !
-!URL categoriesFor: #parseHostPortFrom:!parsing!private! !
-!URL categoriesFor: #parsePathFrom:!parsing!private! !
-!URL categoriesFor: #parseQueryFrom:!parsing!private! !
-!URL categoriesFor: #parseUserInfoFrom:!parsing!private! !
-!URL categoriesFor: #password!accessing!public! !
-!URL categoriesFor: #password:!accessing!public! !
-!URL categoriesFor: #path!inquiries!public! !
-!URL categoriesFor: #path:!accessing!public! !
-!URL categoriesFor: #pathAndQuery!inquiries!public! !
-!URL categoriesFor: #port!accessing!public! !
-!URL categoriesFor: #port:!accessing!public! !
-!URL categoriesFor: #postCopy!copying!public! !
-!URL categoriesFor: #printAuthorityOn:!printing!public! !
-!URL categoriesFor: #printFragmentOn:!printing!public! !
-!URL categoriesFor: #printHostOn:!printing!public! !
-!URL categoriesFor: #printOn:!printing!public! !
-!URL categoriesFor: #printPathOn:!printing!public! !
-!URL categoriesFor: #printPortOn:!printing!public! !
-!URL categoriesFor: #printQueryOn:!printing!public! !
-!URL categoriesFor: #printQueryOption:on:!printing!public! !
-!URL categoriesFor: #printSchemeOn:!printing!public! !
-!URL categoriesFor: #printSegments:on:!printing!public! !
-!URL categoriesFor: #printWithoutPort!printing!public! !
-!URL categoriesFor: #protocol!accessing!public! !
-!URL categoriesFor: #protocol:!accessing!public! !
-!URL categoriesFor: #query!private! !
-!URL categoriesFor: #query:!accessing!public! !
-!URL categoriesFor: #queryAt:!inquiries!public! !
-!URL categoriesFor: #queryAt:put:!accessing!public! !
-!URL categoriesFor: #queryOptions!accessing!public! !
-!URL categoriesFor: #queryString!inquiries!public! !
-!URL categoriesFor: #relativeUri!inquiries!public! !
-!URL categoriesFor: #removeLastSegment!accessing!public! !
-!URL categoriesFor: #removeSegment:!accessing!public! !
-!URL categoriesFor: #removeSubpath:!accessing!public! !
-!URL categoriesFor: #removeTrailingSlash!accessing!public! !
-!URL categoriesFor: #replaceQueryAt:with:!accessing!public! !
-!URL categoriesFor: #root!inquiries!public! !
-!URL categoriesFor: #scheme!accessing!public! !
-!URL categoriesFor: #scheme:!accessing!public! !
-!URL categoriesFor: #segmentAt:!inquiries!public! !
-!URL categoriesFor: #segmentAt:put:!accessing!public! !
-!URL categoriesFor: #segments!accessing!public! !
-!URL categoriesFor: #segments:!accessing!public! !
-!URL categoriesFor: #user!accessing!public! !
-!URL categoriesFor: #user:!accessing!public! !
+
+!URL categoriesForMethods!
+,!public!services! !
+/!public!services! !
+=!comparing!public! !
+addPath:!accessing!public! !
+addSegment:!accessing!public! !
+addSegments:!accessing!public! !
+addTrailingSlash!accessing!public! !
+asHttp!converting!public! !
+asJson!converting!public! !
+asURL!converting!public! !
+asWebSocketURL!converting!public! !
+asWs!converting!public! !
+asWss!converting!public! !
+baseUri!inquiries!public! !
+baseUri:!accessing!public! !
+baseUrl!inquiries!public! !
+beHttp!accessing!public! !
+beHttps!accessing!public! !
+beWs!accessing!public! !
+beWss!accessing!public! !
+decodeString:!private! !
+defaultPort!public!services! !
+encodedFragment:!accessing!public! !
+encodedPassword:!accessing!public! !
+encodedPath:!accessing!public! !
+encodedQueryAt:put:!accessing!public! !
+encodedUser:!accessing!public! !
+encodeString:!private! !
+firstSegment!inquiries!public! !
+fragment!accessing!public! !
+fragment:!accessing!public! !
+hasExplicitPort!public!testing! !
+hash!comparing!public! !
+hashFragment!inquiries!public! !
+hasPath!public!testing! !
+hasQuery!public!testing! !
+hasScheme!public!testing! !
+hasTrailingSlash!public!testing! !
+host!accessing!public! !
+host:!accessing!public! !
+initialize!initializing!public! !
+isAbsolute!public!testing! !
+isEmpty!public!testing! !
+isHttp!public!testing! !
+isHttps!public!testing! !
+isRelative!public!testing! !
+isSecure!public!testing! !
+isSlash!public!testing! !
+isWebSocketURL!public!testing! !
+isWs!public!testing! !
+isWss!public!testing! !
+parseAuthorityFrom:!parsing!private! !
+parseFrom:!parsing!private! !
+parseHostPortFrom:!parsing!private! !
+parsePathFrom:!parsing!private! !
+parseQueryFrom:!parsing!private! !
+parseUserInfoFrom:!parsing!private! !
+password!accessing!public! !
+password:!accessing!public! !
+path!inquiries!public! !
+path:!accessing!public! !
+pathAndQuery!inquiries!public! !
+port!accessing!public! !
+port:!accessing!public! !
+postCopy!copying!public! !
+printAuthorityOn:!printing!public! !
+printFragmentOn:!printing!public! !
+printHostOn:!printing!public! !
+printOn:!printing!public! !
+printPathOn:!printing!public! !
+printPortOn:!printing!public! !
+printQueryOn:!printing!public! !
+printQueryOption:on:!printing!public! !
+printSchemeOn:!printing!public! !
+printSegments:on:!printing!public! !
+printWithoutPort!printing!public! !
+protocol!accessing!public! !
+protocol:!accessing!public! !
+query!private! !
+query:!accessing!public! !
+queryAt:!inquiries!public! !
+queryAt:put:!accessing!public! !
+queryOptions!accessing!public! !
+queryString!inquiries!public! !
+relativeUri!inquiries!public! !
+removeLastSegment!accessing!public! !
+removeSegment:!accessing!public! !
+removeSubpath:!accessing!public! !
+removeTrailingSlash!accessing!public! !
+replaceQueryAt:with:!accessing!public! !
+root!inquiries!public! !
+scheme!accessing!public! !
+scheme:!accessing!public! !
+segmentAt:!inquiries!public! !
+segmentAt:put:!accessing!public! !
+segments!accessing!public! !
+segments:!accessing!public! !
+user!accessing!public! !
+user:!accessing!public! !
+!
 
 !URL class methodsFor!
 
@@ -598,6 +605,9 @@ fromString: aString
 
 new
 	^super new initialize! !
-!URL class categoriesFor: #fromString:!instance creation!public! !
-!URL class categoriesFor: #new!instance creation!public! !
+
+!URL class categoriesForMethods!
+fromString:!instance creation!public! !
+new!instance creation!public! !
+!
 

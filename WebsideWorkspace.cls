@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 WebsideResource subclass: #WebsideWorkspace
 	instanceVariableNames: 'contents bindings'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 WebsideWorkspace guid: (GUID fromString: '{dcba7ff2-0ed4-4a98-8467-b131777c73b8}')!
+
 WebsideWorkspace comment: ''!
+
 !WebsideWorkspace categoriesForClass!Unclassified! !
+
 !WebsideWorkspace methodsFor!
 
 asWebsideJson
@@ -32,11 +36,14 @@ declareVariable: aString	bindings at: aString reduced put: nil!
 initialize	super initialize.	bindings := Dictionary new!
 
 receiver	^nil! !
-!WebsideWorkspace categoriesFor: #asWebsideJson!public! !
-!WebsideWorkspace categoriesFor: #bindings!public! !
-!WebsideWorkspace categoriesFor: #contents!public! !
-!WebsideWorkspace categoriesFor: #contents:!public! !
-!WebsideWorkspace categoriesFor: #declareVariable:!public! !
-!WebsideWorkspace categoriesFor: #initialize!public! !
-!WebsideWorkspace categoriesFor: #receiver!public! !
+
+!WebsideWorkspace categoriesForMethods!
+asWebsideJson!public! !
+bindings!public! !
+contents!public! !
+contents:!public! !
+declareVariable:!public! !
+initialize!public! !
+receiver!public! !
+!
 

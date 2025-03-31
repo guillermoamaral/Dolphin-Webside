@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #WebsideEvaluation
 	instanceVariableNames: 'id expression receiver context requestor priority process state result error semaphore'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 WebsideEvaluation guid: (GUID fromString: '{b4a27f67-df46-4a72-a342-cea2fbac33b9}')!
+
 WebsideEvaluation comment: ''!
+
 !WebsideEvaluation categoriesForClass!Webside-Base! !
+
 !WebsideEvaluation methodsFor!
 
 asWebsideJson
@@ -170,50 +174,56 @@ waitForResult
 
 wasCancelled
 	^state == #cancelled! !
-!WebsideEvaluation categoriesFor: #asWebsideJson!public! !
-!WebsideEvaluation categoriesFor: #cancel!public! !
-!WebsideEvaluation categoriesFor: #cancelled!public! !
-!WebsideEvaluation categoriesFor: #context!public! !
-!WebsideEvaluation categoriesFor: #context:!public! !
-!WebsideEvaluation categoriesFor: #debug!public! !
-!WebsideEvaluation categoriesFor: #error!public! !
-!WebsideEvaluation categoriesFor: #error:!public! !
-!WebsideEvaluation categoriesFor: #evaluate!public! !
-!WebsideEvaluation categoriesFor: #evaluateBlock:!public! !
-!WebsideEvaluation categoriesFor: #expression!public! !
-!WebsideEvaluation categoriesFor: #expression:!public! !
-!WebsideEvaluation categoriesFor: #failed!public! !
-!WebsideEvaluation categoriesFor: #finalized!public! !
-!WebsideEvaluation categoriesFor: #finished!public! !
-!WebsideEvaluation categoriesFor: #hasFailed!public! !
-!WebsideEvaluation categoriesFor: #hasFinished!public! !
-!WebsideEvaluation categoriesFor: #id!public! !
-!WebsideEvaluation categoriesFor: #id:!public! !
-!WebsideEvaluation categoriesFor: #initialize!private! !
-!WebsideEvaluation categoriesFor: #isEvaluating!public! !
-!WebsideEvaluation categoriesFor: #isFinalized!public! !
-!WebsideEvaluation categoriesFor: #isPaused!public! !
-!WebsideEvaluation categoriesFor: #isPending!public! !
-!WebsideEvaluation categoriesFor: #pause!public! !
-!WebsideEvaluation categoriesFor: #paused!public! !
-!WebsideEvaluation categoriesFor: #priority:!public! !
-!WebsideEvaluation categoriesFor: #process!public! !
-!WebsideEvaluation categoriesFor: #process:!public! !
-!WebsideEvaluation categoriesFor: #receiver!public! !
-!WebsideEvaluation categoriesFor: #receiver:!public! !
-!WebsideEvaluation categoriesFor: #requestor!public! !
-!WebsideEvaluation categoriesFor: #requestor:!public! !
-!WebsideEvaluation categoriesFor: #result!public! !
-!WebsideEvaluation categoriesFor: #result:!public! !
-!WebsideEvaluation categoriesFor: #resume!public! !
-!WebsideEvaluation categoriesFor: #resumed!public! !
-!WebsideEvaluation categoriesFor: #state!public! !
-!WebsideEvaluation categoriesFor: #waitForResult!public! !
-!WebsideEvaluation categoriesFor: #wasCancelled!public! !
+
+!WebsideEvaluation categoriesForMethods!
+asWebsideJson!public! !
+cancel!public! !
+cancelled!public! !
+context!public! !
+context:!public! !
+debug!public! !
+error!public! !
+error:!public! !
+evaluate!public! !
+evaluateBlock:!public! !
+expression!public! !
+expression:!public! !
+failed!public! !
+finalized!public! !
+finished!public! !
+hasFailed!public! !
+hasFinished!public! !
+id!public! !
+id:!public! !
+initialize!private! !
+isEvaluating!public! !
+isFinalized!public! !
+isPaused!public! !
+isPending!public! !
+pause!public! !
+paused!public! !
+priority:!public! !
+process!public! !
+process:!public! !
+receiver!public! !
+receiver:!public! !
+requestor!public! !
+requestor:!public! !
+result!public! !
+result:!public! !
+resume!public! !
+resumed!public! !
+state!public! !
+waitForResult!public! !
+wasCancelled!public! !
+!
 
 !WebsideEvaluation class methodsFor!
 
 new
 	 ^super new initialize! !
-!WebsideEvaluation class categoriesFor: #new!public! !
+
+!WebsideEvaluation class categoriesForMethods!
+new!public! !
+!
 

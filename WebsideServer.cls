@@ -1,15 +1,19 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #WebsideServer
 	instanceVariableNames: 'server router baseUri port resources'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 WebsideServer guid: (GUID fromString: '{4ccc35e6-7d31-4554-8b09-5b16765a0d84}')!
+
 WebsideServer comment: 'WebsideAPI startServer
 
 WebsideAPI stopServer'!
+
 !WebsideServer categoriesForClass!Unclassified! !
+
 !WebsideServer methodsFor!
 
 addChange: change
@@ -121,6 +125,9 @@ initializeCodeRoutes
 		routeGET: '/methodtemplate' to: #methodTemplate;
 		routeGET: '/search' to: #search!
 
+initializeCommandRoutes
+	router routeGET: '/command-definitions' to: #commandDefinitions!
+
 initializeDebuggingRoutes
 	router
 		routeGET: '/debuggers' to: #activeDebuggers;
@@ -145,7 +152,9 @@ initializeEvaluationRoutes
 		routePOST: '/evaluations/{id}/resume' to: #resumeEvaluation!
 
 initializeExtensionsRoutes
-	router routeGET: '/extensions' to: #extensions!
+	router
+		routeGET: '/extensions' to: #extensions;
+		routeGET: 'methods-with-issues' to: #methodsWithIssues!
 
 initializeGeneralRoutes
 	router
@@ -197,7 +206,8 @@ initializeRoutes
 		initializeObjectsRoutes;
 		initializeWorkspacesRoutes;
 		initializeDebuggingRoutes;
-		initializeExtensionsRoutes!
+		initializeExtensionsRoutes;
+		initializeCommandRoutes!
 
 initializeServer
 	server := HttpServer new.
@@ -245,47 +255,54 @@ stop
 testRuns	^ self resourcesAt: #testRuns!
 
 workspaces	^ self resourcesAt: #workspaces! !
-!WebsideServer categoriesFor: #addChange:!accessing!public! !
-!WebsideServer categoriesFor: #baseUri!accessing!public! !
-!WebsideServer categoriesFor: #baseUri:!accessing!public! !
-!WebsideServer categoriesFor: #changes!accessing!public! !
-!WebsideServer categoriesFor: #debuggers!accessing!public! !
-!WebsideServer categoriesFor: #defaultBaseUri!accessing!public! !
-!WebsideServer categoriesFor: #defaultPort!accessing!public! !
-!WebsideServer categoriesFor: #evaluations!accessing!public! !
-!WebsideServer categoriesFor: #handlePreflightRequest:!actions!public! !
-!WebsideServer categoriesFor: #handleRequest:with:!actions!public! !
-!WebsideServer categoriesFor: #icons!accessing!public! !
-!WebsideServer categoriesFor: #imageFromIcon:!private! !
-!WebsideServer categoriesFor: #initialize!initializing!public! !
-!WebsideServer categoriesFor: #initializeChangesRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeCodeRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeDebuggingRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeEvaluationRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeExtensionsRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeGeneralRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeIcons!initializing!public! !
-!WebsideServer categoriesFor: #initializeObjectsRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializePreflightRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeResources!initializing!public! !
-!WebsideServer categoriesFor: #initializeRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeServer!initializing!public! !
-!WebsideServer categoriesFor: #initializeWorkspacesRoutes!initializing!public! !
-!WebsideServer categoriesFor: #isPreflight:!public!testing! !
-!WebsideServer categoriesFor: #objects!accessing!public! !
-!WebsideServer categoriesFor: #port!accessing!public! !
-!WebsideServer categoriesFor: #port:!accessing!public! !
-!WebsideServer categoriesFor: #reset!actions!public! !
-!WebsideServer categoriesFor: #resourcesAt:!accessing!public! !
-!WebsideServer categoriesFor: #resourcesAt:put:!accessing!public! !
-!WebsideServer categoriesFor: #start!actions!public! !
-!WebsideServer categoriesFor: #stop!actions!public! !
-!WebsideServer categoriesFor: #testRuns!accessing!public! !
-!WebsideServer categoriesFor: #workspaces!accessing!public! !
+
+!WebsideServer categoriesForMethods!
+addChange:!accessing!public! !
+baseUri!accessing!public! !
+baseUri:!accessing!public! !
+changes!accessing!public! !
+debuggers!accessing!public! !
+defaultBaseUri!accessing!public! !
+defaultPort!accessing!public! !
+evaluations!accessing!public! !
+handlePreflightRequest:!actions!public! !
+handleRequest:with:!actions!public! !
+icons!accessing!public! !
+imageFromIcon:!private! !
+initialize!initializing!public! !
+initializeChangesRoutes!initializing!public! !
+initializeCodeRoutes!initializing!public! !
+initializeCommandRoutes!initializing!public! !
+initializeDebuggingRoutes!initializing!public! !
+initializeEvaluationRoutes!initializing!public! !
+initializeExtensionsRoutes!initializing!public! !
+initializeGeneralRoutes!initializing!public! !
+initializeIcons!initializing!public! !
+initializeObjectsRoutes!initializing!public! !
+initializePreflightRoutes!initializing!public! !
+initializeResources!initializing!public! !
+initializeRoutes!initializing!public! !
+initializeServer!initializing!public! !
+initializeWorkspacesRoutes!initializing!public! !
+isPreflight:!public!testing! !
+objects!accessing!public! !
+port!accessing!public! !
+port:!accessing!public! !
+reset!actions!public! !
+resourcesAt:!accessing!public! !
+resourcesAt:put:!accessing!public! !
+start!actions!public! !
+stop!actions!public! !
+testRuns!accessing!public! !
+workspaces!accessing!public! !
+!
 
 !WebsideServer class methodsFor!
 
 new
 	 ^super new initialize! !
-!WebsideServer class categoriesFor: #new!instance creation!public! !
+
+!WebsideServer class categoriesForMethods!
+new!instance creation!public! !
+!
 

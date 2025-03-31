@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #StringPattern
 	instanceVariableNames: 'stream tokens'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 StringPattern guid: (GUID fromString: '{2e9b341a-0233-41fa-a861-14edc351a4fb}')!
+
 StringPattern comment: ''!
+
 !StringPattern categoriesForClass!Unclassified! !
+
 !StringPattern methodsFor!
 
 addStar
@@ -68,21 +72,27 @@ scan
 
 tokens
 	^tokens copy! !
-!StringPattern categoriesFor: #addStar!public!scanning! !
-!StringPattern categoriesFor: #addToken!public!scanning! !
-!StringPattern categoriesFor: #input!accessing!public! !
-!StringPattern categoriesFor: #match:!inquiries!public! !
-!StringPattern categoriesFor: #match:index:!inquiries!public! !
-!StringPattern categoriesFor: #match:index:ifAbsent:!inquiries!public! !
-!StringPattern categoriesFor: #matches:!inquiries!public! !
-!StringPattern categoriesFor: #on:!accessing!public! !
-!StringPattern categoriesFor: #printOn:!printing!public! !
-!StringPattern categoriesFor: #scan!public!scanning! !
-!StringPattern categoriesFor: #tokens!accessing!public! !
+
+!StringPattern categoriesForMethods!
+addStar!public!scanning! !
+addToken!public!scanning! !
+input!accessing!public! !
+match:!inquiries!public! !
+match:index:!inquiries!public! !
+match:index:ifAbsent:!inquiries!public! !
+matches:!inquiries!public! !
+on:!accessing!public! !
+printOn:!printing!public! !
+scan!public!scanning! !
+tokens!accessing!public! !
+!
 
 !StringPattern class methodsFor!
 
 on: aString
 	^self new on: aString! !
-!StringPattern class categoriesFor: #on:!instance creation!public! !
+
+!StringPattern class categoriesForMethods!
+on:!instance creation!public! !
+!
 

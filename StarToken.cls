@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #StarToken
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: 'current'!
+
 StarToken guid: (GUID fromString: '{101115ed-ae95-41e5-8df0-7c87efce62a9}')!
+
 StarToken comment: ''!
+
 !StarToken categoriesForClass!Unclassified! !
+
 !StarToken methodsFor!
 
 matchFirstAfterStartOn: aMatchAlgorithm
@@ -24,10 +28,13 @@ matchLastOn: aMatchAlgorithm
 
 printOn: aStream
 	aStream nextPut: $*! !
-!StarToken categoriesFor: #matchFirstAfterStartOn:!double dispatching!public! !
-!StarToken categoriesFor: #matchFirstOn:!double dispatching!public! !
-!StarToken categoriesFor: #matchLastOn:!double dispatching!public! !
-!StarToken categoriesFor: #printOn:!printing!public! !
+
+!StarToken categoriesForMethods!
+matchFirstAfterStartOn:!double dispatching!public! !
+matchFirstOn:!double dispatching!public! !
+matchLastOn:!double dispatching!public! !
+printOn:!printing!public! !
+!
 
 !StarToken class methodsFor!
 
@@ -44,7 +51,10 @@ initialize
 
 initializeCurrent
 	current := self new! !
-!StarToken class categoriesFor: #current!public! !
-!StarToken class categoriesFor: #initialize!initializing!public! !
-!StarToken class categoriesFor: #initializeCurrent!initializing!public! !
+
+!StarToken class categoriesForMethods!
+current!public! !
+initialize!initializing!public! !
+initializeCurrent!initializing!public! !
+!
 

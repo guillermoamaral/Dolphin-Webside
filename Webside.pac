@@ -3,7 +3,6 @@ package := Package name: 'Webside'.
 package paxVersion: 1;
 	basicComment: ''.
 
-
 package classNames
 	add: #AddCategoryChange;
 	add: #AddPackageChange;
@@ -137,7 +136,7 @@ package setPrerequisites: #(
 	'..\Core\Object Arts\Dolphin\IDE\Base\Development System'
 	'..\Core\Object Arts\Dolphin\Base\Dolphin'
 	'..\Core\Object Arts\Dolphin\System\Base64\Dolphin Base64'
-	'..\DolphinHttpServer\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
+	'..\DolphinHttpServer\DolphinHttpServer\Dolphin Http Server'
 	'..\Core\Object Arts\Dolphin\MVP\Base\Dolphin MVP Base'
 	'..\Core\Object Arts\Dolphin\MVP\Icons\Dolphin Text Tile Icons'
 	'..\Core\Object Arts\Dolphin\MVP\Gdiplus\Gdiplus'
@@ -158,144 +157,168 @@ Object subclass: #FakeListPresenter
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #HttpRequestRouter
 	instanceVariableNames: 'routes receiver'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #MatchAlgorithm
 	instanceVariableNames: 'string pattern start stop tokens failure ranges'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #MatchToken
 	instanceVariableNames: 'string start stop'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #PercentEncoder
 	instanceVariableNames: 'reserved'
 	classVariableNames: 'Current'
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #StarToken
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: 'current'!
+
 Object subclass: #StringPattern
 	instanceVariableNames: 'stream tokens'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #URL
 	instanceVariableNames: 'scheme user password host port segments query fragment'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #URLTemplate
 	instanceVariableNames: 'raw pattern parameters sample description'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #WebsideAPI
 	instanceVariableNames: 'server request'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #WebsideClient
 	instanceVariableNames: 'url client'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #WebsideEvaluation
 	instanceVariableNames: 'id expression receiver context requestor priority process state result error semaphore'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #WebsideResource
 	instanceVariableNames: 'id'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Object subclass: #WebsideServer
 	instanceVariableNames: 'server router baseUri port resources'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 Exception subclass: #WebsideException
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryChange subclass: #RefactoryPackageChange
 	instanceVariableNames: 'packageName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryClassChange subclass: #ClassifyMethodChange
 	instanceVariableNames: 'selector category'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryClassChange subclass: #CommentClassChange
 	instanceVariableNames: 'comment'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryClassChange subclass: #RefactoryCategoryChange
 	instanceVariableNames: 'category'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryCategoryChange subclass: #AddCategoryChange
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryCategoryChange subclass: #RemoveCategoryChange
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryCategoryChange subclass: #RenameCategoryChange
 	instanceVariableNames: 'newName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryPackageChange subclass: #AddPackageChange
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryPackageChange subclass: #RemovePackageChange
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RefactoryPackageChange subclass: #RenamePackageChange
 	instanceVariableNames: 'newName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 TestCase subclass: #URLTemplateTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 TestCase subclass: #URLTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 WebsideResource subclass: #WebsideWorkspace
 	instanceVariableNames: 'contents bindings'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
-
-"Global Aliases"!
-
 
 "Loose Methods"!
 
@@ -347,27 +370,39 @@ websideExecute
 	packageName := self propertyAt: #packageName ifAbsent: [^self].
 	package := PackageManager current packageNamed: packageName ifNone: [^self].
 	package ifNotNil: [package addClass: self changeClass]! !
-!AddClassChange categoriesFor: #asWebsideJson!public! !
-!AddClassChange categoriesFor: #fromWebsideJson:!public! !
-!AddClassChange categoriesFor: #websideExecute!public! !
+
+!AddClassChange categoriesForMethods!
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+websideExecute!public! !
+!
 
 !AddClassChange class methodsFor!
 
 websideType
 	^'AddClass'! !
-!AddClassChange class categoriesFor: #websideType!public! !
+
+!AddClassChange class categoriesForMethods!
+websideType!public! !
+!
 
 !AddClassVariableChange class methodsFor!
 
 websideType
 	^'AddClassVariable'! !
-!AddClassVariableChange class categoriesFor: #websideType!public! !
+
+!AddClassVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !AddInstanceVariableChange class methodsFor!
 
 websideType
 	^'AddInstanceVariable'! !
-!AddInstanceVariableChange class categoriesFor: #websideType!public! !
+
+!AddInstanceVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !AddMethodChange methodsFor!
 
@@ -389,14 +424,20 @@ fromWebsideJson: json
 	category := json at: 'category' ifAbsent: [].
 	category ifNil: [category := MethodCategory unclassified asString].
 	self protocols: {category asSymbol}! !
-!AddMethodChange categoriesFor: #asWebsideJson!public! !
-!AddMethodChange categoriesFor: #fromWebsideJson:!public! !
+
+!AddMethodChange categoriesForMethods!
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+!
 
 !AddMethodChange class methodsFor!
 
 websideType
 	^'AbstractAddMethod'! !
-!AddMethodChange class categoriesFor: #websideType!instance creation!public! !
+
+!AddMethodChange class categoriesForMethods!
+websideType!instance creation!public! !
+!
 
 !Character methodsFor!
 
@@ -405,8 +446,11 @@ isAsterisk
 
 isQuestionMark
 	^code = 63! !
-!Character categoriesFor: #isAsterisk!public!testing! !
-!Character categoriesFor: #isQuestionMark!public!testing! !
+
+!Character categoriesForMethods!
+isAsterisk!public!testing! !
+isQuestionMark!public!testing! !
+!
 
 !ClassDescription methodsFor!
 
@@ -422,7 +466,10 @@ asWebsideJson
 		at: 'variable' put: self isVariable;
 		at: 'project' put: (self owningPackage ifNotNil: [:p | p name]);
 		yourself! !
-!ClassDescription categoriesFor: #asWebsideJson!converting!public! !
+
+!ClassDescription categoriesForMethods!
+asWebsideJson!converting!public! !
+!
 
 !Collection methodsFor!
 
@@ -457,10 +504,13 @@ groupBy: aspect
 		copy removeAll: remove.
 		remove removeAll].
 	^answer! !
-!Collection categoriesFor: #anyone!adding!public! !
-!Collection categoriesFor: #gather:!enumerating!public! !
-!Collection categoriesFor: #gather:in:!enumerating!public! !
-!Collection categoriesFor: #groupBy:!operations!public! !
+
+!Collection categoriesForMethods!
+anyone!adding!public! !
+gather:!enumerating!public! !
+gather:in:!enumerating!public! !
+groupBy:!operations!public! !
+!
 
 !CompiledCode methodsFor!
 
@@ -476,7 +526,10 @@ asWebsideJson
 		at: 'timestamp' put: nil;
 		at: 'package' put: package;
 		yourself! !
-!CompiledCode categoriesFor: #asWebsideJson!public! !
+
+!CompiledCode categoriesForMethods!
+asWebsideJson!public! !
+!
 
 !CompiledMethod methodsFor!
 
@@ -490,7 +543,10 @@ asWebsideJson
 		at: 'overriding' put: self isOverride;
 		at: 'overriden' put: self isOverridden;
 		yourself! !
-!CompiledMethod categoriesFor: #asWebsideJson!converting!public! !
+
+!CompiledMethod categoriesForMethods!
+asWebsideJson!converting!public! !
+!
 
 !CompilerNotification methodsFor!
 
@@ -505,7 +561,10 @@ asWebsideJson
 		at: 'fullDescription' put: self errorMessage;
 		at: 'interval' put: interval.
 	^json! !
-!CompilerNotification categoriesFor: #asWebsideJson!accessing!public! !
+
+!CompilerNotification categoriesForMethods!
+asWebsideJson!accessing!public! !
+!
 
 !Debugger methodsFor!
 
@@ -549,17 +608,23 @@ stepOver: aStackFrame
 	self breakFrame: aStackFrame.
 	self makeDebugFrame: aStackFrame sender.
 	self resume! !
-!Debugger categoriesFor: #adaptToWebside!public! !
-!Debugger categoriesFor: #process!private!updating! !
-!Debugger categoriesFor: #stepInto:!public! !
-!Debugger categoriesFor: #stepIntoBlock:!public! !
-!Debugger categoriesFor: #stepOver:!public! !
+
+!Debugger categoriesForMethods!
+adaptToWebside!public! !
+process!private!updating! !
+stepInto:!public! !
+stepIntoBlock:!public! !
+stepOver:!public! !
+!
 
 !DolphinAddMethodChange class methodsFor!
 
 websideType
 	^'AddMethod'! !
-!DolphinAddMethodChange class categoriesFor: #websideType!public! !
+
+!DolphinAddMethodChange class categoriesForMethods!
+websideType!public! !
+!
 
 !Exception methodsFor!
 
@@ -568,13 +633,19 @@ asWebsideJson
 	json := super asWebsideJson.
 	json at: 'description' put: self description.
 	^json! !
-!Exception categoriesFor: #asWebsideJson!handling!public! !
+
+!Exception categoriesForMethods!
+asWebsideJson!handling!public! !
+!
 
 !MethodCompileFailed methodsFor!
 
 asWebsideJson
 	^compilerErrorNotification asWebsideJson! !
-!MethodCompileFailed categoriesFor: #asWebsideJson!accessing!private! !
+
+!MethodCompileFailed categoriesForMethods!
+asWebsideJson!accessing!private! !
+!
 
 !MethodRefactoring methodsFor!
 
@@ -587,8 +658,11 @@ fromWebsideJson: json
 	super fromWebsideJson: json.
 	json at: 'className'
 		ifPresent: [:n | Smalltalk at: n ifPresent: [:c | class := RBClass existingNamed: n]]! !
-!MethodRefactoring categoriesFor: #asWebsideJson!private! !
-!MethodRefactoring categoriesFor: #fromWebsideJson:!private! !
+
+!MethodRefactoring categoriesForMethods!
+asWebsideJson!private! !
+fromWebsideJson:!private! !
+!
 
 !Object methodsFor!
 
@@ -614,9 +688,12 @@ websideIconName
 
 websideViews
 	^#()! !
-!Object categoriesFor: #asWebsideJson!converting!public! !
-!Object categoriesFor: #websideIconName!converting!public! !
-!Object categoriesFor: #websideViews!exceptions!private! !
+
+!Object categoriesForMethods!
+asWebsideJson!converting!public! !
+websideIconName!converting!public! !
+websideViews!exceptions!private! !
+!
 
 !Package methodsFor!
 
@@ -631,7 +708,10 @@ asWebsideJson
 		at: 'classes' put: self classNames asArray;
 		at: 'methods' put: methods;
 		yourself! !
-!Package categoriesFor: #asWebsideJson!converting!private! !
+
+!Package categoriesForMethods!
+asWebsideJson!converting!private! !
+!
 
 !PullUpInstanceVariableRefactoring methodsFor!
 
@@ -645,19 +725,28 @@ fromWebsideJson: json
 					[:c |
 					class := RBClass existingNamed: n.
 					class model: model]]! !
-!PullUpInstanceVariableRefactoring categoriesFor: #fromWebsideJson:!public! !
+
+!PullUpInstanceVariableRefactoring categoriesForMethods!
+fromWebsideJson:!public! !
+!
 
 !PullUpInstanceVariableRefactoring class methodsFor!
 
 websideType
 	^'MoveUpInstanceVariable'! !
-!PullUpInstanceVariableRefactoring class categoriesFor: #websideType!public! !
+
+!PullUpInstanceVariableRefactoring class categoriesForMethods!
+websideType!public! !
+!
 
 !PushDownInstanceVariableRefactoring class methodsFor!
 
 websideType
 	^'MoveDownInstanceVariable'! !
-!PushDownInstanceVariableRefactoring class categoriesFor: #websideType!public! !
+
+!PushDownInstanceVariableRefactoring class categoriesForMethods!
+websideType!public! !
+!
 
 !Refactoring methodsFor!
 
@@ -676,9 +765,12 @@ fromWebsideJson: json
 
 websideExecute
 	^self execute! !
-!Refactoring categoriesFor: #asWebsideJson!public! !
-!Refactoring categoriesFor: #fromWebsideJson:!public! !
-!Refactoring categoriesFor: #websideExecute!public! !
+
+!Refactoring categoriesForMethods!
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+websideExecute!public! !
+!
 
 !Refactoring class methodsFor!
 
@@ -700,10 +792,13 @@ websideType
 	type := self name asString.
 	(type endsWith: 'Refactoring') ifTrue: [type := type copyFrom: 1 to: type size - 11].
 	^type! !
-!Refactoring class categoriesFor: #acceptsWebsideJson:!class hierarchy-removing!public! !
-!Refactoring class categoriesFor: #classForWebsideJson:!class hierarchy-removing!public! !
-!Refactoring class categoriesFor: #fromWebsideJson:!class hierarchy-removing!public! !
-!Refactoring class categoriesFor: #websideType!class hierarchy-removing!public! !
+
+!Refactoring class categoriesForMethods!
+acceptsWebsideJson:!class hierarchy-removing!public! !
+classForWebsideJson:!class hierarchy-removing!public! !
+fromWebsideJson:!class hierarchy-removing!public! !
+websideType!class hierarchy-removing!public! !
+!
 
 !RefactoryChange methodsFor!
 
@@ -721,9 +816,12 @@ fromWebsideJson: json
 
 websideExecute
 	^self execute! !
-!RefactoryChange categoriesFor: #asWebsideJson!initialize/release!public! !
-!RefactoryChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
-!RefactoryChange categoriesFor: #websideExecute!initialize/release!public! !
+
+!RefactoryChange categoriesForMethods!
+asWebsideJson!initialize/release!public! !
+fromWebsideJson:!initialize/release!public! !
+websideExecute!initialize/release!public! !
+!
 
 !RefactoryChange class methodsFor!
 
@@ -745,10 +843,13 @@ websideType
 	type := self name asString.
 	(type endsWith: 'Change') ifTrue: [type := type copyFrom: 1 to: type size - 6].
 	^type! !
-!RefactoryChange class categoriesFor: #acceptsWebsideJson:!public! !
-!RefactoryChange class categoriesFor: #classForWebsideJson:!public! !
-!RefactoryChange class categoriesFor: #fromWebsideJson:!public! !
-!RefactoryChange class categoriesFor: #websideType!public! !
+
+!RefactoryChange class categoriesForMethods!
+acceptsWebsideJson:!public! !
+classForWebsideJson:!public! !
+fromWebsideJson:!public! !
+websideType!public! !
+!
 
 !RefactoryClassChange methodsFor!
 
@@ -763,8 +864,11 @@ fromWebsideJson: json
 	isMeta := className notNil and: [className endsWith: ' class'].
 	(className notNil and: [isMeta])
 		ifTrue: [className := (className copyFrom: 1 to: className size - 6) asSymbol]! !
-!RefactoryClassChange categoriesFor: #asWebsideJson!accessing!public! !
-!RefactoryClassChange categoriesFor: #fromWebsideJson:!accessing!public! !
+
+!RefactoryClassChange categoriesForMethods!
+asWebsideJson!accessing!public! !
+fromWebsideJson:!accessing!public! !
+!
 
 !RefactoryVariableChange methodsFor!
 
@@ -774,26 +878,38 @@ asWebsideJson
 fromWebsideJson: json
 	super fromWebsideJson: json.
 	variable := json at: 'variable' ifAbsent: nil! !
-!RefactoryVariableChange categoriesFor: #asWebsideJson!initialize/release!public! !
-!RefactoryVariableChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
+
+!RefactoryVariableChange categoriesForMethods!
+asWebsideJson!initialize/release!public! !
+fromWebsideJson:!initialize/release!public! !
+!
 
 !RemoveClassChange class methodsFor!
 
 websideType
 	^'RemoveClass'! !
-!RemoveClassChange class categoriesFor: #websideType!public! !
+
+!RemoveClassChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RemoveClassVariableChange class methodsFor!
 
 websideType
 	^'RemoveClassVariable'! !
-!RemoveClassVariableChange class categoriesFor: #websideType!public! !
+
+!RemoveClassVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RemoveInstanceVariableChange class methodsFor!
 
 websideType
 	^'RemoveInstanceVariable'! !
-!RemoveInstanceVariableChange class categoriesFor: #websideType!public! !
+
+!RemoveInstanceVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RemoveMethodChange methodsFor!
 
@@ -804,14 +920,20 @@ fromWebsideJson: json
 	super fromWebsideJson: json.
 	selector := json at: 'selector' ifAbsent: [].
 	selector notNil ifTrue: [selector := selector asSymbol]! !
-!RemoveMethodChange categoriesFor: #asWebsideJson!public! !
-!RemoveMethodChange categoriesFor: #fromWebsideJson:!public! !
+
+!RemoveMethodChange categoriesForMethods!
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+!
 
 !RemoveMethodChange class methodsFor!
 
 websideType
 	^'RemoveMethod'! !
-!RemoveMethodChange class categoriesFor: #websideType!public! !
+
+!RemoveMethodChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RenameClassChange methodsFor!
 
@@ -826,26 +948,38 @@ fromWebsideJson: json
 	super fromWebsideJson: json.
 	oldName := json at: 'className' ifAbsent: [].
 	newName := json at: 'newName' ifAbsent: []! !
-!RenameClassChange categoriesFor: #asWebsideJson!initialize/release!public! !
-!RenameClassChange categoriesFor: #fromWebsideJson:!initialize/release!public! !
+
+!RenameClassChange categoriesForMethods!
+asWebsideJson!initialize/release!public! !
+fromWebsideJson:!initialize/release!public! !
+!
 
 !RenameClassChange class methodsFor!
 
 websideType
 	^'RenameClass'! !
-!RenameClassChange class categoriesFor: #websideType!instance creation!public! !
+
+!RenameClassChange class categoriesForMethods!
+websideType!instance creation!public! !
+!
 
 !RenameClassVariableChange class methodsFor!
 
 websideType
 	^'RenameClassVariable'! !
-!RenameClassVariableChange class categoriesFor: #websideType!public! !
+
+!RenameClassVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RenameInstanceVariableChange class methodsFor!
 
 websideType
 	^'RenameInstanceVariable'! !
-!RenameInstanceVariableChange class categoriesFor: #websideType!public! !
+
+!RenameInstanceVariableChange class categoriesForMethods!
+websideType!public! !
+!
 
 !RenameMethodRefactoring methodsFor!
 
@@ -863,8 +997,11 @@ fromWebsideJson: json
 			[:s |
 			newSelector := s asSymbol.
 			permutation := 1 to: newSelector argumentCount]! !
-!RenameMethodRefactoring categoriesFor: #asWebsideJson!public!testing! !
-!RenameMethodRefactoring categoriesFor: #fromWebsideJson:!public!testing! !
+
+!RenameMethodRefactoring categoriesForMethods!
+asWebsideJson!public!testing! !
+fromWebsideJson:!public!testing! !
+!
 
 !RenameVariableChange methodsFor!
 
@@ -881,8 +1018,11 @@ fromWebsideJson: json
 	isMeta := className notNil and: [className endsWith: ' class'].
 	oldName := json at: 'variable' ifAbsent: [].
 	newName := json at: 'newName' ifAbsent: []! !
-!RenameVariableChange categoriesFor: #asWebsideJson!printing!public! !
-!RenameVariableChange categoriesFor: #fromWebsideJson:!printing!public! !
+
+!RenameVariableChange categoriesForMethods!
+asWebsideJson!printing!public! !
+fromWebsideJson:!printing!public! !
+!
 
 !StackFrame methodsFor!
 
@@ -894,12 +1034,18 @@ asWebsideJson
 		at: 'class' put: self receiver class asWebsideJson;
 		at: 'method' put: self method asWebsideJson;
 		yourself! !
-!StackFrame categoriesFor: #asWebsideJson!accessing!private! !
+
+!StackFrame categoriesForMethods!
+asWebsideJson!accessing!private! !
+!
 
 !StAssignmentNode methodsFor!
 
 asWebsideJson 	^super asWebsideJson at: 'children' put: { variable asWebsideJson . value asWebsideJson }! !
-!StAssignmentNode categoriesFor: #asWebsideJson!accessing!public! !
+
+!StAssignmentNode categoriesForMethods!
+asWebsideJson!accessing!public! !
+!
 
 !StCascadeNode methodsFor!
 
@@ -909,13 +1055,19 @@ asWebsideJson
 	^super asWebsideJson
 		at: 'children' put: children asArray;
 		yourself! !
-!StCascadeNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StCascadeNode categoriesForMethods!
+asWebsideJson!public!visitor! !
+!
 
 !StLiteralToken methodsFor!
 
 asWebsideJson
 	^value asString! !
-!StLiteralToken categoriesFor: #asWebsideJson!printing!public! !
+
+!StLiteralToken categoriesForMethods!
+asWebsideJson!printing!public! !
+!
 
 !StLiteralValueNode methodsFor!
 
@@ -925,7 +1077,10 @@ asWebsideJson
 	^super asWebsideJson
 		at: 'value' put: value;
 		yourself! !
-!StLiteralValueNode categoriesFor: #asWebsideJson!matching!public! !
+
+!StLiteralValueNode categoriesForMethods!
+asWebsideJson!matching!public! !
+!
 
 !StMessageNode methodsFor!
 
@@ -942,30 +1097,45 @@ asWebsideJson
 	^super asWebsideJson
 		at: 'children' put: children asArray;
 		yourself! !
-!StMessageNode categoriesFor: #asWebsideJson!matching!public! !
+
+!StMessageNode categoriesForMethods!
+asWebsideJson!matching!public! !
+!
 
 !StMethodNode methodsFor!
 
 asWebsideJson	| children |	children := OrderedCollection with: self selector asWebsideJson.	arguments do: [ :n | children add: n asWebsideJson  ].	children add: body asWebsideJson .	^super asWebsideJson at: 'children' put: children asArray; yourself ! !
-!StMethodNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StMethodNode categoriesForMethods!
+asWebsideJson!public!visitor! !
+!
 
 !StProgramNode methodsFor!
 
 asWebsideJson	^ super asWebsideJson		at: 'type' put: self websideType;		at: 'start' put: self start;		at: 'end' put: self stop;		yourself!
 
 websideType	^self class websideType! !
-!StProgramNode categoriesFor: #asWebsideJson!public!replacing! !
-!StProgramNode categoriesFor: #websideType!public!replacing! !
+
+!StProgramNode categoriesForMethods!
+asWebsideJson!public!replacing! !
+websideType!public!replacing! !
+!
 
 !StProgramNode class methodsFor!
 
 websideType	^self name copyFrom: 3 to: self name size - 4! !
-!StProgramNode class categoriesFor: #websideType!constants!public! !
+
+!StProgramNode class categoriesForMethods!
+websideType!constants!public! !
+!
 
 !StReturnNode methodsFor!
 
 asWebsideJson 	^super asWebsideJson at: 'children' put: { value asWebsideJson  }; yourself! !
-!StReturnNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StReturnNode categoriesForMethods!
+asWebsideJson!public!visitor! !
+!
 
 !String methodsFor!
 
@@ -991,9 +1161,12 @@ indexOfString: aString from: start to: stop
 	^i > 1 ifTrue: [base + 1] ifFalse: [0]
 
 ! !
-!String categoriesFor: #asURL!converting!public! !
-!String categoriesFor: #includesString:!comparing!public! !
-!String categoriesFor: #indexOfString:from:to:!comparing!public! !
+
+!String categoriesForMethods!
+asURL!converting!public! !
+includesString:!comparing!public! !
+indexOfString:from:to:!comparing!public! !
+!
 
 !String class methodsFor!
 
@@ -1001,23 +1174,35 @@ fromUTF8: aString
 	^(aString anySatisfy: [:byte | byte asInteger >= 128])
 		ifTrue: [aString asUtf8String]
 		ifFalse: [aString]! !
-!String class categoriesFor: #fromUTF8:!instance creation!public! !
+
+!String class categoriesForMethods!
+fromUTF8:!instance creation!public! !
+!
 
 !StSequenceNode methodsFor!
 
 asWebsideJson 	| children |	children := OrderedCollection new.	temporaries do: [ :n | children add: n asWebsideJson  ].	statements do: [ :n |  children add: n asWebsideJson].	^super asWebsideJson at: 'children' put: children asArray ; yourself! !
-!StSequenceNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StSequenceNode categoriesForMethods!
+asWebsideJson!public!visitor! !
+!
 
 !StVariableNode methodsFor!
 
 asWebsideJson	^ super asWebsideJson		at: 'value' put: name;		yourself! !
-!StVariableNode categoriesFor: #asWebsideJson!public!visitor! !
+
+!StVariableNode categoriesForMethods!
+asWebsideJson!public!visitor! !
+!
 
 !Symbol methodsFor!
 
 evaluateWith: anObject
 	^anObject perform: self! !
-!Symbol categoriesFor: #evaluateWith:!converting!public! !
+
+!Symbol categoriesForMethods!
+evaluateWith:!converting!public! !
+!
 
 !VariableRefactoring methodsFor!
 
@@ -1038,8 +1223,11 @@ fromWebsideJson: json
 					class := RBClass existingNamed: n.
 					class model: model]].
 	variableName := json at: 'variable' ifAbsent: []! !
-!VariableRefactoring categoriesFor: #asWebsideJson!initialize/release!public! !
-!VariableRefactoring categoriesFor: #fromWebsideJson:!initialize/release!public! !
+
+!VariableRefactoring categoriesForMethods!
+asWebsideJson!initialize/release!public! !
+fromWebsideJson:!initialize/release!public! !
+!
 
 "End of package definition"!
 
@@ -1048,8 +1236,11 @@ fromWebsideJson: json
 "Classes"!
 
 FakeListPresenter guid: (GUID fromString: '{73f8ea67-5b8b-47fb-9ab2-8018f4487c8d}')!
+
 FakeListPresenter comment: ''!
+
 !FakeListPresenter categoriesForClass!Unclassified! !
+
 !FakeListPresenter methodsFor!
 
 initialize
@@ -1079,25 +1270,34 @@ selectionOrNil
 
 selectionOrNil: anObject 
 	 self selection: anObject! !
-!FakeListPresenter categoriesFor: #initialize!public! !
-!FakeListPresenter categoriesFor: #list!public! !
-!FakeListPresenter categoriesFor: #list:!public! !
-!FakeListPresenter categoriesFor: #model!public! !
-!FakeListPresenter categoriesFor: #selectableItems!public! !
-!FakeListPresenter categoriesFor: #selection!public! !
-!FakeListPresenter categoriesFor: #selection:!public! !
-!FakeListPresenter categoriesFor: #selectionOrNil!public! !
-!FakeListPresenter categoriesFor: #selectionOrNil:!public! !
+
+!FakeListPresenter categoriesForMethods!
+initialize!public! !
+list!public! !
+list:!public! !
+model!public! !
+selectableItems!public! !
+selection!public! !
+selection:!public! !
+selectionOrNil!public! !
+selectionOrNil:!public! !
+!
 
 !FakeListPresenter class methodsFor!
 
 new
 	 ^super new initialize! !
-!FakeListPresenter class categoriesFor: #new!public! !
+
+!FakeListPresenter class categoriesForMethods!
+new!public! !
+!
 
 HttpRequestRouter guid: (GUID fromString: '{1ca3c460-0b47-4f5c-b9fb-c6bb4cce7d94}')!
+
 HttpRequestRouter comment: ''!
+
 !HttpRequestRouter categoriesForClass!Unclassified! !
+
 !HttpRequestRouter methodsFor!
 
 actionFor: route verb: verb
@@ -1181,32 +1381,41 @@ routePUT: uri to: action
 
 supportedVerbs
 	^#('GET' 'POST' 'DELETE' 'HEAD' 'PUT' 'OPTIONS')! !
-!HttpRequestRouter categoriesFor: #actionFor:verb:!private! !
-!HttpRequestRouter categoriesFor: #initialize!initializing!public! !
-!HttpRequestRouter categoriesFor: #performAction:for:!private! !
-!HttpRequestRouter categoriesFor: #receiver:!accessing!public! !
-!HttpRequestRouter categoriesFor: #route:!actions!public! !
-!HttpRequestRouter categoriesFor: #route:verb:action:!private! !
-!HttpRequestRouter categoriesFor: #route:verb:to:!private! !
-!HttpRequestRouter categoriesFor: #routeAllTo:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routeDELETE:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routeFor:!private! !
-!HttpRequestRouter categoriesFor: #routeGET:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routeHEAD:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routeOPTIONS:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routePOST:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routePUT:to:!public!services! !
-!HttpRequestRouter categoriesFor: #supportedVerbs!public! !
+
+!HttpRequestRouter categoriesForMethods!
+actionFor:verb:!private! !
+initialize!initializing!public! !
+performAction:for:!private! !
+receiver:!accessing!public! !
+route:!actions!public! !
+route:verb:action:!private! !
+route:verb:to:!private! !
+routeAllTo:to:!public!services! !
+routeDELETE:to:!public!services! !
+routeFor:!private! !
+routeGET:to:!public!services! !
+routeHEAD:to:!public!services! !
+routeOPTIONS:to:!public!services! !
+routePOST:to:!public!services! !
+routePUT:to:!public!services! !
+supportedVerbs!public! !
+!
 
 !HttpRequestRouter class methodsFor!
 
 new
 	^super new initialize! !
-!HttpRequestRouter class categoriesFor: #new!public! !
+
+!HttpRequestRouter class categoriesForMethods!
+new!public! !
+!
 
 MatchAlgorithm guid: (GUID fromString: '{fb86432e-7484-40e1-9ffd-1f4642dcd99b}')!
+
 MatchAlgorithm comment: ''!
+
 !MatchAlgorithm categoriesForClass!Unclassified! !
+
 !MatchAlgorithm methodsFor!
 
 failBecause: aString
@@ -1334,33 +1543,42 @@ run
 
 string: aString
 	string := MatchToken on: aString from: 1 to: aString size! !
-!MatchAlgorithm categoriesFor: #failBecause:!private! !
-!MatchAlgorithm categoriesFor: #failure!outputs!public! !
-!MatchAlgorithm categoriesFor: #hasMatched!public!testing! !
-!MatchAlgorithm categoriesFor: #hasTokens!public!testing! !
-!MatchAlgorithm categoriesFor: #index:!inputs!public! !
-!MatchAlgorithm categoriesFor: #initialize!initializing!public! !
-!MatchAlgorithm categoriesFor: #matchFirstStar!computing!public! !
-!MatchAlgorithm categoriesFor: #matchFirstToken!computing!public! !
-!MatchAlgorithm categoriesFor: #matchFirstTokenAfterStar!computing!public! !
-!MatchAlgorithm categoriesFor: #matchLastToken!computing!public! !
-!MatchAlgorithm categoriesFor: #matchNextToken!computing!public! !
-!MatchAlgorithm categoriesFor: #matchRange!outputs!public! !
-!MatchAlgorithm categoriesFor: #pattern:!inputs!public! !
-!MatchAlgorithm categoriesFor: #privateMatchLastToken!computing!public! !
-!MatchAlgorithm categoriesFor: #reset!private! !
-!MatchAlgorithm categoriesFor: #run!computing!public! !
-!MatchAlgorithm categoriesFor: #string:!inputs!public! !
+
+!MatchAlgorithm categoriesForMethods!
+failBecause:!private! !
+failure!outputs!public! !
+hasMatched!public!testing! !
+hasTokens!public!testing! !
+index:!inputs!public! !
+initialize!initializing!public! !
+matchFirstStar!computing!public! !
+matchFirstToken!computing!public! !
+matchFirstTokenAfterStar!computing!public! !
+matchLastToken!computing!public! !
+matchNextToken!computing!public! !
+matchRange!outputs!public! !
+pattern:!inputs!public! !
+privateMatchLastToken!computing!public! !
+reset!private! !
+run!computing!public! !
+string:!inputs!public! !
+!
 
 !MatchAlgorithm class methodsFor!
 
 new
 	^super new initialize! !
-!MatchAlgorithm class categoriesFor: #new!public! !
+
+!MatchAlgorithm class categoriesForMethods!
+new!public! !
+!
 
 MatchToken guid: (GUID fromString: '{ac4831ee-87bf-4c98-a3e7-3d962ed2e1a4}')!
+
 MatchToken comment: ''!
+
 !MatchToken categoriesForClass!Unclassified! !
+
 !MatchToken methodsFor!
 
 asString
@@ -1421,22 +1639,25 @@ string
 
 string: aString
 	string := aString! !
-!MatchToken categoriesFor: #asString!converting!public! !
-!MatchToken categoriesFor: #at:!accessing!public! !
-!MatchToken categoriesFor: #beginsWith:!inquiries!public! !
-!MatchToken categoriesFor: #endsWith:!inquiries!public! !
-!MatchToken categoriesFor: #indexOf:!inquiries!public! !
-!MatchToken categoriesFor: #length!inquiries!public! !
-!MatchToken categoriesFor: #matchFirstAfterStartOn:!double dispatching!public! !
-!MatchToken categoriesFor: #matchFirstOn:!double dispatching!public! !
-!MatchToken categoriesFor: #matchLastOn:!double dispatching!public! !
-!MatchToken categoriesFor: #printOn:!printing!public! !
-!MatchToken categoriesFor: #start!accessing!public! !
-!MatchToken categoriesFor: #start:!accessing!public! !
-!MatchToken categoriesFor: #stop!accessing!public! !
-!MatchToken categoriesFor: #stop:!accessing!public! !
-!MatchToken categoriesFor: #string!accessing!public! !
-!MatchToken categoriesFor: #string:!accessing!public! !
+
+!MatchToken categoriesForMethods!
+asString!converting!public! !
+at:!accessing!public! !
+beginsWith:!inquiries!public! !
+endsWith:!inquiries!public! !
+indexOf:!inquiries!public! !
+length!inquiries!public! !
+matchFirstAfterStartOn:!double dispatching!public! !
+matchFirstOn:!double dispatching!public! !
+matchLastOn:!double dispatching!public! !
+printOn:!printing!public! !
+start!accessing!public! !
+start:!accessing!public! !
+stop!accessing!public! !
+stop:!accessing!public! !
+string!accessing!public! !
+string:!accessing!public! !
+!
 
 !MatchToken class methodsFor!
 
@@ -1445,11 +1666,17 @@ on: aString from: start to: stop
 		string: aString;
 		start: start;
 		stop: stop! !
-!MatchToken class categoriesFor: #on:from:to:!public! !
+
+!MatchToken class categoriesForMethods!
+on:from:to:!public! !
+!
 
 PercentEncoder guid: (GUID fromString: '{183707c5-6b54-4780-b5d8-71fa30c46297}')!
+
 PercentEncoder comment: ''!
+
 !PercentEncoder categoriesForClass!Unclassified! !
+
 !PercentEncoder methodsFor!
 
 decode: aString
@@ -1488,10 +1715,13 @@ initialize
 
 initializeReserved
 	reserved := ' ?:@&=+$#;%/\!!'! !
-!PercentEncoder categoriesFor: #decode:!public!services! !
-!PercentEncoder categoriesFor: #encode:!public!services! !
-!PercentEncoder categoriesFor: #initialize!initializing!public! !
-!PercentEncoder categoriesFor: #initializeReserved!initializing!public! !
+
+!PercentEncoder categoriesForMethods!
+decode:!public!services! !
+encode:!public!services! !
+initialize!initializing!public! !
+initializeReserved!initializing!public! !
+!
 
 !PercentEncoder class methodsFor!
 
@@ -1507,14 +1737,20 @@ encode: aString
 
 new
 	^super new initialize! !
-!PercentEncoder class categoriesFor: #current!accessing!public! !
-!PercentEncoder class categoriesFor: #decode:!public!services! !
-!PercentEncoder class categoriesFor: #encode:!public!services! !
-!PercentEncoder class categoriesFor: #new!instance creation!public! !
+
+!PercentEncoder class categoriesForMethods!
+current!accessing!public! !
+decode:!public!services! !
+encode:!public!services! !
+new!instance creation!public! !
+!
 
 StarToken guid: (GUID fromString: '{101115ed-ae95-41e5-8df0-7c87efce62a9}')!
+
 StarToken comment: ''!
+
 !StarToken categoriesForClass!Unclassified! !
+
 !StarToken methodsFor!
 
 matchFirstAfterStartOn: aMatchAlgorithm
@@ -1531,10 +1767,13 @@ matchLastOn: aMatchAlgorithm
 
 printOn: aStream
 	aStream nextPut: $*! !
-!StarToken categoriesFor: #matchFirstAfterStartOn:!double dispatching!public! !
-!StarToken categoriesFor: #matchFirstOn:!double dispatching!public! !
-!StarToken categoriesFor: #matchLastOn:!double dispatching!public! !
-!StarToken categoriesFor: #printOn:!printing!public! !
+
+!StarToken categoriesForMethods!
+matchFirstAfterStartOn:!double dispatching!public! !
+matchFirstOn:!double dispatching!public! !
+matchLastOn:!double dispatching!public! !
+printOn:!printing!public! !
+!
 
 !StarToken class methodsFor!
 
@@ -1551,13 +1790,19 @@ initialize
 
 initializeCurrent
 	current := self new! !
-!StarToken class categoriesFor: #current!public! !
-!StarToken class categoriesFor: #initialize!initializing!public! !
-!StarToken class categoriesFor: #initializeCurrent!initializing!public! !
+
+!StarToken class categoriesForMethods!
+current!public! !
+initialize!initializing!public! !
+initializeCurrent!initializing!public! !
+!
 
 StringPattern guid: (GUID fromString: '{2e9b341a-0233-41fa-a861-14edc351a4fb}')!
+
 StringPattern comment: ''!
+
 !StringPattern categoriesForClass!Unclassified! !
+
 !StringPattern methodsFor!
 
 addStar
@@ -1618,27 +1863,36 @@ scan
 
 tokens
 	^tokens copy! !
-!StringPattern categoriesFor: #addStar!public!scanning! !
-!StringPattern categoriesFor: #addToken!public!scanning! !
-!StringPattern categoriesFor: #input!accessing!public! !
-!StringPattern categoriesFor: #match:!inquiries!public! !
-!StringPattern categoriesFor: #match:index:!inquiries!public! !
-!StringPattern categoriesFor: #match:index:ifAbsent:!inquiries!public! !
-!StringPattern categoriesFor: #matches:!inquiries!public! !
-!StringPattern categoriesFor: #on:!accessing!public! !
-!StringPattern categoriesFor: #printOn:!printing!public! !
-!StringPattern categoriesFor: #scan!public!scanning! !
-!StringPattern categoriesFor: #tokens!accessing!public! !
+
+!StringPattern categoriesForMethods!
+addStar!public!scanning! !
+addToken!public!scanning! !
+input!accessing!public! !
+match:!inquiries!public! !
+match:index:!inquiries!public! !
+match:index:ifAbsent:!inquiries!public! !
+matches:!inquiries!public! !
+on:!accessing!public! !
+printOn:!printing!public! !
+scan!public!scanning! !
+tokens!accessing!public! !
+!
 
 !StringPattern class methodsFor!
 
 on: aString
 	^self new on: aString! !
-!StringPattern class categoriesFor: #on:!instance creation!public! !
+
+!StringPattern class categoriesForMethods!
+on:!instance creation!public! !
+!
 
 URL guid: (GUID fromString: '{4516f8c3-aa63-452c-8c04-353175f5a128}')!
+
 URL comment: 'URL fromString: ''http://server:123/this/is/the/paht?one=1'''!
+
 !URL categoriesForClass!Unclassified! !
+
 !URL methodsFor!
 
 , aString
@@ -2122,105 +2376,108 @@ user
 
 user: aString
 	user := aString! !
-!URL categoriesFor: #,!public!services! !
-!URL categoriesFor: #/!public!services! !
-!URL categoriesFor: #=!comparing!public! !
-!URL categoriesFor: #addPath:!accessing!public! !
-!URL categoriesFor: #addSegment:!accessing!public! !
-!URL categoriesFor: #addSegments:!accessing!public! !
-!URL categoriesFor: #addTrailingSlash!accessing!public! !
-!URL categoriesFor: #asHttp!converting!public! !
-!URL categoriesFor: #asJson!converting!public! !
-!URL categoriesFor: #asURL!converting!public! !
-!URL categoriesFor: #asWebSocketURL!converting!public! !
-!URL categoriesFor: #asWs!converting!public! !
-!URL categoriesFor: #asWss!converting!public! !
-!URL categoriesFor: #baseUri!inquiries!public! !
-!URL categoriesFor: #baseUri:!accessing!public! !
-!URL categoriesFor: #baseUrl!inquiries!public! !
-!URL categoriesFor: #beHttp!accessing!public! !
-!URL categoriesFor: #beHttps!accessing!public! !
-!URL categoriesFor: #beWs!accessing!public! !
-!URL categoriesFor: #beWss!accessing!public! !
-!URL categoriesFor: #decodeString:!private! !
-!URL categoriesFor: #defaultPort!public!services! !
-!URL categoriesFor: #encodedFragment:!accessing!public! !
-!URL categoriesFor: #encodedPassword:!accessing!public! !
-!URL categoriesFor: #encodedPath:!accessing!public! !
-!URL categoriesFor: #encodedQueryAt:put:!accessing!public! !
-!URL categoriesFor: #encodedUser:!accessing!public! !
-!URL categoriesFor: #encodeString:!private! !
-!URL categoriesFor: #firstSegment!inquiries!public! !
-!URL categoriesFor: #fragment!accessing!public! !
-!URL categoriesFor: #fragment:!accessing!public! !
-!URL categoriesFor: #hasExplicitPort!public!testing! !
-!URL categoriesFor: #hash!comparing!public! !
-!URL categoriesFor: #hashFragment!inquiries!public! !
-!URL categoriesFor: #hasPath!public!testing! !
-!URL categoriesFor: #hasQuery!public!testing! !
-!URL categoriesFor: #hasScheme!public!testing! !
-!URL categoriesFor: #hasTrailingSlash!public!testing! !
-!URL categoriesFor: #host!accessing!public! !
-!URL categoriesFor: #host:!accessing!public! !
-!URL categoriesFor: #initialize!initializing!public! !
-!URL categoriesFor: #isAbsolute!public!testing! !
-!URL categoriesFor: #isEmpty!public!testing! !
-!URL categoriesFor: #isHttp!public!testing! !
-!URL categoriesFor: #isHttps!public!testing! !
-!URL categoriesFor: #isRelative!public!testing! !
-!URL categoriesFor: #isSecure!public!testing! !
-!URL categoriesFor: #isSlash!public!testing! !
-!URL categoriesFor: #isWebSocketURL!public!testing! !
-!URL categoriesFor: #isWs!public!testing! !
-!URL categoriesFor: #isWss!public!testing! !
-!URL categoriesFor: #parseAuthorityFrom:!parsing!private! !
-!URL categoriesFor: #parseFrom:!parsing!private! !
-!URL categoriesFor: #parseHostPortFrom:!parsing!private! !
-!URL categoriesFor: #parsePathFrom:!parsing!private! !
-!URL categoriesFor: #parseQueryFrom:!parsing!private! !
-!URL categoriesFor: #parseUserInfoFrom:!parsing!private! !
-!URL categoriesFor: #password!accessing!public! !
-!URL categoriesFor: #password:!accessing!public! !
-!URL categoriesFor: #path!inquiries!public! !
-!URL categoriesFor: #path:!accessing!public! !
-!URL categoriesFor: #pathAndQuery!inquiries!public! !
-!URL categoriesFor: #port!accessing!public! !
-!URL categoriesFor: #port:!accessing!public! !
-!URL categoriesFor: #postCopy!copying!public! !
-!URL categoriesFor: #printAuthorityOn:!printing!public! !
-!URL categoriesFor: #printFragmentOn:!printing!public! !
-!URL categoriesFor: #printHostOn:!printing!public! !
-!URL categoriesFor: #printOn:!printing!public! !
-!URL categoriesFor: #printPathOn:!printing!public! !
-!URL categoriesFor: #printPortOn:!printing!public! !
-!URL categoriesFor: #printQueryOn:!printing!public! !
-!URL categoriesFor: #printQueryOption:on:!printing!public! !
-!URL categoriesFor: #printSchemeOn:!printing!public! !
-!URL categoriesFor: #printSegments:on:!printing!public! !
-!URL categoriesFor: #printWithoutPort!printing!public! !
-!URL categoriesFor: #protocol!accessing!public! !
-!URL categoriesFor: #protocol:!accessing!public! !
-!URL categoriesFor: #query!private! !
-!URL categoriesFor: #query:!accessing!public! !
-!URL categoriesFor: #queryAt:!inquiries!public! !
-!URL categoriesFor: #queryAt:put:!accessing!public! !
-!URL categoriesFor: #queryOptions!accessing!public! !
-!URL categoriesFor: #queryString!inquiries!public! !
-!URL categoriesFor: #relativeUri!inquiries!public! !
-!URL categoriesFor: #removeLastSegment!accessing!public! !
-!URL categoriesFor: #removeSegment:!accessing!public! !
-!URL categoriesFor: #removeSubpath:!accessing!public! !
-!URL categoriesFor: #removeTrailingSlash!accessing!public! !
-!URL categoriesFor: #replaceQueryAt:with:!accessing!public! !
-!URL categoriesFor: #root!inquiries!public! !
-!URL categoriesFor: #scheme!accessing!public! !
-!URL categoriesFor: #scheme:!accessing!public! !
-!URL categoriesFor: #segmentAt:!inquiries!public! !
-!URL categoriesFor: #segmentAt:put:!accessing!public! !
-!URL categoriesFor: #segments!accessing!public! !
-!URL categoriesFor: #segments:!accessing!public! !
-!URL categoriesFor: #user!accessing!public! !
-!URL categoriesFor: #user:!accessing!public! !
+
+!URL categoriesForMethods!
+,!public!services! !
+/!public!services! !
+=!comparing!public! !
+addPath:!accessing!public! !
+addSegment:!accessing!public! !
+addSegments:!accessing!public! !
+addTrailingSlash!accessing!public! !
+asHttp!converting!public! !
+asJson!converting!public! !
+asURL!converting!public! !
+asWebSocketURL!converting!public! !
+asWs!converting!public! !
+asWss!converting!public! !
+baseUri!inquiries!public! !
+baseUri:!accessing!public! !
+baseUrl!inquiries!public! !
+beHttp!accessing!public! !
+beHttps!accessing!public! !
+beWs!accessing!public! !
+beWss!accessing!public! !
+decodeString:!private! !
+defaultPort!public!services! !
+encodedFragment:!accessing!public! !
+encodedPassword:!accessing!public! !
+encodedPath:!accessing!public! !
+encodedQueryAt:put:!accessing!public! !
+encodedUser:!accessing!public! !
+encodeString:!private! !
+firstSegment!inquiries!public! !
+fragment!accessing!public! !
+fragment:!accessing!public! !
+hasExplicitPort!public!testing! !
+hash!comparing!public! !
+hashFragment!inquiries!public! !
+hasPath!public!testing! !
+hasQuery!public!testing! !
+hasScheme!public!testing! !
+hasTrailingSlash!public!testing! !
+host!accessing!public! !
+host:!accessing!public! !
+initialize!initializing!public! !
+isAbsolute!public!testing! !
+isEmpty!public!testing! !
+isHttp!public!testing! !
+isHttps!public!testing! !
+isRelative!public!testing! !
+isSecure!public!testing! !
+isSlash!public!testing! !
+isWebSocketURL!public!testing! !
+isWs!public!testing! !
+isWss!public!testing! !
+parseAuthorityFrom:!parsing!private! !
+parseFrom:!parsing!private! !
+parseHostPortFrom:!parsing!private! !
+parsePathFrom:!parsing!private! !
+parseQueryFrom:!parsing!private! !
+parseUserInfoFrom:!parsing!private! !
+password!accessing!public! !
+password:!accessing!public! !
+path!inquiries!public! !
+path:!accessing!public! !
+pathAndQuery!inquiries!public! !
+port!accessing!public! !
+port:!accessing!public! !
+postCopy!copying!public! !
+printAuthorityOn:!printing!public! !
+printFragmentOn:!printing!public! !
+printHostOn:!printing!public! !
+printOn:!printing!public! !
+printPathOn:!printing!public! !
+printPortOn:!printing!public! !
+printQueryOn:!printing!public! !
+printQueryOption:on:!printing!public! !
+printSchemeOn:!printing!public! !
+printSegments:on:!printing!public! !
+printWithoutPort!printing!public! !
+protocol!accessing!public! !
+protocol:!accessing!public! !
+query!private! !
+query:!accessing!public! !
+queryAt:!inquiries!public! !
+queryAt:put:!accessing!public! !
+queryOptions!accessing!public! !
+queryString!inquiries!public! !
+relativeUri!inquiries!public! !
+removeLastSegment!accessing!public! !
+removeSegment:!accessing!public! !
+removeSubpath:!accessing!public! !
+removeTrailingSlash!accessing!public! !
+replaceQueryAt:with:!accessing!public! !
+root!inquiries!public! !
+scheme!accessing!public! !
+scheme:!accessing!public! !
+segmentAt:!inquiries!public! !
+segmentAt:put:!accessing!public! !
+segments!accessing!public! !
+segments:!accessing!public! !
+user!accessing!public! !
+user:!accessing!public! !
+!
 
 !URL class methodsFor!
 
@@ -2229,12 +2486,18 @@ fromString: aString
 
 new
 	^super new initialize! !
-!URL class categoriesFor: #fromString:!instance creation!public! !
-!URL class categoriesFor: #new!instance creation!public! !
+
+!URL class categoriesForMethods!
+fromString:!instance creation!public! !
+new!instance creation!public! !
+!
 
 URLTemplate guid: (GUID fromString: '{7dd6fd49-79ba-4946-9983-eddb03e0d83f}')!
+
 URLTemplate comment: ''!
+
 !URLTemplate categoriesForClass!Unclassified! !
+
 !URLTemplate methodsFor!
 
 = anObject
@@ -2308,33 +2571,42 @@ trimSlashesFrom: aString
 		ifFalse: [aString].
 	(string endsWith: '/') ifTrue: [string := string allButLast].
 	^string! !
-!URLTemplate categoriesFor: #=!comparing!public! !
-!URLTemplate categoriesFor: #argumentsFrom:!private! !
-!URLTemplate categoriesFor: #description!accessing!public! !
-!URLTemplate categoriesFor: #description:!accessing!public! !
-!URLTemplate categoriesFor: #hasDescription!private! !
-!URLTemplate categoriesFor: #hash!comparing!public! !
-!URLTemplate categoriesFor: #initializeParameters!private! !
-!URLTemplate categoriesFor: #initializePattern!private! !
-!URLTemplate categoriesFor: #initializeSample!private! !
-!URLTemplate categoriesFor: #matches:!private! !
-!URLTemplate categoriesFor: #on:!private! !
-!URLTemplate categoriesFor: #parameters!accessing!public! !
-!URLTemplate categoriesFor: #pattern!accessing!public! !
-!URLTemplate categoriesFor: #printOn:!printing!public! !
-!URLTemplate categoriesFor: #trimSlashesFrom:!private! !
+
+!URLTemplate categoriesForMethods!
+=!comparing!public! !
+argumentsFrom:!private! !
+description!accessing!public! !
+description:!accessing!public! !
+hasDescription!private! !
+hash!comparing!public! !
+initializeParameters!private! !
+initializePattern!private! !
+initializeSample!private! !
+matches:!private! !
+on:!private! !
+parameters!accessing!public! !
+pattern!accessing!public! !
+printOn:!printing!public! !
+trimSlashesFrom:!private! !
+!
 
 !URLTemplate class methodsFor!
 
 on: aString
 	^self new on: aString! !
-!URLTemplate class categoriesFor: #on:!instance creation!public! !
+
+!URLTemplate class categoriesForMethods!
+on:!instance creation!public! !
+!
 
 WebsideAPI guid: (GUID fromString: '{0d468ed7-e8b5-4ad5-a744-fe615bb74dcb}')!
+
 WebsideAPI comment: 'WebsideAPI startServer.
 WebsideServer allInstances do: [:s | s stop].
 WebsideAPI stopServer.'!
+
 !WebsideAPI categoriesForClass!Unclassified! !
+
 !WebsideAPI methodsFor!
 
 activeDebuggers
@@ -2485,6 +2757,9 @@ colors
 		at: 'primary' put: '#1d7bb9';
 		at: 'secondary' put: '#1565C0';
 		yourself!
+
+commandDefinitions
+	 ^#()!
 
 compilationError: aCompilationError
 	| error |
@@ -2669,7 +2944,15 @@ evaluations
 	^server evaluations!
 
 extensions
-	^#()!
+	^OrderedCollection new
+		add: (self newJsonObject
+			at: 'type' put: 'search';
+			at: 'elementType' put: 'system';
+			at: 'label' put: 'Methods with compilation issues';
+			at: 'get'
+			put: '/methods-with-issues';
+			yourself);
+		yourself asArray!
 
 filterByCategory: aCollection
 	| category |
@@ -2858,6 +3141,12 @@ methods
 	methods := self filterByVariable: methods.
 	(self queryAt: 'count') = 'true' ifTrue: [^methods size].
 	^self jsonFromMethods: methods!
+
+methodsWithIssues
+	| system |
+	system := SmalltalkSystem current.
+	^(system selectMethods: [:m | m hasCompilationIssues] in: system systemEnvironment) allMethods
+		asArray collect: [:m | m asWebsideJson]!
 
 methodsWithSelectorMatching: aString
 	^(SmalltalkSystem current systemEnvironment implementorsMatching: '*' , aString , '*') allMethods
@@ -3320,132 +3609,137 @@ workspaceBindings
 
 workspaces
 	^ server workspaces! !
-!WebsideAPI categoriesFor: #activeDebuggers!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #activeEvaluation!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #activeEvaluations!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #activeWorkspaces!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #addChange!changes endpoints!public! !
-!WebsideAPI categoriesFor: #badRequest:!private! !
-!WebsideAPI categoriesFor: #bodyAt:!private! !
-!WebsideAPI categoriesFor: #bodyAt:ifAbsent:!private! !
-!WebsideAPI categoriesFor: #cancelEvaluation!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #categories!code endpoints!public! !
-!WebsideAPI categoriesFor: #changes!changes endpoints!public! !
-!WebsideAPI categoriesFor: #classDefinition!code endpoints!public! !
-!WebsideAPI categoriesFor: #classes!code endpoints!public! !
-!WebsideAPI categoriesFor: #classNamed:!private! !
-!WebsideAPI categoriesFor: #classTreeFrom:depth:!private! !
-!WebsideAPI categoriesFor: #classTreeFromClasses:!private! !
-!WebsideAPI categoriesFor: #classVariables!code endpoints!public! !
-!WebsideAPI categoriesFor: #colors!general endpoints!public! !
-!WebsideAPI categoriesFor: #compilationError:!private! !
-!WebsideAPI categoriesFor: #compilerReceiver!private! !
-!WebsideAPI categoriesFor: #created:!private! !
-!WebsideAPI categoriesFor: #createDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #createEvaluation!private! !
-!WebsideAPI categoriesFor: #createWorkspace!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #customViewsOf:!private! !
-!WebsideAPI categoriesFor: #debugExpression!private! !
-!WebsideAPI categoriesFor: #debuggerFrame!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #debuggerFrames!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #debuggers!private! !
-!WebsideAPI categoriesFor: #defaultRootClass!private! !
-!WebsideAPI categoriesFor: #deleteDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #deleteWorkspace!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #dialect!general endpoints!public! !
-!WebsideAPI categoriesFor: #evaluateExpression!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #evaluateExpression:!private! !
-!WebsideAPI categoriesFor: #evaluationError:!public! !
-!WebsideAPI categoriesFor: #evaluations!private! !
-!WebsideAPI categoriesFor: #extensions!extensions endpoints!public! !
-!WebsideAPI categoriesFor: #filterByCategory:!public! !
-!WebsideAPI categoriesFor: #filterByVariable:!private! !
-!WebsideAPI categoriesFor: #frameBindings!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #icons!general endpoints!public! !
-!WebsideAPI categoriesFor: #implementorsOf:!private! !
-!WebsideAPI categoriesFor: #indexedSlotsOf:!private! !
-!WebsideAPI categoriesFor: #instanceVariables!code endpoints!public! !
-!WebsideAPI categoriesFor: #instanceVariablesOf:!public! !
-!WebsideAPI categoriesFor: #integerFrom:!private! !
-!WebsideAPI categoriesFor: #jsonFromMethods:!private! !
-!WebsideAPI categoriesFor: #logo!general endpoints!public! !
-!WebsideAPI categoriesFor: #method!code endpoints!public! !
-!WebsideAPI categoriesFor: #methods!code endpoints!public! !
-!WebsideAPI categoriesFor: #methodsWithSelectorMatching:!private! !
-!WebsideAPI categoriesFor: #methodTemplate!code endpoints!public! !
-!WebsideAPI categoriesFor: #namedSlotsOf:!private! !
-!WebsideAPI categoriesFor: #newID!private! !
-!WebsideAPI categoriesFor: #newJsonObject!private! !
-!WebsideAPI categoriesFor: #notFound!private! !
-!WebsideAPI categoriesFor: #objectFromPath:!private! !
-!WebsideAPI categoriesFor: #objects!private! !
-!WebsideAPI categoriesFor: #package!code endpoints!public! !
-!WebsideAPI categoriesFor: #packageClasses!code endpoints!public! !
-!WebsideAPI categoriesFor: #packageMethods!code endpoints!public! !
-!WebsideAPI categoriesFor: #packageNamed:!private! !
-!WebsideAPI categoriesFor: #packages!code endpoints!public! !
-!WebsideAPI categoriesFor: #pauseEvaluation!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #pinnedObject!objects endpoints!public! !
-!WebsideAPI categoriesFor: #pinnedObjects!objects endpoints!public! !
-!WebsideAPI categoriesFor: #pinnedObjectSlots!objects endpoints!public! !
-!WebsideAPI categoriesFor: #pinObjectSlot!objects endpoints!public! !
-!WebsideAPI categoriesFor: #profileExpression!profiling endpoints!public! !
-!WebsideAPI categoriesFor: #queriedAccessing!private! !
-!WebsideAPI categoriesFor: #queriedAssigning!private! !
-!WebsideAPI categoriesFor: #queriedCategory!private! !
-!WebsideAPI categoriesFor: #queriedClass!private! !
-!WebsideAPI categoriesFor: #queriedPackage!private! !
-!WebsideAPI categoriesFor: #queriedReferencing!private! !
-!WebsideAPI categoriesFor: #queriedReferencingClass!private! !
-!WebsideAPI categoriesFor: #queriedReferencingString!private! !
-!WebsideAPI categoriesFor: #queriedScope!private! !
-!WebsideAPI categoriesFor: #queriedSelector!private! !
-!WebsideAPI categoriesFor: #queriedSelectorMatching!private! !
-!WebsideAPI categoriesFor: #queriedSending!private! !
-!WebsideAPI categoriesFor: #queriedUsing!private! !
-!WebsideAPI categoriesFor: #queryAt:!private! !
-!WebsideAPI categoriesFor: #queryAt:ifAbsent:!private! !
-!WebsideAPI categoriesFor: #queryAt:ifPresent:!private! !
-!WebsideAPI categoriesFor: #queryAt:ifPresent:ifAbsent:!private! !
-!WebsideAPI categoriesFor: #referencesTo:!private! !
-!WebsideAPI categoriesFor: #request:!accessing!public! !
-!WebsideAPI categoriesFor: #requestedChange!private! !
-!WebsideAPI categoriesFor: #requestedClass!private! !
-!WebsideAPI categoriesFor: #requestedEvaluationContext!private! !
-!WebsideAPI categoriesFor: #requestedEvaluationReceiver!private! !
-!WebsideAPI categoriesFor: #requestedId!private! !
-!WebsideAPI categoriesFor: #requestedIndex!private! !
-!WebsideAPI categoriesFor: #requestedPackage!private! !
-!WebsideAPI categoriesFor: #requestedSelector!private! !
-!WebsideAPI categoriesFor: #requestedSlot!private! !
-!WebsideAPI categoriesFor: #restartDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #resumeDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #resumeEvaluation!evaluation endpoints!public! !
-!WebsideAPI categoriesFor: #saveImage!general endpoints!public! !
-!WebsideAPI categoriesFor: #search!code endpoints!public! !
-!WebsideAPI categoriesFor: #search:for:with:condition:type:ignoreCase:!private! !
-!WebsideAPI categoriesFor: #selectors!code endpoints!public! !
-!WebsideAPI categoriesFor: #sendersOf:!private! !
-!WebsideAPI categoriesFor: #server:!accessing!public! !
-!WebsideAPI categoriesFor: #slot:of:ifAbsent:!private! !
-!WebsideAPI categoriesFor: #stepIntoDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #stepOverDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #stepThroughDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #subclasses!code endpoints!public! !
-!WebsideAPI categoriesFor: #superclasses!code endpoints!public! !
-!WebsideAPI categoriesFor: #systemPackage!private! !
-!WebsideAPI categoriesFor: #terminateDebugger!debugging endpoints!public! !
-!WebsideAPI categoriesFor: #unpinAllObjects!objects endpoints!public! !
-!WebsideAPI categoriesFor: #unpinObject!objects endpoints!public! !
-!WebsideAPI categoriesFor: #updateWorkspace!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #urlAt:!private! !
-!WebsideAPI categoriesFor: #usedCategories!code endpoints!public! !
-!WebsideAPI categoriesFor: #usualCategories!code endpoints!public! !
-!WebsideAPI categoriesFor: #variables!code endpoints!public! !
-!WebsideAPI categoriesFor: #version!general endpoints!public! !
-!WebsideAPI categoriesFor: #workspace!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #workspaceBindings!public!workspaces endpoints! !
-!WebsideAPI categoriesFor: #workspaces!private! !
+
+!WebsideAPI categoriesForMethods!
+activeDebuggers!debugging endpoints!public! !
+activeEvaluation!evaluation endpoints!public! !
+activeEvaluations!evaluation endpoints!public! !
+activeWorkspaces!public!workspaces endpoints! !
+addChange!changes endpoints!public! !
+badRequest:!private! !
+bodyAt:!private! !
+bodyAt:ifAbsent:!private! !
+cancelEvaluation!evaluation endpoints!public! !
+categories!code endpoints!public! !
+changes!changes endpoints!public! !
+classDefinition!code endpoints!public! !
+classes!code endpoints!public! !
+classNamed:!private! !
+classTreeFrom:depth:!private! !
+classTreeFromClasses:!private! !
+classVariables!code endpoints!public! !
+colors!general endpoints!public! !
+commandDefinitions!commands endpoints!public! !
+compilationError:!private! !
+compilerReceiver!private! !
+created:!private! !
+createDebugger!debugging endpoints!public! !
+createEvaluation!private! !
+createWorkspace!public!workspaces endpoints! !
+customViewsOf:!private! !
+debugExpression!private! !
+debuggerFrame!debugging endpoints!public! !
+debuggerFrames!debugging endpoints!public! !
+debuggers!private! !
+defaultRootClass!private! !
+deleteDebugger!debugging endpoints!public! !
+deleteWorkspace!public!workspaces endpoints! !
+dialect!general endpoints!public! !
+evaluateExpression!evaluation endpoints!public! !
+evaluateExpression:!private! !
+evaluationError:!public! !
+evaluations!private! !
+extensions!extensions endpoints!public! !
+filterByCategory:!public! !
+filterByVariable:!private! !
+frameBindings!debugging endpoints!public! !
+icons!general endpoints!public! !
+implementorsOf:!private! !
+indexedSlotsOf:!private! !
+instanceVariables!code endpoints!public! !
+instanceVariablesOf:!public! !
+integerFrom:!private! !
+jsonFromMethods:!private! !
+logo!general endpoints!public! !
+method!code endpoints!public! !
+methods!code endpoints!public! !
+methodsWithIssues!extensions endpoints!public! !
+methodsWithSelectorMatching:!private! !
+methodTemplate!code endpoints!public! !
+namedSlotsOf:!private! !
+newID!private! !
+newJsonObject!private! !
+notFound!private! !
+objectFromPath:!private! !
+objects!private! !
+package!code endpoints!public! !
+packageClasses!code endpoints!public! !
+packageMethods!code endpoints!public! !
+packageNamed:!private! !
+packages!code endpoints!public! !
+pauseEvaluation!evaluation endpoints!public! !
+pinnedObject!objects endpoints!public! !
+pinnedObjects!objects endpoints!public! !
+pinnedObjectSlots!objects endpoints!public! !
+pinObjectSlot!objects endpoints!public! !
+profileExpression!profiling endpoints!public! !
+queriedAccessing!private! !
+queriedAssigning!private! !
+queriedCategory!private! !
+queriedClass!private! !
+queriedPackage!private! !
+queriedReferencing!private! !
+queriedReferencingClass!private! !
+queriedReferencingString!private! !
+queriedScope!private! !
+queriedSelector!private! !
+queriedSelectorMatching!private! !
+queriedSending!private! !
+queriedUsing!private! !
+queryAt:!private! !
+queryAt:ifAbsent:!private! !
+queryAt:ifPresent:!private! !
+queryAt:ifPresent:ifAbsent:!private! !
+referencesTo:!private! !
+request:!accessing!public! !
+requestedChange!private! !
+requestedClass!private! !
+requestedEvaluationContext!private! !
+requestedEvaluationReceiver!private! !
+requestedId!private! !
+requestedIndex!private! !
+requestedPackage!private! !
+requestedSelector!private! !
+requestedSlot!private! !
+restartDebugger!debugging endpoints!public! !
+resumeDebugger!debugging endpoints!public! !
+resumeEvaluation!evaluation endpoints!public! !
+saveImage!general endpoints!public! !
+search!code endpoints!public! !
+search:for:with:condition:type:ignoreCase:!private! !
+selectors!code endpoints!public! !
+sendersOf:!private! !
+server:!accessing!public! !
+slot:of:ifAbsent:!private! !
+stepIntoDebugger!debugging endpoints!public! !
+stepOverDebugger!debugging endpoints!public! !
+stepThroughDebugger!debugging endpoints!public! !
+subclasses!code endpoints!public! !
+superclasses!code endpoints!public! !
+systemPackage!private! !
+terminateDebugger!debugging endpoints!public! !
+unpinAllObjects!objects endpoints!public! !
+unpinObject!objects endpoints!public! !
+updateWorkspace!public!workspaces endpoints! !
+urlAt:!private! !
+usedCategories!code endpoints!public! !
+usualCategories!code endpoints!public! !
+variables!code endpoints!public! !
+version!general endpoints!public! !
+workspace!public!workspaces endpoints! !
+workspaceBindings!public!workspaces endpoints! !
+workspaces!private! !
+!
 
 !WebsideAPI class methodsFor!
 
@@ -3465,15 +3759,24 @@ stopServer
 	"
 
 	WebsideServer allInstances do: [:s | s stop]! !
-!WebsideAPI class categoriesFor: #startServer!public!services! !
-!WebsideAPI class categoriesFor: #stopServer!public!services! !
+
+!WebsideAPI class categoriesForMethods!
+startServer!public!services! !
+stopServer!public!services! !
+!
 
 WebsideClient guid: (GUID fromString: '{01ff30e8-7918-4d1f-8703-ba7c4f350477}')!
+
 WebsideClient comment: ''!
+
 !WebsideClient categoriesForClass!Unclassified! !
+
 WebsideEvaluation guid: (GUID fromString: '{b4a27f67-df46-4a72-a342-cea2fbac33b9}')!
+
 WebsideEvaluation comment: ''!
+
 !WebsideEvaluation categoriesForClass!Webside-Base! !
+
 !WebsideEvaluation methodsFor!
 
 asWebsideJson
@@ -3636,56 +3939,65 @@ waitForResult
 
 wasCancelled
 	^state == #cancelled! !
-!WebsideEvaluation categoriesFor: #asWebsideJson!public! !
-!WebsideEvaluation categoriesFor: #cancel!public! !
-!WebsideEvaluation categoriesFor: #cancelled!public! !
-!WebsideEvaluation categoriesFor: #context!public! !
-!WebsideEvaluation categoriesFor: #context:!public! !
-!WebsideEvaluation categoriesFor: #debug!public! !
-!WebsideEvaluation categoriesFor: #error!public! !
-!WebsideEvaluation categoriesFor: #error:!public! !
-!WebsideEvaluation categoriesFor: #evaluate!public! !
-!WebsideEvaluation categoriesFor: #evaluateBlock:!public! !
-!WebsideEvaluation categoriesFor: #expression!public! !
-!WebsideEvaluation categoriesFor: #expression:!public! !
-!WebsideEvaluation categoriesFor: #failed!public! !
-!WebsideEvaluation categoriesFor: #finalized!public! !
-!WebsideEvaluation categoriesFor: #finished!public! !
-!WebsideEvaluation categoriesFor: #hasFailed!public! !
-!WebsideEvaluation categoriesFor: #hasFinished!public! !
-!WebsideEvaluation categoriesFor: #id!public! !
-!WebsideEvaluation categoriesFor: #id:!public! !
-!WebsideEvaluation categoriesFor: #initialize!private! !
-!WebsideEvaluation categoriesFor: #isEvaluating!public! !
-!WebsideEvaluation categoriesFor: #isFinalized!public! !
-!WebsideEvaluation categoriesFor: #isPaused!public! !
-!WebsideEvaluation categoriesFor: #isPending!public! !
-!WebsideEvaluation categoriesFor: #pause!public! !
-!WebsideEvaluation categoriesFor: #paused!public! !
-!WebsideEvaluation categoriesFor: #priority:!public! !
-!WebsideEvaluation categoriesFor: #process!public! !
-!WebsideEvaluation categoriesFor: #process:!public! !
-!WebsideEvaluation categoriesFor: #receiver!public! !
-!WebsideEvaluation categoriesFor: #receiver:!public! !
-!WebsideEvaluation categoriesFor: #requestor!public! !
-!WebsideEvaluation categoriesFor: #requestor:!public! !
-!WebsideEvaluation categoriesFor: #result!public! !
-!WebsideEvaluation categoriesFor: #result:!public! !
-!WebsideEvaluation categoriesFor: #resume!public! !
-!WebsideEvaluation categoriesFor: #resumed!public! !
-!WebsideEvaluation categoriesFor: #state!public! !
-!WebsideEvaluation categoriesFor: #waitForResult!public! !
-!WebsideEvaluation categoriesFor: #wasCancelled!public! !
+
+!WebsideEvaluation categoriesForMethods!
+asWebsideJson!public! !
+cancel!public! !
+cancelled!public! !
+context!public! !
+context:!public! !
+debug!public! !
+error!public! !
+error:!public! !
+evaluate!public! !
+evaluateBlock:!public! !
+expression!public! !
+expression:!public! !
+failed!public! !
+finalized!public! !
+finished!public! !
+hasFailed!public! !
+hasFinished!public! !
+id!public! !
+id:!public! !
+initialize!private! !
+isEvaluating!public! !
+isFinalized!public! !
+isPaused!public! !
+isPending!public! !
+pause!public! !
+paused!public! !
+priority:!public! !
+process!public! !
+process:!public! !
+receiver!public! !
+receiver:!public! !
+requestor!public! !
+requestor:!public! !
+result!public! !
+result:!public! !
+resume!public! !
+resumed!public! !
+state!public! !
+waitForResult!public! !
+wasCancelled!public! !
+!
 
 !WebsideEvaluation class methodsFor!
 
 new
 	 ^super new initialize! !
-!WebsideEvaluation class categoriesFor: #new!public! !
+
+!WebsideEvaluation class categoriesForMethods!
+new!public! !
+!
 
 WebsideResource guid: (GUID fromString: '{fb90d8b3-e1bf-4830-b05d-2d19107070b8}')!
+
 WebsideResource comment: ''!
+
 !WebsideResource categoriesForClass!Unclassified! !
+
 !WebsideResource methodsFor!
 
 asWebsideJson
@@ -3698,24 +4010,33 @@ id	^id!
 id: anIID	id := anIID!
 
 initialize	super initialize.	id := self class newId! !
-!WebsideResource categoriesFor: #asWebsideJson!public! !
-!WebsideResource categoriesFor: #id!public! !
-!WebsideResource categoriesFor: #id:!public! !
-!WebsideResource categoriesFor: #initialize!public! !
+
+!WebsideResource categoriesForMethods!
+asWebsideJson!public! !
+id!public! !
+id:!public! !
+initialize!public! !
+!
 
 !WebsideResource class methodsFor!
 
 new	^super new initialize!
 
 newId	^IID newUnique! !
-!WebsideResource class categoriesFor: #new!public! !
-!WebsideResource class categoriesFor: #newId!public! !
+
+!WebsideResource class categoriesForMethods!
+new!public! !
+newId!public! !
+!
 
 WebsideServer guid: (GUID fromString: '{4ccc35e6-7d31-4554-8b09-5b16765a0d84}')!
+
 WebsideServer comment: 'WebsideAPI startServer
 
 WebsideAPI stopServer'!
+
 !WebsideServer categoriesForClass!Unclassified! !
+
 !WebsideServer methodsFor!
 
 addChange: change
@@ -3827,6 +4148,9 @@ initializeCodeRoutes
 		routeGET: '/methodtemplate' to: #methodTemplate;
 		routeGET: '/search' to: #search!
 
+initializeCommandRoutes
+	router routeGET: '/command-definitions' to: #commandDefinitions!
+
 initializeDebuggingRoutes
 	router
 		routeGET: '/debuggers' to: #activeDebuggers;
@@ -3851,7 +4175,9 @@ initializeEvaluationRoutes
 		routePOST: '/evaluations/{id}/resume' to: #resumeEvaluation!
 
 initializeExtensionsRoutes
-	router routeGET: '/extensions' to: #extensions!
+	router
+		routeGET: '/extensions' to: #extensions;
+		routeGET: 'methods-with-issues' to: #methodsWithIssues!
 
 initializeGeneralRoutes
 	router
@@ -3903,7 +4229,8 @@ initializeRoutes
 		initializeObjectsRoutes;
 		initializeWorkspacesRoutes;
 		initializeDebuggingRoutes;
-		initializeExtensionsRoutes!
+		initializeExtensionsRoutes;
+		initializeCommandRoutes!
 
 initializeServer
 	server := HttpServer new.
@@ -3951,65 +4278,81 @@ stop
 testRuns	^ self resourcesAt: #testRuns!
 
 workspaces	^ self resourcesAt: #workspaces! !
-!WebsideServer categoriesFor: #addChange:!accessing!public! !
-!WebsideServer categoriesFor: #baseUri!accessing!public! !
-!WebsideServer categoriesFor: #baseUri:!accessing!public! !
-!WebsideServer categoriesFor: #changes!accessing!public! !
-!WebsideServer categoriesFor: #debuggers!accessing!public! !
-!WebsideServer categoriesFor: #defaultBaseUri!accessing!public! !
-!WebsideServer categoriesFor: #defaultPort!accessing!public! !
-!WebsideServer categoriesFor: #evaluations!accessing!public! !
-!WebsideServer categoriesFor: #handlePreflightRequest:!actions!public! !
-!WebsideServer categoriesFor: #handleRequest:with:!actions!public! !
-!WebsideServer categoriesFor: #icons!accessing!public! !
-!WebsideServer categoriesFor: #imageFromIcon:!private! !
-!WebsideServer categoriesFor: #initialize!initializing!public! !
-!WebsideServer categoriesFor: #initializeChangesRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeCodeRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeDebuggingRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeEvaluationRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeExtensionsRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeGeneralRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeIcons!initializing!public! !
-!WebsideServer categoriesFor: #initializeObjectsRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializePreflightRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeResources!initializing!public! !
-!WebsideServer categoriesFor: #initializeRoutes!initializing!public! !
-!WebsideServer categoriesFor: #initializeServer!initializing!public! !
-!WebsideServer categoriesFor: #initializeWorkspacesRoutes!initializing!public! !
-!WebsideServer categoriesFor: #isPreflight:!public!testing! !
-!WebsideServer categoriesFor: #objects!accessing!public! !
-!WebsideServer categoriesFor: #port!accessing!public! !
-!WebsideServer categoriesFor: #port:!accessing!public! !
-!WebsideServer categoriesFor: #reset!actions!public! !
-!WebsideServer categoriesFor: #resourcesAt:!accessing!public! !
-!WebsideServer categoriesFor: #resourcesAt:put:!accessing!public! !
-!WebsideServer categoriesFor: #start!actions!public! !
-!WebsideServer categoriesFor: #stop!actions!public! !
-!WebsideServer categoriesFor: #testRuns!accessing!public! !
-!WebsideServer categoriesFor: #workspaces!accessing!public! !
+
+!WebsideServer categoriesForMethods!
+addChange:!accessing!public! !
+baseUri!accessing!public! !
+baseUri:!accessing!public! !
+changes!accessing!public! !
+debuggers!accessing!public! !
+defaultBaseUri!accessing!public! !
+defaultPort!accessing!public! !
+evaluations!accessing!public! !
+handlePreflightRequest:!actions!public! !
+handleRequest:with:!actions!public! !
+icons!accessing!public! !
+imageFromIcon:!private! !
+initialize!initializing!public! !
+initializeChangesRoutes!initializing!public! !
+initializeCodeRoutes!initializing!public! !
+initializeCommandRoutes!initializing!public! !
+initializeDebuggingRoutes!initializing!public! !
+initializeEvaluationRoutes!initializing!public! !
+initializeExtensionsRoutes!initializing!public! !
+initializeGeneralRoutes!initializing!public! !
+initializeIcons!initializing!public! !
+initializeObjectsRoutes!initializing!public! !
+initializePreflightRoutes!initializing!public! !
+initializeResources!initializing!public! !
+initializeRoutes!initializing!public! !
+initializeServer!initializing!public! !
+initializeWorkspacesRoutes!initializing!public! !
+isPreflight:!public!testing! !
+objects!accessing!public! !
+port!accessing!public! !
+port:!accessing!public! !
+reset!actions!public! !
+resourcesAt:!accessing!public! !
+resourcesAt:put:!accessing!public! !
+start!actions!public! !
+stop!actions!public! !
+testRuns!accessing!public! !
+workspaces!accessing!public! !
+!
 
 !WebsideServer class methodsFor!
 
 new
 	 ^super new initialize! !
-!WebsideServer class categoriesFor: #new!instance creation!public! !
+
+!WebsideServer class categoriesForMethods!
+new!instance creation!public! !
+!
 
 WebsideException guid: (GUID fromString: '{0bccb83b-5d71-46ce-90ab-3fd303168aa4}')!
+
 WebsideException comment: ''!
+
 !WebsideException categoriesForClass!Kernel-Exception Handling! !
+
 !WebsideException methodsFor!
 
 defaultAction!
 
 isResumable
 	^true! !
-!WebsideException categoriesFor: #defaultAction!public! !
-!WebsideException categoriesFor: #isResumable!public! !
+
+!WebsideException categoriesForMethods!
+defaultAction!public! !
+isResumable!public! !
+!
 
 RefactoryPackageChange guid: (GUID fromString: '{a233a4fd-81a3-45c7-9a63-338591e63744}')!
+
 RefactoryPackageChange comment: ''!
+
 !RefactoryPackageChange categoriesForClass!Refactory-Change Objects! !
+
 !RefactoryPackageChange methodsFor!
 
 asUndoOperation!
@@ -4033,15 +4376,21 @@ fromWebsideJson: json
 
 primitiveExecute
 	^self subclassResponsibility! !
-!RefactoryPackageChange categoriesFor: #asUndoOperation!public! !
-!RefactoryPackageChange categoriesFor: #asWebsideJson!public! !
-!RefactoryPackageChange categoriesFor: #executeNotifying:!public! !
-!RefactoryPackageChange categoriesFor: #fromWebsideJson:!public! !
-!RefactoryPackageChange categoriesFor: #primitiveExecute!public! !
+
+!RefactoryPackageChange categoriesForMethods!
+asUndoOperation!public! !
+asWebsideJson!public! !
+executeNotifying:!public! !
+fromWebsideJson:!public! !
+primitiveExecute!public! !
+!
 
 ClassifyMethodChange guid: (GUID fromString: '{80aeef58-aca9-4378-b558-42c99c9ae553}')!
+
 ClassifyMethodChange comment: ''!
+
 !ClassifyMethodChange categoriesForClass!Refactory-Change Objects! !
+
 !ClassifyMethodChange methodsFor!
 
 asUndoOperation
@@ -4066,15 +4415,21 @@ method
 
 primitiveExecute
 	MethodCategory setMethod: self method categories: (Array with: category asMethodCategory)! !
-!ClassifyMethodChange categoriesFor: #asUndoOperation!public! !
-!ClassifyMethodChange categoriesFor: #asWebsideJson!public! !
-!ClassifyMethodChange categoriesFor: #fromWebsideJson:!public! !
-!ClassifyMethodChange categoriesFor: #method!public! !
-!ClassifyMethodChange categoriesFor: #primitiveExecute!public! !
+
+!ClassifyMethodChange categoriesForMethods!
+asUndoOperation!public! !
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+method!public! !
+primitiveExecute!public! !
+!
 
 CommentClassChange guid: (GUID fromString: '{86fa936b-3c4d-4835-88a3-9df9f185b725}')!
+
 CommentClassChange comment: ''!
+
 !CommentClassChange categoriesForClass!Refactory-Change Objects! !
+
 !CommentClassChange methodsFor!
 
 asUndoOperation
@@ -4094,15 +4449,21 @@ fromWebsideJson: json
 
 primitiveExecute
 	self changeClass comment: comment! !
-!CommentClassChange categoriesFor: #asUndoOperation!public! !
-!CommentClassChange categoriesFor: #asWebsideJson!public! !
-!CommentClassChange categoriesFor: #comment:!public! !
-!CommentClassChange categoriesFor: #fromWebsideJson:!public! !
-!CommentClassChange categoriesFor: #primitiveExecute!public! !
+
+!CommentClassChange categoriesForMethods!
+asUndoOperation!public! !
+asWebsideJson!public! !
+comment:!public! !
+fromWebsideJson:!public! !
+primitiveExecute!public! !
+!
 
 RefactoryCategoryChange guid: (GUID fromString: '{a56b47bc-9b75-4e97-b085-6127c9cb60eb}')!
+
 RefactoryCategoryChange comment: ''!
+
 !RefactoryCategoryChange categoriesForClass!Refactory-Change Objects! !
+
 !RefactoryCategoryChange methodsFor!
 
 asWebsideJson
@@ -4116,13 +4477,19 @@ category: aString
 fromWebsideJson: json
 	super fromWebsideJson: json.
 	category := json at: 'category' ifAbsent: []! !
-!RefactoryCategoryChange categoriesFor: #asWebsideJson!public! !
-!RefactoryCategoryChange categoriesFor: #category:!public! !
-!RefactoryCategoryChange categoriesFor: #fromWebsideJson:!public! !
+
+!RefactoryCategoryChange categoriesForMethods!
+asWebsideJson!public! !
+category:!public! !
+fromWebsideJson:!public! !
+!
 
 AddCategoryChange guid: (GUID fromString: '{8eb4977e-9a49-4989-bafc-f2b365181fa2}')!
+
 AddCategoryChange comment: ''!
+
 !AddCategoryChange categoriesForClass!Refactory-Change Objects! !
+
 !AddCategoryChange methodsFor!
 
 asUndoOperation
@@ -4137,12 +4504,18 @@ primitiveExecute
 	catalogue := class methodsCatalogue.
 	existing := catalogue keys detect: [:k | k name = category] ifNone: [].
 	existing ifNil: [catalogue at: category asMethodCategory put: {}]! !
-!AddCategoryChange categoriesFor: #asUndoOperation!public! !
-!AddCategoryChange categoriesFor: #primitiveExecute!public! !
+
+!AddCategoryChange categoriesForMethods!
+asUndoOperation!public! !
+primitiveExecute!public! !
+!
 
 RemoveCategoryChange guid: (GUID fromString: '{ae6cec4f-39ab-4bad-a9c8-ebb8593dd62d}')!
+
 RemoveCategoryChange comment: ''!
+
 !RemoveCategoryChange categoriesForClass!Refactory-Change Objects! !
+
 !RemoveCategoryChange methodsFor!
 
 asUndoOperation
@@ -4157,12 +4530,18 @@ primitiveExecute
 	catalogue := class methodsCatalogue.
 	existing := catalogue keys detect: [:k | k name = category] ifNone: [].
 	existing ifNotNil: [catalogue removeKey: existing]! !
-!RemoveCategoryChange categoriesFor: #asUndoOperation!public! !
-!RemoveCategoryChange categoriesFor: #primitiveExecute!public! !
+
+!RemoveCategoryChange categoriesForMethods!
+asUndoOperation!public! !
+primitiveExecute!public! !
+!
 
 RenameCategoryChange guid: (GUID fromString: '{56140d1e-1ec2-4cd9-aa5a-abc85a9200d5}')!
+
 RenameCategoryChange comment: ''!
+
 !RenameCategoryChange categoriesForClass!Refactory-Change Objects! !
+
 !RenameCategoryChange methodsFor!
 
 asUndoOperation
@@ -4197,15 +4576,21 @@ primitiveExecute
 	catalogue
 		at: target put: methods;
 		removeKey: source! !
-!RenameCategoryChange categoriesFor: #asUndoOperation!public! !
-!RenameCategoryChange categoriesFor: #asWebsideJson!public! !
-!RenameCategoryChange categoriesFor: #fromWebsideJson:!public! !
-!RenameCategoryChange categoriesFor: #newName:!public! !
-!RenameCategoryChange categoriesFor: #primitiveExecute!public! !
+
+!RenameCategoryChange categoriesForMethods!
+asUndoOperation!public! !
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+newName:!public! !
+primitiveExecute!public! !
+!
 
 AddPackageChange guid: (GUID fromString: '{a2e72d80-c0cb-4bf5-8398-127e871225f6}')!
+
 AddPackageChange comment: ''!
+
 !AddPackageChange categoriesForClass!Refactory-Change Objects! !
+
 !AddPackageChange methodsFor!
 
 primitiveExecute
@@ -4215,11 +4600,17 @@ primitiveExecute
 		ifNone: 
 			[filename := File composePath: PackageFolder dolphinRootPathname subPath: packageName.
 			pm newPackage: filename]! !
-!AddPackageChange categoriesFor: #primitiveExecute!public! !
+
+!AddPackageChange categoriesForMethods!
+primitiveExecute!public! !
+!
 
 RemovePackageChange guid: (GUID fromString: '{411f07c2-aecb-44a9-9d66-f292cff602fb}')!
+
 RemovePackageChange comment: ''!
+
 !RemovePackageChange categoriesForClass!Refactory-Change Objects! !
+
 !RemovePackageChange methodsFor!
 
 primitiveExecute
@@ -4227,11 +4618,17 @@ primitiveExecute
 	pm := Package manager.
 	package := pm packageNamed: packageName.
 	package ifNotNil: [pm removePackage: package]! !
-!RemovePackageChange categoriesFor: #primitiveExecute!public! !
+
+!RemovePackageChange categoriesForMethods!
+primitiveExecute!public! !
+!
 
 RenamePackageChange guid: (GUID fromString: '{64e42418-9e10-4e76-81bf-a783daad96b7}')!
+
 RenamePackageChange comment: ''!
+
 !RenamePackageChange categoriesForClass!Refactory-Change Objects! !
+
 !RenamePackageChange methodsFor!
 
 asWebsideJson
@@ -4249,13 +4646,19 @@ primitiveExecute
 	pm := Package manager.
 	package := pm packageNamed: packageName.
 	package ifNotNil: [pm renamePackage: package to: newName]! !
-!RenamePackageChange categoriesFor: #asWebsideJson!public! !
-!RenamePackageChange categoriesFor: #fromWebsideJson:!public! !
-!RenamePackageChange categoriesFor: #primitiveExecute!public! !
+
+!RenamePackageChange categoriesForMethods!
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+primitiveExecute!public! !
+!
 
 URLTemplateTest guid: (GUID fromString: '{56dde46a-6c6a-4bea-93df-0767604a2c75}')!
+
 URLTemplateTest comment: ''!
+
 !URLTemplateTest categoriesForClass!Unclassified! !
+
 !URLTemplateTest methodsFor!
 
 testArguments
@@ -4293,14 +4696,20 @@ testVariablePath
 		assert: (template matches: '/library/books/hamlet/pages/33' asURL);
 		assert: (template
 			matches: '/library/books/hamlet/pages/33/paragraphs/22' asURL)! !
-!URLTemplateTest categoriesFor: #testArguments!public! !
-!URLTemplateTest categoriesFor: #testMatching!public! !
-!URLTemplateTest categoriesFor: #testTrailingSlash!public! !
-!URLTemplateTest categoriesFor: #testVariablePath!public! !
+
+!URLTemplateTest categoriesForMethods!
+testArguments!public! !
+testMatching!public! !
+testTrailingSlash!public! !
+testVariablePath!public! !
+!
 
 URLTest guid: (GUID fromString: '{fd4eeb84-43db-47c1-893d-71cf8638bc94}')!
+
 URLTest comment: ''!
+
 !URLTest categoriesForClass!SUnit! !
+
 !URLTest methodsFor!
 
 testAddPath
@@ -4892,59 +5301,65 @@ testWikipedia5
 		assert: url path = '/ISSN:1535-3613';
 		deny: url hasQuery;
 		assert: url fragment isNil! !
-!URLTest categoriesFor: #testAddPath!public! !
-!URLTest categoriesFor: #testBaseUri!public! !
-!URLTest categoriesFor: #testBaseUrl!public! !
-!URLTest categoriesFor: #testConcatenation!public! !
-!URLTest categoriesFor: #testDefaultPort!public! !
-!URLTest categoriesFor: #testEncodedQuery!public! !
-!URLTest categoriesFor: #testEquality!public! !
-!URLTest categoriesFor: #testFreeFormatter1!public! !
-!URLTest categoriesFor: #testFreeFormatter10!public! !
-!URLTest categoriesFor: #testFreeFormatter11!public! !
-!URLTest categoriesFor: #testFreeFormatter12!public! !
-!URLTest categoriesFor: #testFreeFormatter13!public! !
-!URLTest categoriesFor: #testFreeFormatter14!public! !
-!URLTest categoriesFor: #testFreeFormatter15!public! !
-!URLTest categoriesFor: #testFreeFormatter16!public! !
-!URLTest categoriesFor: #testFreeFormatter17!public! !
-!URLTest categoriesFor: #testFreeFormatter18!public! !
-!URLTest categoriesFor: #testFreeFormatter19!public! !
-!URLTest categoriesFor: #testFreeFormatter2!public! !
-!URLTest categoriesFor: #testFreeFormatter20!public! !
-!URLTest categoriesFor: #testFreeFormatter21!public! !
-!URLTest categoriesFor: #testFreeFormatter22!public! !
-!URLTest categoriesFor: #testFreeFormatter23!public! !
-!URLTest categoriesFor: #testFreeFormatter3!public! !
-!URLTest categoriesFor: #testFreeFormatter4!public! !
-!URLTest categoriesFor: #testFreeFormatter5!public! !
-!URLTest categoriesFor: #testFreeFormatter6!public! !
-!URLTest categoriesFor: #testFreeFormatter7!public! !
-!URLTest categoriesFor: #testFreeFormatter8!public! !
-!URLTest categoriesFor: #testFreeFormatter9!public! !
-!URLTest categoriesFor: #testHost!public! !
-!URLTest categoriesFor: #testMakeAbsolute!public! !
-!URLTest categoriesFor: #testODataQueryName!public! !
-!URLTest categoriesFor: #testPath!public! !
-!URLTest categoriesFor: #testProtocol!public! !
-!URLTest categoriesFor: #testQuery!public! !
-!URLTest categoriesFor: #testRelative!public! !
-!URLTest categoriesFor: #testRemoveSegment!public! !
-!URLTest categoriesFor: #testRemoveSubpath!public! !
-!URLTest categoriesFor: #testRepeatedOption!public! !
-!URLTest categoriesFor: #testScheme!public! !
-!URLTest categoriesFor: #testSlashConcatenation!public! !
-!URLTest categoriesFor: #testSlashInBetween!public! !
-!URLTest categoriesFor: #testTrailingSlash!public! !
-!URLTest categoriesFor: #testWikipedia1!public! !
-!URLTest categoriesFor: #testWikipedia2!public! !
-!URLTest categoriesFor: #testWikipedia3!public! !
-!URLTest categoriesFor: #testWikipedia4!public! !
-!URLTest categoriesFor: #testWikipedia5!public! !
+
+!URLTest categoriesForMethods!
+testAddPath!public! !
+testBaseUri!public! !
+testBaseUrl!public! !
+testConcatenation!public! !
+testDefaultPort!public! !
+testEncodedQuery!public! !
+testEquality!public! !
+testFreeFormatter1!public! !
+testFreeFormatter10!public! !
+testFreeFormatter11!public! !
+testFreeFormatter12!public! !
+testFreeFormatter13!public! !
+testFreeFormatter14!public! !
+testFreeFormatter15!public! !
+testFreeFormatter16!public! !
+testFreeFormatter17!public! !
+testFreeFormatter18!public! !
+testFreeFormatter19!public! !
+testFreeFormatter2!public! !
+testFreeFormatter20!public! !
+testFreeFormatter21!public! !
+testFreeFormatter22!public! !
+testFreeFormatter23!public! !
+testFreeFormatter3!public! !
+testFreeFormatter4!public! !
+testFreeFormatter5!public! !
+testFreeFormatter6!public! !
+testFreeFormatter7!public! !
+testFreeFormatter8!public! !
+testFreeFormatter9!public! !
+testHost!public! !
+testMakeAbsolute!public! !
+testODataQueryName!public! !
+testPath!public! !
+testProtocol!public! !
+testQuery!public! !
+testRelative!public! !
+testRemoveSegment!public! !
+testRemoveSubpath!public! !
+testRepeatedOption!public! !
+testScheme!public! !
+testSlashConcatenation!public! !
+testSlashInBetween!public! !
+testTrailingSlash!public! !
+testWikipedia1!public! !
+testWikipedia2!public! !
+testWikipedia3!public! !
+testWikipedia4!public! !
+testWikipedia5!public! !
+!
 
 WebsideWorkspace guid: (GUID fromString: '{dcba7ff2-0ed4-4a98-8467-b131777c73b8}')!
+
 WebsideWorkspace comment: ''!
+
 !WebsideWorkspace categoriesForClass!Unclassified! !
+
 !WebsideWorkspace methodsFor!
 
 asWebsideJson
@@ -4969,13 +5384,16 @@ declareVariable: aString	bindings at: aString reduced put: nil!
 initialize	super initialize.	bindings := Dictionary new!
 
 receiver	^nil! !
-!WebsideWorkspace categoriesFor: #asWebsideJson!public! !
-!WebsideWorkspace categoriesFor: #bindings!public! !
-!WebsideWorkspace categoriesFor: #contents!public! !
-!WebsideWorkspace categoriesFor: #contents:!public! !
-!WebsideWorkspace categoriesFor: #declareVariable:!public! !
-!WebsideWorkspace categoriesFor: #initialize!public! !
-!WebsideWorkspace categoriesFor: #receiver!public! !
+
+!WebsideWorkspace categoriesForMethods!
+asWebsideJson!public! !
+bindings!public! !
+contents!public! !
+contents:!public! !
+declareVariable:!public! !
+initialize!public! !
+receiver!public! !
+!
 
 "Binary Globals"!
 

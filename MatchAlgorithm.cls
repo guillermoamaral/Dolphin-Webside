@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #MatchAlgorithm
 	instanceVariableNames: 'string pattern start stop tokens failure ranges'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 MatchAlgorithm guid: (GUID fromString: '{fb86432e-7484-40e1-9ffd-1f4642dcd99b}')!
+
 MatchAlgorithm comment: ''!
+
 !MatchAlgorithm categoriesForClass!Unclassified! !
+
 !MatchAlgorithm methodsFor!
 
 failBecause: aString
@@ -135,27 +139,33 @@ run
 
 string: aString
 	string := MatchToken on: aString from: 1 to: aString size! !
-!MatchAlgorithm categoriesFor: #failBecause:!private! !
-!MatchAlgorithm categoriesFor: #failure!outputs!public! !
-!MatchAlgorithm categoriesFor: #hasMatched!public!testing! !
-!MatchAlgorithm categoriesFor: #hasTokens!public!testing! !
-!MatchAlgorithm categoriesFor: #index:!inputs!public! !
-!MatchAlgorithm categoriesFor: #initialize!initializing!public! !
-!MatchAlgorithm categoriesFor: #matchFirstStar!computing!public! !
-!MatchAlgorithm categoriesFor: #matchFirstToken!computing!public! !
-!MatchAlgorithm categoriesFor: #matchFirstTokenAfterStar!computing!public! !
-!MatchAlgorithm categoriesFor: #matchLastToken!computing!public! !
-!MatchAlgorithm categoriesFor: #matchNextToken!computing!public! !
-!MatchAlgorithm categoriesFor: #matchRange!outputs!public! !
-!MatchAlgorithm categoriesFor: #pattern:!inputs!public! !
-!MatchAlgorithm categoriesFor: #privateMatchLastToken!computing!public! !
-!MatchAlgorithm categoriesFor: #reset!private! !
-!MatchAlgorithm categoriesFor: #run!computing!public! !
-!MatchAlgorithm categoriesFor: #string:!inputs!public! !
+
+!MatchAlgorithm categoriesForMethods!
+failBecause:!private! !
+failure!outputs!public! !
+hasMatched!public!testing! !
+hasTokens!public!testing! !
+index:!inputs!public! !
+initialize!initializing!public! !
+matchFirstStar!computing!public! !
+matchFirstToken!computing!public! !
+matchFirstTokenAfterStar!computing!public! !
+matchLastToken!computing!public! !
+matchNextToken!computing!public! !
+matchRange!outputs!public! !
+pattern:!inputs!public! !
+privateMatchLastToken!computing!public! !
+reset!private! !
+run!computing!public! !
+string:!inputs!public! !
+!
 
 !MatchAlgorithm class methodsFor!
 
 new
 	^super new initialize! !
-!MatchAlgorithm class categoriesFor: #new!public! !
+
+!MatchAlgorithm class categoriesForMethods!
+new!public! !
+!
 

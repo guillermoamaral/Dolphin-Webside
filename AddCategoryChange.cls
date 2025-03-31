@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 RefactoryCategoryChange subclass: #AddCategoryChange
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 AddCategoryChange guid: (GUID fromString: '{8eb4977e-9a49-4989-bafc-f2b365181fa2}')!
+
 AddCategoryChange comment: ''!
+
 !AddCategoryChange categoriesForClass!Refactory-Change Objects! !
+
 !AddCategoryChange methodsFor!
 
 asUndoOperation
@@ -22,6 +26,9 @@ primitiveExecute
 	catalogue := class methodsCatalogue.
 	existing := catalogue keys detect: [:k | k name = category] ifNone: [].
 	existing ifNil: [catalogue at: category asMethodCategory put: {}]! !
-!AddCategoryChange categoriesFor: #asUndoOperation!public! !
-!AddCategoryChange categoriesFor: #primitiveExecute!public! !
+
+!AddCategoryChange categoriesForMethods!
+asUndoOperation!public! !
+primitiveExecute!public! !
+!
 

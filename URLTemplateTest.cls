@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 TestCase subclass: #URLTemplateTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 URLTemplateTest guid: (GUID fromString: '{56dde46a-6c6a-4bea-93df-0767604a2c75}')!
+
 URLTemplateTest comment: ''!
+
 !URLTemplateTest categoriesForClass!Unclassified! !
+
 !URLTemplateTest methodsFor!
 
 testArguments
@@ -45,8 +49,11 @@ testVariablePath
 		assert: (template matches: '/library/books/hamlet/pages/33' asURL);
 		assert: (template
 			matches: '/library/books/hamlet/pages/33/paragraphs/22' asURL)! !
-!URLTemplateTest categoriesFor: #testArguments!public! !
-!URLTemplateTest categoriesFor: #testMatching!public! !
-!URLTemplateTest categoriesFor: #testTrailingSlash!public! !
-!URLTemplateTest categoriesFor: #testVariablePath!public! !
+
+!URLTemplateTest categoriesForMethods!
+testArguments!public! !
+testMatching!public! !
+testTrailingSlash!public! !
+testVariablePath!public! !
+!
 

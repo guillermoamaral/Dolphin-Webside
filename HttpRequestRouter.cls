@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #HttpRequestRouter
 	instanceVariableNames: 'routes receiver'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 HttpRequestRouter guid: (GUID fromString: '{1ca3c460-0b47-4f5c-b9fb-c6bb4cce7d94}')!
+
 HttpRequestRouter comment: ''!
+
 !HttpRequestRouter categoriesForClass!Unclassified! !
+
 !HttpRequestRouter methodsFor!
 
 actionFor: route verb: verb
@@ -91,26 +95,32 @@ routePUT: uri to: action
 
 supportedVerbs
 	^#('GET' 'POST' 'DELETE' 'HEAD' 'PUT' 'OPTIONS')! !
-!HttpRequestRouter categoriesFor: #actionFor:verb:!private! !
-!HttpRequestRouter categoriesFor: #initialize!initializing!public! !
-!HttpRequestRouter categoriesFor: #performAction:for:!private! !
-!HttpRequestRouter categoriesFor: #receiver:!accessing!public! !
-!HttpRequestRouter categoriesFor: #route:!actions!public! !
-!HttpRequestRouter categoriesFor: #route:verb:action:!private! !
-!HttpRequestRouter categoriesFor: #route:verb:to:!private! !
-!HttpRequestRouter categoriesFor: #routeAllTo:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routeDELETE:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routeFor:!private! !
-!HttpRequestRouter categoriesFor: #routeGET:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routeHEAD:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routeOPTIONS:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routePOST:to:!public!services! !
-!HttpRequestRouter categoriesFor: #routePUT:to:!public!services! !
-!HttpRequestRouter categoriesFor: #supportedVerbs!public! !
+
+!HttpRequestRouter categoriesForMethods!
+actionFor:verb:!private! !
+initialize!initializing!public! !
+performAction:for:!private! !
+receiver:!accessing!public! !
+route:!actions!public! !
+route:verb:action:!private! !
+route:verb:to:!private! !
+routeAllTo:to:!public!services! !
+routeDELETE:to:!public!services! !
+routeFor:!private! !
+routeGET:to:!public!services! !
+routeHEAD:to:!public!services! !
+routeOPTIONS:to:!public!services! !
+routePOST:to:!public!services! !
+routePUT:to:!public!services! !
+supportedVerbs!public! !
+!
 
 !HttpRequestRouter class methodsFor!
 
 new
 	^super new initialize! !
-!HttpRequestRouter class categoriesFor: #new!public! !
+
+!HttpRequestRouter class categoriesForMethods!
+new!public! !
+!
 

@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 TestCase subclass: #URLTest
 	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 URLTest guid: (GUID fromString: '{fd4eeb84-43db-47c1-893d-71cf8638bc94}')!
+
 URLTest comment: ''!
+
 !URLTest categoriesForClass!SUnit! !
+
 !URLTest methodsFor!
 
 testAddPath
@@ -599,53 +603,56 @@ testWikipedia5
 		assert: url path = '/ISSN:1535-3613';
 		deny: url hasQuery;
 		assert: url fragment isNil! !
-!URLTest categoriesFor: #testAddPath!public! !
-!URLTest categoriesFor: #testBaseUri!public! !
-!URLTest categoriesFor: #testBaseUrl!public! !
-!URLTest categoriesFor: #testConcatenation!public! !
-!URLTest categoriesFor: #testDefaultPort!public! !
-!URLTest categoriesFor: #testEncodedQuery!public! !
-!URLTest categoriesFor: #testEquality!public! !
-!URLTest categoriesFor: #testFreeFormatter1!public! !
-!URLTest categoriesFor: #testFreeFormatter10!public! !
-!URLTest categoriesFor: #testFreeFormatter11!public! !
-!URLTest categoriesFor: #testFreeFormatter12!public! !
-!URLTest categoriesFor: #testFreeFormatter13!public! !
-!URLTest categoriesFor: #testFreeFormatter14!public! !
-!URLTest categoriesFor: #testFreeFormatter15!public! !
-!URLTest categoriesFor: #testFreeFormatter16!public! !
-!URLTest categoriesFor: #testFreeFormatter17!public! !
-!URLTest categoriesFor: #testFreeFormatter18!public! !
-!URLTest categoriesFor: #testFreeFormatter19!public! !
-!URLTest categoriesFor: #testFreeFormatter2!public! !
-!URLTest categoriesFor: #testFreeFormatter20!public! !
-!URLTest categoriesFor: #testFreeFormatter21!public! !
-!URLTest categoriesFor: #testFreeFormatter22!public! !
-!URLTest categoriesFor: #testFreeFormatter23!public! !
-!URLTest categoriesFor: #testFreeFormatter3!public! !
-!URLTest categoriesFor: #testFreeFormatter4!public! !
-!URLTest categoriesFor: #testFreeFormatter5!public! !
-!URLTest categoriesFor: #testFreeFormatter6!public! !
-!URLTest categoriesFor: #testFreeFormatter7!public! !
-!URLTest categoriesFor: #testFreeFormatter8!public! !
-!URLTest categoriesFor: #testFreeFormatter9!public! !
-!URLTest categoriesFor: #testHost!public! !
-!URLTest categoriesFor: #testMakeAbsolute!public! !
-!URLTest categoriesFor: #testODataQueryName!public! !
-!URLTest categoriesFor: #testPath!public! !
-!URLTest categoriesFor: #testProtocol!public! !
-!URLTest categoriesFor: #testQuery!public! !
-!URLTest categoriesFor: #testRelative!public! !
-!URLTest categoriesFor: #testRemoveSegment!public! !
-!URLTest categoriesFor: #testRemoveSubpath!public! !
-!URLTest categoriesFor: #testRepeatedOption!public! !
-!URLTest categoriesFor: #testScheme!public! !
-!URLTest categoriesFor: #testSlashConcatenation!public! !
-!URLTest categoriesFor: #testSlashInBetween!public! !
-!URLTest categoriesFor: #testTrailingSlash!public! !
-!URLTest categoriesFor: #testWikipedia1!public! !
-!URLTest categoriesFor: #testWikipedia2!public! !
-!URLTest categoriesFor: #testWikipedia3!public! !
-!URLTest categoriesFor: #testWikipedia4!public! !
-!URLTest categoriesFor: #testWikipedia5!public! !
+
+!URLTest categoriesForMethods!
+testAddPath!public! !
+testBaseUri!public! !
+testBaseUrl!public! !
+testConcatenation!public! !
+testDefaultPort!public! !
+testEncodedQuery!public! !
+testEquality!public! !
+testFreeFormatter1!public! !
+testFreeFormatter10!public! !
+testFreeFormatter11!public! !
+testFreeFormatter12!public! !
+testFreeFormatter13!public! !
+testFreeFormatter14!public! !
+testFreeFormatter15!public! !
+testFreeFormatter16!public! !
+testFreeFormatter17!public! !
+testFreeFormatter18!public! !
+testFreeFormatter19!public! !
+testFreeFormatter2!public! !
+testFreeFormatter20!public! !
+testFreeFormatter21!public! !
+testFreeFormatter22!public! !
+testFreeFormatter23!public! !
+testFreeFormatter3!public! !
+testFreeFormatter4!public! !
+testFreeFormatter5!public! !
+testFreeFormatter6!public! !
+testFreeFormatter7!public! !
+testFreeFormatter8!public! !
+testFreeFormatter9!public! !
+testHost!public! !
+testMakeAbsolute!public! !
+testODataQueryName!public! !
+testPath!public! !
+testProtocol!public! !
+testQuery!public! !
+testRelative!public! !
+testRemoveSegment!public! !
+testRemoveSubpath!public! !
+testRepeatedOption!public! !
+testScheme!public! !
+testSlashConcatenation!public! !
+testSlashInBetween!public! !
+testTrailingSlash!public! !
+testWikipedia1!public! !
+testWikipedia2!public! !
+testWikipedia3!public! !
+testWikipedia4!public! !
+testWikipedia5!public! !
+!
 

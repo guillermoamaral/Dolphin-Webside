@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 RefactoryPackageChange subclass: #RenamePackageChange
 	instanceVariableNames: 'newName'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 RenamePackageChange guid: (GUID fromString: '{64e42418-9e10-4e76-81bf-a783daad96b7}')!
+
 RenamePackageChange comment: ''!
+
 !RenamePackageChange categoriesForClass!Refactory-Change Objects! !
+
 !RenamePackageChange methodsFor!
 
 asWebsideJson
@@ -25,7 +29,10 @@ primitiveExecute
 	pm := Package manager.
 	package := pm packageNamed: packageName.
 	package ifNotNil: [pm renamePackage: package to: newName]! !
-!RenamePackageChange categoriesFor: #asWebsideJson!public! !
-!RenamePackageChange categoriesFor: #fromWebsideJson:!public! !
-!RenamePackageChange categoriesFor: #primitiveExecute!public! !
+
+!RenamePackageChange categoriesForMethods!
+asWebsideJson!public! !
+fromWebsideJson:!public! !
+primitiveExecute!public! !
+!
 

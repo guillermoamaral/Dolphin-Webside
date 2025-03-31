@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #URLTemplate
 	instanceVariableNames: 'raw pattern parameters sample description'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 URLTemplate guid: (GUID fromString: '{7dd6fd49-79ba-4946-9983-eddb03e0d83f}')!
+
 URLTemplate comment: ''!
+
 !URLTemplate categoriesForClass!Unclassified! !
+
 !URLTemplate methodsFor!
 
 = anObject
@@ -81,25 +85,31 @@ trimSlashesFrom: aString
 		ifFalse: [aString].
 	(string endsWith: '/') ifTrue: [string := string allButLast].
 	^string! !
-!URLTemplate categoriesFor: #=!comparing!public! !
-!URLTemplate categoriesFor: #argumentsFrom:!private! !
-!URLTemplate categoriesFor: #description!accessing!public! !
-!URLTemplate categoriesFor: #description:!accessing!public! !
-!URLTemplate categoriesFor: #hasDescription!private! !
-!URLTemplate categoriesFor: #hash!comparing!public! !
-!URLTemplate categoriesFor: #initializeParameters!private! !
-!URLTemplate categoriesFor: #initializePattern!private! !
-!URLTemplate categoriesFor: #initializeSample!private! !
-!URLTemplate categoriesFor: #matches:!private! !
-!URLTemplate categoriesFor: #on:!private! !
-!URLTemplate categoriesFor: #parameters!accessing!public! !
-!URLTemplate categoriesFor: #pattern!accessing!public! !
-!URLTemplate categoriesFor: #printOn:!printing!public! !
-!URLTemplate categoriesFor: #trimSlashesFrom:!private! !
+
+!URLTemplate categoriesForMethods!
+=!comparing!public! !
+argumentsFrom:!private! !
+description!accessing!public! !
+description:!accessing!public! !
+hasDescription!private! !
+hash!comparing!public! !
+initializeParameters!private! !
+initializePattern!private! !
+initializeSample!private! !
+matches:!private! !
+on:!private! !
+parameters!accessing!public! !
+pattern!accessing!public! !
+printOn:!printing!public! !
+trimSlashesFrom:!private! !
+!
 
 !URLTemplate class methodsFor!
 
 on: aString
 	^self new on: aString! !
-!URLTemplate class categoriesFor: #on:!instance creation!public! !
+
+!URLTemplate class categoriesForMethods!
+on:!instance creation!public! !
+!
 

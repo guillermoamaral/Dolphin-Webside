@@ -1,13 +1,17 @@
-﻿"Filed out from Dolphin Smalltalk 7"!
+﻿"Filed out from Dolphin Smalltalk"!
 
 Object subclass: #FakeListPresenter
 	instanceVariableNames: 'list selection'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
+
 FakeListPresenter guid: (GUID fromString: '{73f8ea67-5b8b-47fb-9ab2-8018f4487c8d}')!
+
 FakeListPresenter comment: ''!
+
 !FakeListPresenter categoriesForClass!Unclassified! !
+
 !FakeListPresenter methodsFor!
 
 initialize
@@ -37,19 +41,25 @@ selectionOrNil
 
 selectionOrNil: anObject 
 	 self selection: anObject! !
-!FakeListPresenter categoriesFor: #initialize!public! !
-!FakeListPresenter categoriesFor: #list!public! !
-!FakeListPresenter categoriesFor: #list:!public! !
-!FakeListPresenter categoriesFor: #model!public! !
-!FakeListPresenter categoriesFor: #selectableItems!public! !
-!FakeListPresenter categoriesFor: #selection!public! !
-!FakeListPresenter categoriesFor: #selection:!public! !
-!FakeListPresenter categoriesFor: #selectionOrNil!public! !
-!FakeListPresenter categoriesFor: #selectionOrNil:!public! !
+
+!FakeListPresenter categoriesForMethods!
+initialize!public! !
+list!public! !
+list:!public! !
+model!public! !
+selectableItems!public! !
+selection!public! !
+selection:!public! !
+selectionOrNil!public! !
+selectionOrNil:!public! !
+!
 
 !FakeListPresenter class methodsFor!
 
 new
 	 ^super new initialize! !
-!FakeListPresenter class categoriesFor: #new!public! !
+
+!FakeListPresenter class categoriesForMethods!
+new!public! !
+!
 
