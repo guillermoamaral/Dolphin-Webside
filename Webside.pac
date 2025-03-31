@@ -9,6 +9,7 @@ package classNames
 	add: #AddPackageChange;
 	add: #ClassifyMethodChange;
 	add: #CommentClassChange;
+	add: #FakeListPresenter;
 	add: #HttpRequestRouter;
 	add: #MatchAlgorithm;
 	add: #MatchToken;
@@ -28,6 +29,7 @@ package classNames
 	add: #WebsideAPI;
 	add: #WebsideClient;
 	add: #WebsideEvaluation;
+	add: #WebsideException;
 	add: #WebsideResource;
 	add: #WebsideServer;
 	add: #WebsideWorkspace;
@@ -49,6 +51,7 @@ package methodNames
 	add: #CompiledCode -> #asWebsideJson;
 	add: #CompiledMethod -> #asWebsideJson;
 	add: #CompilerNotification -> #asWebsideJson;
+	add: #Debugger -> #adaptToWebside;
 	add: #Debugger -> #process;
 	add: #Debugger -> #stepInto:;
 	add: #Debugger -> #stepIntoBlock:;
@@ -150,6 +153,11 @@ package!
 
 "Class Definitions"!
 
+Object subclass: #FakeListPresenter
+	instanceVariableNames: 'list selection'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
 Object subclass: #HttpRequestRouter
 	instanceVariableNames: 'routes receiver'
 	classVariableNames: ''
@@ -201,7 +209,7 @@ Object subclass: #WebsideClient
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
 Object subclass: #WebsideEvaluation
-	instanceVariableNames: 'id expression receiver context requestor priority process state result error'
+	instanceVariableNames: 'id expression receiver context requestor priority process state result error semaphore'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -212,6 +220,11 @@ Object subclass: #WebsideResource
 	classInstanceVariableNames: ''!
 Object subclass: #WebsideServer
 	instanceVariableNames: 'server router baseUri port resources'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Exception subclass: #WebsideException
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -496,6 +509,11 @@ asWebsideJson
 
 !Debugger methodsFor!
 
+adaptToWebside
+	"Super uggly way to trick the UI-less usage of this object.
+	With infinite time, we should have a WebsideDebugger to control the debuggee without have to hack/avoid UI dependency."
+	stackPresenter := FakeListPresenter new!
+
 process
 	^process!
 
@@ -524,11 +542,14 @@ stepOver: aStackFrame
 	Of course #stepOver could (and should) be implemented by calling this method, but we
 	decided to preserve original Dolphin services untouched by the moment."
 
+	Transcript cr; nextPutAll: 'Stepping over '.
 	self beRunning.
 	self debugState: 'Step over'.
+	aStackFrame displayOn: Transcript.
 	self breakFrame: aStackFrame.
 	self makeDebugFrame: aStackFrame sender.
 	self resume! !
+!Debugger categoriesFor: #adaptToWebside!public! !
 !Debugger categoriesFor: #process!private!updating! !
 !Debugger categoriesFor: #stepInto:!public! !
 !Debugger categoriesFor: #stepIntoBlock:!public! !
@@ -1025,6 +1046,54 @@ fromWebsideJson: json
 "Source Globals"!
 
 "Classes"!
+
+FakeListPresenter guid: (GUID fromString: '{73f8ea67-5b8b-47fb-9ab2-8018f4487c8d}')!
+FakeListPresenter comment: ''!
+!FakeListPresenter categoriesForClass!Unclassified! !
+!FakeListPresenter methodsFor!
+
+initialize
+	super initialize.
+	list := OrderedCollection new!
+
+list
+	 ^list!
+
+list: aCollection
+	 list := aCollection!
+
+model
+	 ^list!
+
+selectableItems
+	 ^self!
+
+selection
+	^selection!
+
+selection: anObject 
+	 selection := anObject!
+
+selectionOrNil
+	^self selection!
+
+selectionOrNil: anObject 
+	 self selection: anObject! !
+!FakeListPresenter categoriesFor: #initialize!public! !
+!FakeListPresenter categoriesFor: #list!public! !
+!FakeListPresenter categoriesFor: #list:!public! !
+!FakeListPresenter categoriesFor: #model!public! !
+!FakeListPresenter categoriesFor: #selectableItems!public! !
+!FakeListPresenter categoriesFor: #selection!public! !
+!FakeListPresenter categoriesFor: #selection:!public! !
+!FakeListPresenter categoriesFor: #selectionOrNil!public! !
+!FakeListPresenter categoriesFor: #selectionOrNil:!public! !
+
+!FakeListPresenter class methodsFor!
+
+new
+	 ^super new initialize! !
+!FakeListPresenter class categoriesFor: #new!public! !
 
 HttpRequestRouter guid: (GUID fromString: '{1ca3c460-0b47-4f5c-b9fb-c6bb4cce7d94}')!
 HttpRequestRouter comment: ''!
@@ -2262,9 +2331,9 @@ on: aString
 !URLTemplate class categoriesFor: #on:!instance creation!public! !
 
 WebsideAPI guid: (GUID fromString: '{0d468ed7-e8b5-4ad5-a744-fe615bb74dcb}')!
-WebsideAPI comment: 'WebsideAPI startServer
-
-WebsideAPI stopServer'!
+WebsideAPI comment: 'WebsideAPI startServer.
+WebsideServer allInstances do: [:s | s stop].
+WebsideAPI stopServer.'!
 !WebsideAPI categoriesForClass!Unclassified! !
 !WebsideAPI methodsFor!
 
@@ -2273,7 +2342,7 @@ activeDebuggers
 			[:a |
 			a value asWebsideJson
 				at: 'id' put: a key asString;
-				at: 'description' put: a value name;
+				at: 'description' put: a value caption;
 				yourself]!
 
 activeEvaluation
@@ -2395,7 +2464,21 @@ classTreeFromClasses: aCollection
 					ifTrue: [(roots includesKey: c superclass name) ifTrue: [roots removeKey: c name]]].
 	^(roots asArray asSortedCollection: [:a :b | (a at: 'name') <= (b at: 'name')]) asArray!
 
-classVariables	| class |	class := self requestedClass.	class ifNil: [^self notFound].	^(class withAllSuperclasses gather: 			[:c |			c classVarNames asArray sort collect: 					[:v |					self newJsonObject						at: 'name' put: v;						at: 'class' put: c name , ' class';						at: 'type' put: 'class';						yourself]])		asArray!
+classVariables
+	| class |
+	class := self requestedClass.
+	class ifNil: [^self notFound].
+	^(class withAllSuperclasses gather: 
+			[:c |
+			c classVarNames asArray sort collect: 
+					[:v |
+					self newJsonObject
+						at: 'name' put: v;
+						at: 'class' put: c name , ' class';
+						at: 'type' put: 'class';
+						at: 'iconName' put: c websideIconName;
+						yourself]])
+		asArray!
 
 colors
 	^self newJsonObject
@@ -2421,7 +2504,7 @@ compilerReceiver
 			[:id |
 			index := context at: 'frame' ifAbsent: [^nil].
 			debugger := self debuggers at: (IID fromString: id) ifAbsent: [^nil].
-			frame := debugger stack at: index asInteger ifAbsent: nil.
+			frame := debugger frames at: index asInteger ifAbsent: nil.
 			^frame ifNotNil: [frame receiver]].
 	^nil!
 
@@ -2482,7 +2565,21 @@ createWorkspace
 customViewsOf: anObject
 	^anObject websideViews!
 
-debugExpression	| expression method receiver process context debugger id |	expression := self bodyAt: 'expression' ifAbsent: [''].	method := self compiler compile: expression.	receiver := self compilerReceiver.	process := [ method valueWithReceiver: receiver arguments: #() ]		newProcess.	context := process suspendedContext.	debugger := process		newDebugSessionNamed: 'debug it'		startedAt: context.	debugger stepIntoUntil: [ :c | c method == method ].	id := self newID.	self evaluations at: id put: process.	self debuggers at: id put: debugger.	^ id asString!
+debugExpression
+	| evaluation debugger |
+	evaluation := self createEvaluation.
+	evaluation ifNil: [^nil].
+	evaluation debug.
+	debugger := Smalltalk developmentSystem debuggerClass new.
+	debugger
+		caption: 'Debug expression';
+		process: evaluation process topFrame: evaluation error raisingFrame;
+		resumable: true;
+		suspendProcess.
+	"debugger stepOver; stepOver."
+	self evaluations at: evaluation id put: evaluation.
+	self debuggers at: evaluation id put: debugger.
+	^evaluation id asString!
 
 debuggerFrame
 	| debugger index frame map interval source lfs |
@@ -2633,7 +2730,7 @@ frameBindings
 			[:t |
 			t third > 0
 				ifTrue: 
-					[value := (frame getOuter: t second) at: t third.
+					[value := [(frame getOuter: t second) at: t third] on: Error do: [:e | ].
 					bindings addLast: (Array with: t first with: value)]].
 	base := frame index + frame frameSize.
 	0 to: extra - 1
@@ -2682,7 +2779,21 @@ indexedSlotsOf: anObject
 				at: 'slot' put: i;
 				yourself]!
 
-instanceVariables	| class |	class := self requestedClass.	class isNil ifTrue: [^self notFound].	^(class withAllSuperclasses gather: 			[:c |			c instVarNames collect: 					[:v |					self newJsonObject						at: 'name' put: v;						at: 'class' put: c name;						at: 'type' put: 'instance';						yourself]])		asArray!
+instanceVariables
+	| class |
+	class := self requestedClass.
+	class isNil ifTrue: [^self notFound].
+	^(class withAllSuperclasses gather: 
+			[:c |
+			c instVarNames collect: 
+					[:v |
+					self newJsonObject
+						at: 'name' put: v;
+						at: 'class' put: c name;
+						at: 'type' put: 'instance';
+						at: 'iconName' put: c websideIconName;
+						yourself]])
+		asArray!
 
 instanceVariablesOf: anObject	^anObject class allInstVarNames		collect: [ :n | 			self newJsonObject				at: 'name' put: n;				yourself ]!
 
@@ -2952,7 +3063,7 @@ requestedEvaluationContext
 			[id := IID fromString: id.
 			debugger := self debuggers at: id ifAbsent: [^nil].
 			index := context at: 'frame' ifAbsent: [^nil].
-			^debugger stack at: index asInteger ifAbsent: nil].
+			^debugger frames at: index asInteger ifAbsent: nil].
 	^nil!
 
 requestedEvaluationReceiver
@@ -2968,7 +3079,7 @@ requestedEvaluationReceiver
 			[id := IID fromString: id.
 			debugger := self debuggers at: id ifAbsent: [^nil].
 			index := context at: 'frame' ifAbsent: [^nil].
-			frame := debugger stack at: index asInteger ifAbsent: nil.
+			frame := debugger frames at: index asInteger ifAbsent: nil.
 			^frame ifNotNil: [frame receiver]].
 	^nil!
 
@@ -3063,12 +3174,14 @@ search
 	^results asArray!
 
 search: aCollection for: aString with: aSymbol condition: anotherSymbol type: anotherString ignoreCase: aBoolean
+	| target |
+	target := aBoolean ifTrue: [aString asLowercase] ifFalse: [aString].
 	^aCollection select: 
 			[:element |
 			| candidate |
 			candidate := element perform: aSymbol.
 			aBoolean ifTrue: [candidate := candidate asLowercase].
-			candidate perform: anotherSymbol with: aString]
+			candidate perform: anotherSymbol with: target]
 		thenCollect: 
 			[:element |
 			self newJsonObject
@@ -3373,19 +3486,30 @@ asWebsideJson
 	error ifNotNil: [json at: 'error' put: error asWebsideJson].
 	^json!
 
-cancel	process ifNotNil: [process terminate].	self cancelled!
+cancel
+	process ifNotNil: [process terminate].
+	self cancelled!
 
 cancelled
 	state := #cancelled.
 	self
 		trigger: #cancelled;
-		trigger: #finalized!
+		finalized!
 
 context	^context!
 
 context: anObject	context := anObject!
 
-error	^ error!
+debug
+	self evaluateBlock: 
+			[process suspend.
+			result := Compiler evaluate: expression for: receiver]!
+
+error
+	^error!
+
+error: anException
+	error := anException!
 
 evaluate
 	self evaluateBlock: [result := Compiler evaluate: expression for: receiver]!
@@ -3401,7 +3525,7 @@ evaluateBlock: aBlock
 					process suspend].
 			self finished]
 					newProcess.
-"priority should be already set. In fact, it is initiallized as Processor userSchedulingPriority.
+	"Priority should be already set. In fact, it is initiallized as Processor userSchedulingPriority.
 However, for some reason that should be understood/modified, HttpServer loop is scheduled at a lower priority,
 making the resuming of the evaluation process to take control immediately when #resume is sent below, making synchronous
 what otherwise would be asynchronous evaluation."
@@ -3410,29 +3534,38 @@ what otherwise would be asynchronous evaluation."
 		name: 'Webside evaluation ' , id asString;
 		resume!
 
-expression	^expression!
+expression
+	^expression!
 
-expression: aString	expression := aString!
+expression: aString
+	expression := aString!
 
 failed
 	state := #failed.
 	self
 		trigger: #failed;
-		trigger: #finalized!
+		finalized!
+
+finalized
+	semaphore notNil ifTrue: [semaphore signal].
+	^self trigger: #finalized!
 
 finished
 	state := #finished.
 	self
 		trigger: #finished;
-		trigger: #finalized!
+		finalized!
 
-hasFailed	^ state == #failed!
+hasFailed
+	^state == #failed!
 
-hasFinished	^ state == #finished!
+hasFinished
+	^state == #finished!
 
 id	^id!
 
-id: uuid	id := uuid!
+id: uuid
+	id := uuid!
 
 initialize
 	super initialize.
@@ -3440,36 +3573,50 @@ initialize
 	state := #pending.
 	priority := Processor userSchedulingPriority!
 
-isEvaluating	^ state == #evaluating!
+isEvaluating
+	^state == #evaluating!
 
-isFinalized	^ self hasFinished or: [ self hasFailed or: [ self wasCancelled ] ]!
+isFinalized
+	^self hasFinished or: [self hasFailed or: [self wasCancelled]]!
 
-isPaused	^ state == #paused!
+isPaused
+	^state == #paused!
 
-isPending	^ state == #pending!
+isPending
+	^state == #pending!
 
-pause	process suspend.	self paused!
+pause
+	self paused.
+	process suspend!
 
-paused	state := #paused.	self trigger: #paused!
+paused
+	state := #paused.
+	self trigger: #paused!
 
 priority: anInteger	priority := anInteger!
 
 process	^process!
 
-process: aProcess	process := aProcess!
+process: aProcess
+	process := aProcess!
 
-receiver	^ receiver!
+receiver
+	^receiver!
 
-receiver: anObject	receiver := anObject!
+receiver: anObject
+	receiver := anObject!
 
-requestor	^ requestor!
+requestor
+	^requestor!
 
-requestor: anObject	requestor := anObject!
+requestor: anObject
+	requestor := anObject!
 
 result
 	self hasFinished ifTrue: [^result]!
 
-result: anObject	result := anObject!
+result: anObject
+	result := anObject!
 
 resume	self resumed.	process resume.!
 
@@ -3481,29 +3628,28 @@ state
 	 ^state!
 
 waitForResult
-	| semaphore |
 	self isFinalized
 		ifFalse: 
 			[semaphore := Semaphore new.
-			self
-				when: #finalized
-				send: #signal
-				to: semaphore.
 			semaphore wait].
 	^self result!
 
-wasCancelled	^ state == #cancelled! !
+wasCancelled
+	^state == #cancelled! !
 !WebsideEvaluation categoriesFor: #asWebsideJson!public! !
 !WebsideEvaluation categoriesFor: #cancel!public! !
 !WebsideEvaluation categoriesFor: #cancelled!public! !
 !WebsideEvaluation categoriesFor: #context!public! !
 !WebsideEvaluation categoriesFor: #context:!public! !
+!WebsideEvaluation categoriesFor: #debug!public! !
 !WebsideEvaluation categoriesFor: #error!public! !
+!WebsideEvaluation categoriesFor: #error:!public! !
 !WebsideEvaluation categoriesFor: #evaluate!public! !
 !WebsideEvaluation categoriesFor: #evaluateBlock:!public! !
 !WebsideEvaluation categoriesFor: #expression!public! !
 !WebsideEvaluation categoriesFor: #expression:!public! !
 !WebsideEvaluation categoriesFor: #failed!public! !
+!WebsideEvaluation categoriesFor: #finalized!public! !
 !WebsideEvaluation categoriesFor: #finished!public! !
 !WebsideEvaluation categoriesFor: #hasFailed!public! !
 !WebsideEvaluation categoriesFor: #hasFinished!public! !
@@ -3848,6 +3994,18 @@ workspaces	^ self resourcesAt: #workspaces! !
 new
 	 ^super new initialize! !
 !WebsideServer class categoriesFor: #new!instance creation!public! !
+
+WebsideException guid: (GUID fromString: '{0bccb83b-5d71-46ce-90ab-3fd303168aa4}')!
+WebsideException comment: ''!
+!WebsideException categoriesForClass!Kernel-Exception Handling! !
+!WebsideException methodsFor!
+
+defaultAction!
+
+isResumable
+	^true! !
+!WebsideException categoriesFor: #defaultAction!public! !
+!WebsideException categoriesFor: #isResumable!public! !
 
 RefactoryPackageChange guid: (GUID fromString: '{a233a4fd-81a3-45c7-9a63-338591e63744}')!
 RefactoryPackageChange comment: ''!

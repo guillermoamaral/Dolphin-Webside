@@ -6,9 +6,9 @@ Object subclass: #WebsideAPI
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
 WebsideAPI guid: (GUID fromString: '{0d468ed7-e8b5-4ad5-a744-fe615bb74dcb}')!
-WebsideAPI comment: 'WebsideAPI startServer
-
-WebsideAPI stopServer'!
+WebsideAPI comment: 'WebsideAPI startServer.
+WebsideServer allInstances do: [:s | s stop].
+WebsideAPI stopServer.'!
 !WebsideAPI categoriesForClass!Unclassified! !
 !WebsideAPI methodsFor!
 
@@ -17,7 +17,7 @@ activeDebuggers
 			[:a |
 			a value asWebsideJson
 				at: 'id' put: a key asString;
-				at: 'description' put: a value name;
+				at: 'description' put: a value caption;
 				yourself]!
 
 activeEvaluation
@@ -139,7 +139,21 @@ classTreeFromClasses: aCollection
 					ifTrue: [(roots includesKey: c superclass name) ifTrue: [roots removeKey: c name]]].
 	^(roots asArray asSortedCollection: [:a :b | (a at: 'name') <= (b at: 'name')]) asArray!
 
-classVariables	| class |	class := self requestedClass.	class ifNil: [^self notFound].	^(class withAllSuperclasses gather: 			[:c |			c classVarNames asArray sort collect: 					[:v |					self newJsonObject						at: 'name' put: v;						at: 'class' put: c name , ' class';						at: 'type' put: 'class';						yourself]])		asArray!
+classVariables
+	| class |
+	class := self requestedClass.
+	class ifNil: [^self notFound].
+	^(class withAllSuperclasses gather: 
+			[:c |
+			c classVarNames asArray sort collect: 
+					[:v |
+					self newJsonObject
+						at: 'name' put: v;
+						at: 'class' put: c name , ' class';
+						at: 'type' put: 'class';
+						at: 'iconName' put: c websideIconName;
+						yourself]])
+		asArray!
 
 colors
 	^self newJsonObject
@@ -165,7 +179,7 @@ compilerReceiver
 			[:id |
 			index := context at: 'frame' ifAbsent: [^nil].
 			debugger := self debuggers at: (IID fromString: id) ifAbsent: [^nil].
-			frame := debugger stack at: index asInteger ifAbsent: nil.
+			frame := debugger frames at: index asInteger ifAbsent: nil.
 			^frame ifNotNil: [frame receiver]].
 	^nil!
 
@@ -226,7 +240,21 @@ createWorkspace
 customViewsOf: anObject
 	^anObject websideViews!
 
-debugExpression	| expression method receiver process context debugger id |	expression := self bodyAt: 'expression' ifAbsent: [''].	method := self compiler compile: expression.	receiver := self compilerReceiver.	process := [ method valueWithReceiver: receiver arguments: #() ]		newProcess.	context := process suspendedContext.	debugger := process		newDebugSessionNamed: 'debug it'		startedAt: context.	debugger stepIntoUntil: [ :c | c method == method ].	id := self newID.	self evaluations at: id put: process.	self debuggers at: id put: debugger.	^ id asString!
+debugExpression
+	| evaluation debugger |
+	evaluation := self createEvaluation.
+	evaluation ifNil: [^nil].
+	evaluation debug.
+	debugger := Smalltalk developmentSystem debuggerClass new.
+	debugger
+		caption: 'Debug expression';
+		process: evaluation process topFrame: evaluation error raisingFrame;
+		resumable: true;
+		suspendProcess.
+	"debugger stepOver; stepOver."
+	self evaluations at: evaluation id put: evaluation.
+	self debuggers at: evaluation id put: debugger.
+	^evaluation id asString!
 
 debuggerFrame
 	| debugger index frame map interval source lfs |
@@ -377,7 +405,7 @@ frameBindings
 			[:t |
 			t third > 0
 				ifTrue: 
-					[value := (frame getOuter: t second) at: t third.
+					[value := [(frame getOuter: t second) at: t third] on: Error do: [:e | ].
 					bindings addLast: (Array with: t first with: value)]].
 	base := frame index + frame frameSize.
 	0 to: extra - 1
@@ -426,7 +454,21 @@ indexedSlotsOf: anObject
 				at: 'slot' put: i;
 				yourself]!
 
-instanceVariables	| class |	class := self requestedClass.	class isNil ifTrue: [^self notFound].	^(class withAllSuperclasses gather: 			[:c |			c instVarNames collect: 					[:v |					self newJsonObject						at: 'name' put: v;						at: 'class' put: c name;						at: 'type' put: 'instance';						yourself]])		asArray!
+instanceVariables
+	| class |
+	class := self requestedClass.
+	class isNil ifTrue: [^self notFound].
+	^(class withAllSuperclasses gather: 
+			[:c |
+			c instVarNames collect: 
+					[:v |
+					self newJsonObject
+						at: 'name' put: v;
+						at: 'class' put: c name;
+						at: 'type' put: 'instance';
+						at: 'iconName' put: c websideIconName;
+						yourself]])
+		asArray!
 
 instanceVariablesOf: anObject	^anObject class allInstVarNames		collect: [ :n | 			self newJsonObject				at: 'name' put: n;				yourself ]!
 
@@ -696,7 +738,7 @@ requestedEvaluationContext
 			[id := IID fromString: id.
 			debugger := self debuggers at: id ifAbsent: [^nil].
 			index := context at: 'frame' ifAbsent: [^nil].
-			^debugger stack at: index asInteger ifAbsent: nil].
+			^debugger frames at: index asInteger ifAbsent: nil].
 	^nil!
 
 requestedEvaluationReceiver
@@ -712,7 +754,7 @@ requestedEvaluationReceiver
 			[id := IID fromString: id.
 			debugger := self debuggers at: id ifAbsent: [^nil].
 			index := context at: 'frame' ifAbsent: [^nil].
-			frame := debugger stack at: index asInteger ifAbsent: nil.
+			frame := debugger frames at: index asInteger ifAbsent: nil.
 			^frame ifNotNil: [frame receiver]].
 	^nil!
 
@@ -807,12 +849,14 @@ search
 	^results asArray!
 
 search: aCollection for: aString with: aSymbol condition: anotherSymbol type: anotherString ignoreCase: aBoolean
+	| target |
+	target := aBoolean ifTrue: [aString asLowercase] ifFalse: [aString].
 	^aCollection select: 
 			[:element |
 			| candidate |
 			candidate := element perform: aSymbol.
 			aBoolean ifTrue: [candidate := candidate asLowercase].
-			candidate perform: anotherSymbol with: aString]
+			candidate perform: anotherSymbol with: target]
 		thenCollect: 
 			[:element |
 			self newJsonObject

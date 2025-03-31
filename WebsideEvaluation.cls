@@ -1,7 +1,7 @@
 ﻿"Filed out from Dolphin Smalltalk 7"!
 
 Object subclass: #WebsideEvaluation
-	instanceVariableNames: 'id expression receiver context requestor priority process state result error'
+	instanceVariableNames: 'id expression receiver context requestor priority process state result error semaphore'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -20,19 +20,30 @@ asWebsideJson
 	error ifNotNil: [json at: 'error' put: error asWebsideJson].
 	^json!
 
-cancel	process ifNotNil: [process terminate].	self cancelled!
+cancel
+	process ifNotNil: [process terminate].
+	self cancelled!
 
 cancelled
 	state := #cancelled.
 	self
 		trigger: #cancelled;
-		trigger: #finalized!
+		finalized!
 
 context	^context!
 
 context: anObject	context := anObject!
 
-error	^ error!
+debug
+	self evaluateBlock: 
+			[process suspend.
+			result := Compiler evaluate: expression for: receiver]!
+
+error
+	^error!
+
+error: anException
+	error := anException!
 
 evaluate
 	self evaluateBlock: [result := Compiler evaluate: expression for: receiver]!
@@ -48,7 +59,7 @@ evaluateBlock: aBlock
 					process suspend].
 			self finished]
 					newProcess.
-"priority should be already set. In fact, it is initiallized as Processor userSchedulingPriority.
+	"Priority should be already set. In fact, it is initiallized as Processor userSchedulingPriority.
 However, for some reason that should be understood/modified, HttpServer loop is scheduled at a lower priority,
 making the resuming of the evaluation process to take control immediately when #resume is sent below, making synchronous
 what otherwise would be asynchronous evaluation."
@@ -57,29 +68,38 @@ what otherwise would be asynchronous evaluation."
 		name: 'Webside evaluation ' , id asString;
 		resume!
 
-expression	^expression!
+expression
+	^expression!
 
-expression: aString	expression := aString!
+expression: aString
+	expression := aString!
 
 failed
 	state := #failed.
 	self
 		trigger: #failed;
-		trigger: #finalized!
+		finalized!
+
+finalized
+	semaphore notNil ifTrue: [semaphore signal].
+	^self trigger: #finalized!
 
 finished
 	state := #finished.
 	self
 		trigger: #finished;
-		trigger: #finalized!
+		finalized!
 
-hasFailed	^ state == #failed!
+hasFailed
+	^state == #failed!
 
-hasFinished	^ state == #finished!
+hasFinished
+	^state == #finished!
 
 id	^id!
 
-id: uuid	id := uuid!
+id: uuid
+	id := uuid!
 
 initialize
 	super initialize.
@@ -87,36 +107,50 @@ initialize
 	state := #pending.
 	priority := Processor userSchedulingPriority!
 
-isEvaluating	^ state == #evaluating!
+isEvaluating
+	^state == #evaluating!
 
-isFinalized	^ self hasFinished or: [ self hasFailed or: [ self wasCancelled ] ]!
+isFinalized
+	^self hasFinished or: [self hasFailed or: [self wasCancelled]]!
 
-isPaused	^ state == #paused!
+isPaused
+	^state == #paused!
 
-isPending	^ state == #pending!
+isPending
+	^state == #pending!
 
-pause	process suspend.	self paused!
+pause
+	self paused.
+	process suspend!
 
-paused	state := #paused.	self trigger: #paused!
+paused
+	state := #paused.
+	self trigger: #paused!
 
 priority: anInteger	priority := anInteger!
 
 process	^process!
 
-process: aProcess	process := aProcess!
+process: aProcess
+	process := aProcess!
 
-receiver	^ receiver!
+receiver
+	^receiver!
 
-receiver: anObject	receiver := anObject!
+receiver: anObject
+	receiver := anObject!
 
-requestor	^ requestor!
+requestor
+	^requestor!
 
-requestor: anObject	requestor := anObject!
+requestor: anObject
+	requestor := anObject!
 
 result
 	self hasFinished ifTrue: [^result]!
 
-result: anObject	result := anObject!
+result: anObject
+	result := anObject!
 
 resume	self resumed.	process resume.!
 
@@ -128,29 +162,28 @@ state
 	 ^state!
 
 waitForResult
-	| semaphore |
 	self isFinalized
 		ifFalse: 
 			[semaphore := Semaphore new.
-			self
-				when: #finalized
-				send: #signal
-				to: semaphore.
 			semaphore wait].
 	^self result!
 
-wasCancelled	^ state == #cancelled! !
+wasCancelled
+	^state == #cancelled! !
 !WebsideEvaluation categoriesFor: #asWebsideJson!public! !
 !WebsideEvaluation categoriesFor: #cancel!public! !
 !WebsideEvaluation categoriesFor: #cancelled!public! !
 !WebsideEvaluation categoriesFor: #context!public! !
 !WebsideEvaluation categoriesFor: #context:!public! !
+!WebsideEvaluation categoriesFor: #debug!public! !
 !WebsideEvaluation categoriesFor: #error!public! !
+!WebsideEvaluation categoriesFor: #error:!public! !
 !WebsideEvaluation categoriesFor: #evaluate!public! !
 !WebsideEvaluation categoriesFor: #evaluateBlock:!public! !
 !WebsideEvaluation categoriesFor: #expression!public! !
 !WebsideEvaluation categoriesFor: #expression:!public! !
 !WebsideEvaluation categoriesFor: #failed!public! !
+!WebsideEvaluation categoriesFor: #finalized!public! !
 !WebsideEvaluation categoriesFor: #finished!public! !
 !WebsideEvaluation categoriesFor: #hasFailed!public! !
 !WebsideEvaluation categoriesFor: #hasFinished!public! !

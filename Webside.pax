@@ -9,6 +9,7 @@ package classNames
 	add: #AddPackageChange;
 	add: #ClassifyMethodChange;
 	add: #CommentClassChange;
+	add: #FakeListPresenter;
 	add: #HttpRequestRouter;
 	add: #MatchAlgorithm;
 	add: #MatchToken;
@@ -28,6 +29,7 @@ package classNames
 	add: #WebsideAPI;
 	add: #WebsideClient;
 	add: #WebsideEvaluation;
+	add: #WebsideException;
 	add: #WebsideResource;
 	add: #WebsideServer;
 	add: #WebsideWorkspace;
@@ -49,6 +51,7 @@ package methodNames
 	add: #CompiledCode -> #asWebsideJson;
 	add: #CompiledMethod -> #asWebsideJson;
 	add: #CompilerNotification -> #asWebsideJson;
+	add: #Debugger -> #adaptToWebside;
 	add: #Debugger -> #process;
 	add: #Debugger -> #stepInto:;
 	add: #Debugger -> #stepIntoBlock:;
@@ -150,6 +153,11 @@ package!
 
 "Class Definitions"!
 
+Object subclass: #FakeListPresenter
+	instanceVariableNames: 'list selection'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
 Object subclass: #HttpRequestRouter
 	instanceVariableNames: 'routes receiver'
 	classVariableNames: ''
@@ -201,7 +209,7 @@ Object subclass: #WebsideClient
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
 Object subclass: #WebsideEvaluation
-	instanceVariableNames: 'id expression receiver context requestor priority process state result error'
+	instanceVariableNames: 'id expression receiver context requestor priority process state result error semaphore'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -212,6 +220,11 @@ Object subclass: #WebsideResource
 	classInstanceVariableNames: ''!
 Object subclass: #WebsideServer
 	instanceVariableNames: 'server router baseUri port resources'
+	classVariableNames: ''
+	poolDictionaries: ''
+	classInstanceVariableNames: ''!
+Exception subclass: #WebsideException
+	instanceVariableNames: ''
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -496,6 +509,11 @@ asWebsideJson
 
 !Debugger methodsFor!
 
+adaptToWebside
+	"Super uggly way to trick the UI-less usage of this object.
+	With infinite time, we should have a WebsideDebugger to control the debuggee without have to hack/avoid UI dependency."
+	stackPresenter := FakeListPresenter new!
+
 process
 	^process!
 
@@ -524,11 +542,14 @@ stepOver: aStackFrame
 	Of course #stepOver could (and should) be implemented by calling this method, but we
 	decided to preserve original Dolphin services untouched by the moment."
 
+	Transcript cr; nextPutAll: 'Stepping over '.
 	self beRunning.
 	self debugState: 'Step over'.
+	aStackFrame displayOn: Transcript.
 	self breakFrame: aStackFrame.
 	self makeDebugFrame: aStackFrame sender.
 	self resume! !
+!Debugger categoriesFor: #adaptToWebside!public! !
 !Debugger categoriesFor: #process!private!updating! !
 !Debugger categoriesFor: #stepInto:!public! !
 !Debugger categoriesFor: #stepIntoBlock:!public! !
