@@ -878,6 +878,12 @@ search
 						condition: condition
 						type: 'package'
 						ignoreCase: ignoreCase)].
+	(type = 'all' or: [type = 'pool'])
+		ifTrue: 
+			[results addAll: (self
+						searchPoolsWith: text
+						condition: condition
+						ignoreCase: ignoreCase)].
 	^results asArray!
 
 search: aCollection for: aString with: aSymbol condition: anotherSymbol type: anotherString ignoreCase: aBoolean
@@ -895,6 +901,24 @@ search: aCollection for: aString with: aSymbol condition: anotherSymbol type: an
 				at: 'type' put: anotherString;
 				at: 'text' put: (element perform: aSymbol);
 				at: 'iconName' put: element websideIconName;
+				yourself]!
+
+searchPoolsWith: aString condition: anotherSymbol ignoreCase: aBoolean
+	| target |
+	target := aBoolean ifTrue: [aString asLowercase] ifFalse: [aString].
+	^Smalltalk associations select: 
+			[:a |
+			| candidate |
+			(a value isKindOf: PoolDictionary) and: 
+					[candidate := a key.
+					aBoolean ifTrue: [candidate := candidate asLowercase].
+					candidate perform: anotherSymbol with: target]]
+		thenCollect: 
+			[:a |
+			self newJsonObject
+				at: 'type' put: 'pool';
+				at: 'text' put: a key;
+				at: 'iconName' put: a value websideIconName;
 				yourself]!
 
 selectors
@@ -1136,6 +1160,7 @@ resumeEvaluation!evaluation endpoints!public! !
 saveImage!general endpoints!public! !
 search!code endpoints!public! !
 search:for:with:condition:type:ignoreCase:!private! !
+searchPoolsWith:condition:ignoreCase:!private! !
 selectors!code endpoints!public! !
 sendersOf:!private! !
 server:!accessing!public! !
