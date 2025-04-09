@@ -1,7 +1,7 @@
 ﻿"Filed out from Dolphin Smalltalk"!
 
 WebsideResource subclass: #WebsideWorkspace
-	instanceVariableNames: 'contents bindings'
+	instanceVariableNames: 'contents bindings name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -14,13 +14,7 @@ WebsideWorkspace comment: ''!
 
 !WebsideWorkspace methodsFor!
 
-asWebsideJson
-	| json |
-	json := super asWebsideJson.
-	json
-		at: 'id' put: id asString;
-		at: 'source' put: contents.
-	^json!
+asWebsideJson	| json |	json := super asWebsideJson.	json		at: 'id' put: id asString;        at: 'name' put: (name ifNil: ['Unnamed']);		at: 'source' put: contents.	^json!
 
 bindings
 	^bindings!
@@ -35,6 +29,10 @@ declareVariable: aString	bindings at: aString reduced put: nil!
 
 initialize	super initialize.	bindings := Dictionary new!
 
+name	^name!
+
+name: aString	name := aString!
+
 receiver	^nil! !
 
 !WebsideWorkspace categoriesForMethods!
@@ -44,6 +42,8 @@ contents!public! !
 contents:!public! !
 declareVariable:!public! !
 initialize!public! !
+name!public! !
+name:!public! !
 receiver!public! !
 !
 

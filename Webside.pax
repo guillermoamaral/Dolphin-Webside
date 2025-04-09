@@ -315,7 +315,7 @@ TestCase subclass: #URLTest
 	classInstanceVariableNames: ''!
 
 WebsideResource subclass: #WebsideWorkspace
-	instanceVariableNames: 'contents bindings'
+	instanceVariableNames: 'contents bindings name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!

@@ -315,7 +315,7 @@ TestCase subclass: #URLTest
 	classInstanceVariableNames: ''!
 
 WebsideResource subclass: #WebsideWorkspace
-	instanceVariableNames: 'contents bindings'
+	instanceVariableNames: 'contents bindings name'
 	classVariableNames: ''
 	poolDictionaries: ''
 	classInstanceVariableNames: ''!
@@ -3603,10 +3603,12 @@ unpinObject
 	^nil!
 
 updateWorkspace
-	| workspace source |
+	| workspace name source |
 	workspace := self workspaces at: self requestedId ifAbsent: [^self notFound].
-	source := self bodyAt: 'source' ifAbsent: ''.
-	workspace contents: source.
+	name := self bodyAt: 'name' ifAbsent: [].
+	name ifNotNil: [workspace contents: name].
+	source := self bodyAt: 'source' ifAbsent: [].
+	source ifNotNil: [workspace contents: source].
 	^workspace asWebsideJson!
 
 urlAt: aString
@@ -5401,13 +5403,7 @@ WebsideWorkspace comment: ''!
 
 !WebsideWorkspace methodsFor!
 
-asWebsideJson
-	| json |
-	json := super asWebsideJson.
-	json
-		at: 'id' put: id asString;
-		at: 'source' put: contents.
-	^json!
+asWebsideJson	| json |	json := super asWebsideJson.	json		at: 'id' put: id asString;        at: 'name' put: (name ifNil: ['Unnamed']);		at: 'source' put: contents.	^json!
 
 bindings
 	^bindings!
@@ -5422,6 +5418,10 @@ declareVariable: aString	bindings at: aString reduced put: nil!
 
 initialize	super initialize.	bindings := Dictionary new!
 
+name	^name!
+
+name: aString	name := aString!
+
 receiver	^nil! !
 
 !WebsideWorkspace categoriesForMethods!
@@ -5431,6 +5431,8 @@ contents!public! !
 contents:!public! !
 declareVariable:!public! !
 initialize!public! !
+name!public! !
+name:!public! !
 receiver!public! !
 !
 

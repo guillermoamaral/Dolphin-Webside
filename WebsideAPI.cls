@@ -1010,10 +1010,12 @@ unpinObject
 	^nil!
 
 updateWorkspace
-	| workspace source |
+	| workspace name source |
 	workspace := self workspaces at: self requestedId ifAbsent: [^self notFound].
-	source := self bodyAt: 'source' ifAbsent: ''.
-	workspace contents: source.
+	name := self bodyAt: 'name' ifAbsent: [].
+	name ifNotNil: [workspace contents: name].
+	source := self bodyAt: 'source' ifAbsent: [].
+	source ifNotNil: [workspace contents: source].
 	^workspace asWebsideJson!
 
 urlAt: aString
