@@ -3216,8 +3216,8 @@ packageClasses
 	tree = 'true'
 		ifTrue: [^(self classTreeFromClasses: defined) , (self classTreeFromClasses: extensions)].
 	names := self queryAt: 'names'.
-	names = 'true' ifTrue: [^(defined , extensions collect: #name) asArray sort].
-	^(defined , extensions) asArray collect: #asWebsideJson!
+	names = 'true' ifTrue: [^(defined , extensions collect: [:c | c name]) asArray sort].
+	^(defined , extensions) asArray collect: [:c | c asWebsideJson]!
 
 packageMethods
 	| package |
